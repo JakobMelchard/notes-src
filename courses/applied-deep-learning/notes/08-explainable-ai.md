@@ -215,3 +215,88 @@ Saliency: 1 backward pass; a first-order local sensitivity, no completeness. IG:
 - Geirhos et al., "Shortcut Learning in Deep Neural Networks", Nature MI 2020 (Clever Hans).
 - Arrieta et al., "Explainable Artificial Intelligence (XAI): concepts, taxonomies, opportunities and challenges", Information Fusion 2020 [S76], and Molnar, *Interpretable Machine Learning* [S76] -- **Lecture 10's references 2 and 1**, and the source of its taxonomy and of the interpretability-vs-explainability distinction it opens with.
 - **Lecture 10** [S4], *Explainable AI*, is the lecture this note covers: why trust a model, the black-box problem, interpretability vs explainability, goals of XAI, explainability vs accuracy, taxonomy, saliency maps, LIME, RISE, XAI in reinforcement learning, quantized bottleneck insertions, understanding GANs (GAN dissection), SHAP. It moved from lecture 12 to lecture 10 between the 2024 and 2025 editions [S6].
+
+## Cards
+
+```card id=adl-08-saliency
+What does vanilla saliency return for a linear model $f = w^\top x$, and why is that a problem?
+---
+$|w_i|$ regardless of $x$: it explains the model, not the instance.
+The instance contribution is $w_i x_i$ (gradient $\times$ input).
+```
+
+```card id=adl-08-ig
+Write integrated gradients and its completeness property.
+---
+$\mathrm{IG}_i = (x_i - x_i')\int_0^1 \partial_i f(x' + \alpha(x - x'))\,d\alpha$.
+$\sum_i \mathrm{IG}_i = f(x) - f(x')$.
+```
+
+```card id=adl-08-ig-compute
+Compute IG for $f(x) = 2x$, $x = 3$, with baseline $x' = 0$ and with $x' = 1$.
+---
+$x' = 0$: $\mathrm{IG} = 6$. $x' = 1$: $\mathrm{IG} = 4$.
+IG explains the difference to the baseline, not $f(x)$ itself.
+```
+
+```card id=adl-08-ig-baseline
+Why does IG with a black baseline attribute nothing to a dark shape on black background?
+---
+$x_i - x_i' = 0$ at those pixels.
+Use a blurred, noise or mean-image baseline, or average several.
+```
+
+```card id=adl-08-gradcam
+How are Grad-CAM channel weights computed, and which layer is used?
+---
+$\alpha_k^c$ = global-average-pooled gradient of $y^c$ w.r.t. $A^k$; map $\mathrm{ReLU}(\sum_k \alpha_k^c A^k)$, upsampled.
+Usually the last conv layer: semantic but low resolution.
+```
+
+```card id=adl-08-cam
+When does Grad-CAM reduce to CAM?
+---
+When the network ends in global average pooling plus a linear layer: $\alpha_k^c = W_{ck}/(HW)$.
+For `ShapeCNN`, $W_{ck}/256$.
+```
+
+```card id=adl-08-shapley
+State the Shapley value and its cost.
+---
+$\phi_i = \sum_{S \subseteq F\setminus\{i\}} \frac{|S|!(|F|-|S|-1)!}{|F|!}[f(S\cup\{i\}) - f(S)]$.
+$2^{|F|}$ evaluations, infeasible beyond about 20 features.
+```
+
+```card id=adl-08-shap-axioms
+Which axioms uniquely determine Shapley values?
+---
+Efficiency ($\sum\phi_i = f(F) - f(\emptyset)$), symmetry, dummy, linearity.
+```
+
+```card id=adl-08-ig-shap
+How are IG and Shapley values related?
+---
+IG is exactly the Aumann-Shapley value with baseline $x'$.
+Difference: SHAP marginalises over a background; IG interpolates between two points.
+```
+
+```card id=adl-08-attention
+Why is attention not an explanation (Jain and Wallace 2019)?
+---
+Weights correlate weakly with gradient and leave-one-out importance; alternative attentions give the same prediction.
+Weights are over contextualised hidden states, not inputs.
+```
+
+```card id=adl-08-sanity
+What do the Adebayo sanity checks do, and which methods fail?
+---
+Randomise model weights (or train on permuted labels); a faithful map must change.
+Guided backprop and guided Grad-CAM fail (edge detectors); gradient, IG, Grad-CAM pass.
+```
+
+```card id=adl-08-faithful
+Faithful vs plausible: give a metric for each.
+---
+Faithful: deletion/insertion curves or model randomisation.
+Plausible: mass inside a ground-truth mask, pointing game.
+```

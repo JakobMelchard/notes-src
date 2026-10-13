@@ -196,3 +196,82 @@ Registered in [`../refs/SOURCES.md`](../refs/SOURCES.md) as S9–S12 and S29–S
 - Cybenko (1989) "Approximation by superpositions of a sigmoidal function"; Hornik (1991); Leshno, Lin, Pinkus & Schocken (1993); Barron (1993) "Universal approximation bounds for superpositions of a sigmoidal function"; Telgarsky (2016) "Benefits of depth in neural networks"; Montúfar, Pascanu, Cho & Bengio (2014); Bartlett, Harvey, Liaw & Mehrabian (2019) "Nearly-tight VC-dimension and pseudodimension bounds for piecewise linear neural networks".
 - Blum & Rivest (1992); Kawaguchi (2016) "Deep learning without poor local minima"; Du, Zhai, Poczos & Singh (2019) "Gradient descent provably optimizes over-parameterized neural networks"; Jacot, Gabriel & Hongler (2018) "Neural tangent kernel"; Chizat, Oyallon & Bach (2019) "On lazy training"; Arora et al. (2019) "Fine-grained analysis of optimization and generalization for overparameterized two-layer neural networks".
 - Zhang, Bengio, Hardt, Recht & Vinyals (2017) "Understanding deep learning requires rethinking generalization"; Soudry et al. (2018) "The implicit bias of gradient descent on separable data"; Bartlett, Foster & Telgarsky (2017) "Spectrally-normalized margin bounds"; Dziugaite & Roy (2017) "Computing nonvacuous generalization bounds"; Nagarajan & Kolter (2019) "Uniform convergence may be unable to explain generalization in deep learning"; Belkin, Hsu, Ma & Mandal (2019) "Reconciling modern machine-learning practice and the classical bias–variance trade-off"; Hastie, Montanari, Rosset & Tibshirani (2022) "Surprises in high-dimensional ridgeless least squares interpolation"; Bartlett, Long, Lugosi & Tsigler (2020) "Benign overfitting in linear regression"; Nakkiran et al. (2020) "Deep double descent".
+
+## Cards
+
+```card id=tfml-10-universal-approximation
+State the universal approximation theorem (Leshno et al.) with its exact condition.
+---
+$K$ compact: one-hidden-layer nets are dense in $C(K)$ (sup norm) iff $\sigma$ is not a polynomial.
+Leshno et al. need only locally bounded, piecewise continuous $\sigma$ (null discontinuity set). Biases are essential.
+```
+
+```card id=tfml-10-cybenko-proof
+Proof idea of Cybenko's universal approximation argument?
+---
+If the span is not dense, Hahn–Banach plus Riesz give a nonzero signed measure $\mu$ annihilating all $\sigma(\langle w,x\rangle+b)$. Scaled sigmoids tend to halfspace indicators, so $\mu$ vanishes on halfspaces; Fourier argument gives $\mu=0$.
+```
+
+```card id=tfml-10-telgarsky
+Give Telgarsky's actual depth separation numbers (Thm 1.1).
+---
+A ReLU net with $2k^3+8$ layers, $3k^3+12$ nodes computes $f$ such that every net with $\le k$ layers and $\le2^k$ nodes has $\int_{[0,1]^d}|f-g|\ge\tfrac1{64}$.
+Folklore sawtooth version is true but not his theorem.
+```
+
+```card id=tfml-10-vc-relu
+VC dimension of ReLU networks ($W$ params, $L$ layers), and its condition?
+---
+$O(WL\log W)$ and $\Omega(WL\log(W/L))$, so $\Theta(WL\log W)$ provided $L\ll W^{0.99}$.
+With $W\gg n$ the VC bound exceeds 1: correct but vacuous.
+```
+
+```card id=tfml-10-ntk-dynamics
+What is the NTK and how do outputs evolve under gradient flow on squared loss?
+---
+$\Theta_\theta(x,x')=\langle\nabla_\theta f(x;\theta),\nabla_\theta f(x';\theta)\rangle$.
+$\dot u=-\Theta_t(u-y)$. Infinite width: $u(t)-y=e^{-\Theta_\infty t}(u(0)-y)$, kernel ridgeless regression with $\Theta_\infty$.
+```
+
+```card id=tfml-10-jacot-conditions
+Which hypotheses of Jacot et al. Theorem 2 must not be dropped?
+---
+Finite horizon $[0,T]$ (not all $t$), and $\sigma$ twice differentiable with bounded second derivative, which excludes ReLU. NTK parametrisation, widths $\to\infty$.
+```
+
+```card id=tfml-10-random-labels
+What does Zhang et al. (2017) random-label fitting show?
+---
+Standard nets reach zero training error on random labels with the same hyperparameters, so $\tau_{\mathcal H}(n)=2^n$ at practical $n$ and class-capacity bounds are vacuous. Explicit regularisers are not necessary. Explanation must involve algorithm and data.
+```
+
+```card id=tfml-10-implicit-ls
+GD on least squares from $w_0=0$, $p\ge n$, full row rank, $0<\eta<2/\|\Phi\|_2^2$: where does it converge and why?
+---
+To the min-norm interpolator $\Phi^+y$. Iterates stay in $\mathrm{row}(\Phi)$; unique interpolator there; any $\ker\Phi$ component only adds norm.
+```
+
+```card id=tfml-10-implicit-logistic
+State the Soudry et al. implicit bias result for separable data.
+---
+Smooth decreasing loss with exponential tail: $w_t=\hat w\log t+O(\log\log t)$, $\hat w$ the hard-margin SVM. Direction converges as $O(\log\log t/\log t)$; margin only as $O(1/\log t)$, extremely slow.
+```
+
+```card id=tfml-10-ridgeless-risk
+Ridgeless least squares, isotropic, $p/n\to\gamma$: limiting excess risk?
+---
+$\gamma<1$: $\sigma^2\gamma/(1-\gamma)$. $\gamma>1$: $r^2(1-1/\gamma)+\sigma^2/(\gamma-1)$. Both diverge at $\gamma=1$.
+```
+
+```card id=tfml-10-double-descent-trap
+True or false: in the well-specified isotropic model the second descent beats the underparameterised minimum.
+---
+False. Global minimum is in $\gamma<1$ (risk $\to0$ as $\gamma\to0$). SNR only shapes the right branch. Optimal ridge removes the peak and dominates at every $\gamma$.
+```
+
+```card id=tfml-10-pac-bayes
+State the PAC-Bayes kl bound and what Dziugaite–Roy did with it.
+---
+$\mathrm{kl}(\hat L_S(Q)\|L_{\mathcal D}(Q))\le\frac{\mathrm{KL}(Q\|P)+\log(2\sqrt n/\delta)}n$ (Maurer form), prior $P$ data-independent.
+Dziugaite–Roy: Gaussian $Q$ around trained weights, optimised variances; first non-vacuous bound. Certifies the stochastic net $Q$.
+```

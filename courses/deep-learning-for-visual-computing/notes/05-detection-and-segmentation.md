@@ -115,10 +115,10 @@ $4/28 = 0.143$, Dice $8/32 = 0.25 = 2(0.143)/1.143$.
 IoU 0, soft Dice loss 0.498. Dice sees the failure, CE and accuracy do not.
 
 **Transposed convolution by hand** [S8 format]. Input
-$\begin{psmallmatrix}1&2\\3&4\end{psmallmatrix}$, $3\times3$ kernel of ones,
+$\begin{pmatrix}1&2\\3&4\end{pmatrix}$, $3\times3$ kernel of ones,
 stride 2, padding 1. Each input stamps value $\times$ kernel onto a $5\times5$
 canvas at stride 2 (overlaps add); crop 1 on each side:
-$\begin{psmallmatrix}1&3&2\\4&10&6\\3&7&4\end{psmallmatrix}$, size
+$\begin{pmatrix}1&3&2\\4&10&6\\3&7&4\end{pmatrix}$, size
 $(2-1)2 - 2 + 3 = 3$.
 
 ## Design question: remove text and compression artifacts [S7]

@@ -73,3 +73,78 @@ Bernstein–Vazirani with $n=3$, $s=101$. After $H^{\otimes3}$ and the phase ora
 ## Code
 
 `src/py/quantum/deutsch_jozsa.py`: `deutsch(f)`, `deutsch_jozsa(f, n)`, `xor_oracle`, `phase_oracle`. `src/py/quantum/bernstein_vazirani.py`: `bernstein_vazirani(s)`. `src/py/quantum/teleport.py`: `teleport(state, rng)` (returns Bob's state and the classical bits), `superdense_encode(bits)`, `superdense_decode(register)`. Tests assert exact classification for all one-bit functions, random balanced/constant $f$ for $n=3,4$, random $s$ up to $n=6$, and teleportation fidelity 1 for random input states.
+
+## Cards
+
+```card id=qc-qu3-deutsch
+Deutsch's algorithm: circuit and what the measurement yields.
+---
+$|0\rangle|1\rangle$, $H\otimes H$, $U_f$, $H$ on qubit 0, measure.
+Outcome $f(0)\oplus f(1)$ with certainty, 1 query (classically 2).
+```
+
+```card id=qc-qu3-dj-amplitude
+Deutsch-Jozsa: amplitude of $|0^n\rangle$ and decision rule.
+---
+$a_0=\frac{1}{2^n}\sum_x(-1)^{f(x)}$: $\pm1$ if constant, $0$ if balanced.
+Output constant iff the outcome is $0^n$.
+```
+
+```card id=qc-qu3-dj-classical
+True or false: Deutsch-Jozsa shows an exponential speedup over randomised classical algorithms.
+---
+False. Deterministic needs $2^{n-1}+1$ queries, but randomised needs $O(\log1/\varepsilon)$.
+```
+
+```card id=qc-qu3-dj-promise
+What happens in Deutsch-Jozsa if $f$ is neither constant nor balanced?
+---
+$|a_0|^2\in(0,1)$; the answer is meaningless. The algorithm needs the promise.
+```
+
+```card id=qc-qu3-bv
+Bernstein-Vazirani: why does the circuit output $s$ exactly?
+---
+$a_y=\frac{1}{2^n}\sum_x(-1)^{(s\oplus y)\cdot x}=\delta_{y,s}$.
+1 query vs $n$ classically, even randomised.
+```
+
+```card id=qc-qu3-dj-compute
+Compute: Deutsch-Jozsa outcome for $n=2$, $f(x)=x_0$.
+---
+Outcome $10$ with certainty, so balanced. This is BV with $s=10$.
+```
+
+```card id=qc-qu3-teleport-steps
+Teleportation: Alice's operations and what she sends.
+---
+CNOT$_{0\to1}$, then $H_0$, measure $m_0m_1$ (each outcome $\frac14$).
+She sends 2 classical bits; Bob applies $Z^{m_0}X^{m_1}$.
+```
+
+```card id=qc-qu3-teleport-table
+Teleportation: Bob's state and correction for outcome $m_0m_1=11$.
+---
+Bob has $\alpha|1\rangle-\beta|0\rangle$; apply $X$ then $Z$ ($ZX$).
+```
+
+```card id=qc-qu3-no-signal
+Why does teleportation allow neither signalling nor cloning?
+---
+Before the bits arrive Bob's state is $I/2$.
+Alice's qubit ends in $|m_0\rangle$: the original is destroyed.
+```
+
+```card id=qc-qu3-superdense
+Superdense coding: encoding, decoding, resource statement.
+---
+Alice applies $I,X,Z,XZ$ to her half of $|\Phi^+\rangle$, giving the four Bell states; Bob applies CNOT then $H$ and measures.
+$1$ ebit $+$ $1$ qubit $\ge2$ cbits.
+```
+
+```card id=qc-qu3-resources
+Teleportation resource statement, and how many qubits Alice needs to send 4 bits by superdense coding?
+---
+$1$ ebit $+$ $2$ cbits $\ge1$ qubit.
+4 bits: two Bell pairs and two transmitted qubits.
+```

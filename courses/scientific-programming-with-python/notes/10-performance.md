@@ -77,3 +77,77 @@ rather than exam preparation.
 5. `@numba.njit` speeds up
    (a) any Python function, including ones using pandas and requests (b) numeric loops over numpy arrays and scalars, by compiling them with LLVM (c) BLAS matrix products (d) I/O
    **b.** Unsupported Python objects are a compile error in nopython mode; BLAS calls are already compiled.
+
+## Cards
+
+```card id=spp-10-order
+In what order should you attack a performance problem after profiling?
+---
+Algorithm and complexity, avoid work, vectorise, reduce memory traffic, compile the hot loop, parallelise. Re-run tests and benchmark after each change.
+```
+
+```card id=spp-10-perf-counter
+Which clock for manual timing, and why not `time.time()`?
+---
+`time.perf_counter()`, the high-resolution wall clock. `time.time()` has low resolution and jumps; `time.process_time()` counts CPU time.
+```
+
+```card id=spp-10-timeit-min
+Why report the minimum over `timeit` repeats rather than the mean?
+---
+System noise only ever adds time, so the minimum is closest to the intrinsic cost (the median is also fine).
+```
+
+```card id=spp-10-tottime
+In a cProfile table, what does small `tottime` with large `cumtime` mean?
+---
+The function spends its time in its callees: `tottime` excludes callees, `cumtime` includes them.
+```
+
+```card id=spp-10-sampling
+What are cProfile's limits, and what do sampling profilers like `py-spy` offer?
+---
+cProfile inflates tiny calls and cannot see inside C. Sampling profilers have negligible overhead, attach to running code and show native frames.
+```
+
+```card id=spp-10-ufunc-small
+For `n = 10`, is `np.sin(x)` faster than a Python loop with `math.sin`?
+---
+About the same or slower: a ufunc call has about 1 µs fixed overhead. Vectorisation pays off for large arrays.
+```
+
+```card id=spp-10-local-lookup
+Why bind `local_sqrt = math.sqrt` before a hot loop?
+---
+A global lookup is slower than a local, and an attribute lookup costs about 20 ns each time.
+```
+
+```card id=spp-10-getsizeof
+What does `sys.getsizeof` miss for a list of $10^3$ floats?
+---
+It counts only the list's 8 kB of pointers, not the $10^3 \times 24$ B float objects. The numpy array is 8 kB total.
+```
+
+```card id=spp-10-memory-bound
+Why are elementwise operations on large arrays memory-bound?
+---
+A core does about 10 GFLOP/s but memory delivers about 10-20 GB/s; arithmetic intensity is below 1 flop/byte, and every temporary costs a full write and read.
+```
+
+```card id=spp-10-out
+How do you compute `y = 2 * x + 1` in a time-step loop with no array allocations?
+---
+Preallocate `y`, then `np.multiply(x, 2, out=y); np.add(y, 1, out=y)`.
+```
+
+```card id=spp-10-elision
+What is numpy temporary elision?
+---
+In `2 * x + 1` numpy reuses the `2 * x` temporary for `+ 1` (above a few hundred kB), so one allocation instead of two. Since numpy 1.13.
+```
+
+```card id=spp-10-numba
+What does `@numba.njit` speed up, and what happens with unsupported code?
+---
+Numeric loops over numpy arrays and scalars, compiled with LLVM on first call per type signature. Unsupported code (pandas, arbitrary libraries) is a compile error, not a fallback.
+```

@@ -94,3 +94,76 @@ Why the peak width matters: the counting register must have $t\geq2n+1 = 11$ for
 ## Code
 
 `src/py/quantum/shor.py`: `shor(N, rng, max_trials)` (full algorithm with the classical checks, using `order_finding.order_finding` for the quantum step), `shor_classical_order(N, rng)` (same control flow with a classical order oracle, for larger $N$ demos), `factor_from_order(a, r, N)`. Tests: $15$ factored in $\geq80\%$ of 20 seeded runs; $21$ in the demo (`python src/py/quantum/shor.py`). `src/py/quantum/order_finding.py`: `order_finding`, `continued_fraction`, `convergents`, `order_classical`.
+
+## Cards
+
+```card id=qc-qu7-lemma1
+If $x^2\equiv1\pmod N$ and $x\not\equiv\pm1$, what follows?
+---
+$\gcd(x-1,N)$ and $\gcd(x+1,N)$ are nontrivial factors of $N$.
+```
+
+```card id=qc-qu7-lemma3
+For odd $N$ with $k\ge2$ distinct primes, probability that random $a$ is good?
+---
+$\Pr[r\text{ even and }a^{r/2}\not\equiv-1]\ge1-2^{-(k-1)}\ge\frac12$.
+```
+
+```card id=qc-qu7-steps
+Shor's algorithm: the classical steps around order finding.
+---
+Return 2 if $N$ even; return $p$ if $N=p^k$; pick $a$, return $\gcd(a,N)$ if $>1$.
+Find $r$; retry if $r$ odd or $a^{r/2}\equiv-1$; else output $\gcd(a^{r/2}\pm1,N)$.
+```
+
+```card id=qc-qu7-cost
+Gate count of Shor's algorithm and best classical comparison.
+---
+$O(n^3)$ (modular exponentiation dominates), $O(n^2\log n\log\log n)$ with fast multiplication.
+Number field sieve: $\exp(O(n^{1/3}\log^{2/3}n))$.
+```
+
+```card id=qc-qu7-15-a2
+Compute: Shor by hand for $N=15$, $a=2$.
+---
+$r=4$; $x=2^2=4$; $\gcd(3,15)=3$, $\gcd(5,15)=5$.
+```
+
+```card id=qc-qu7-15-a14
+Why does $a=14$ fail for $N=15$?
+---
+$14\equiv-1$, order 2, $a^{r/2}\equiv-1$: $\gcd(13,15)=1$, $\gcd(15,15)=15$. Pick a new $a$.
+```
+
+```card id=qc-qu7-21
+Compute: $N=21$, $a=2$. Order and factors?
+---
+$r=6$, $2^3=8\not\equiv-1$.
+$\gcd(7,21)=7$, $\gcd(9,21)=3$.
+```
+
+```card id=qc-qu7-exact-peaks
+When are the counting register outcomes exactly $s2^t/r$?
+---
+Only when $r\mid2^t$ (e.g. $N=15$). Otherwise the nearest integer w.p. $\ge4/\pi^2$.
+```
+
+```card id=qc-qu7-speedup
+True or false: Shor gives an exponential speedup over the best classical factoring algorithm.
+---
+False strictly: the classical best is subexponential ($L_N[1/3]$), so the speedup is superpolynomial.
+```
+
+```card id=qc-qu7-crypto
+Which cryptography does Shor break, and which survives?
+---
+Breaks RSA, Diffie-Hellman, ECC/ECDSA (abelian hidden subgroups).
+Symmetric and hash functions weakened only quadratically (Grover); lattice schemes unaffected.
+```
+
+```card id=qc-qu7-np
+Is FACTORING NP-complete? What would that imply?
+---
+Not known and believed not; it is in NP $\cap$ coNP.
+NP-completeness would imply NP = coNP and collapse PH.
+```

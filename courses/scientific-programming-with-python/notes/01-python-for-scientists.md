@@ -112,3 +112,83 @@ style the 2024W-onwards examination modalities imply [S3].
 5. Which is true of `@dataclass(frozen=True)`?
    (a) Instances are hashable and attribute assignment raises. (b) Fields cannot have defaults. (c) `__eq__` is not generated. (d) Only `__init__` is generated.
    **a.** frozen forbids assignment (FrozenInstanceError) and, together with the generated `__eq__`, makes instances hashable.
+
+## Cards
+
+```card id=spp-01-assign
+After `a = [1, 2, 3]; b = a; b.append(4)`, what is `a`?
+---
+`[1, 2, 3, 4]`. Assignment never copies; it binds a second name to the same object.
+```
+
+```card id=spp-01-iadd
+For a list `x` with an alias, how do `x = x + [4]` and `x += [4]` differ?
+---
+`x = x + [4]` rebinds `x` to a new list; the alias keeps the old one.
+`x += [4]` calls `list.__iadd__` and mutates in place, so every alias sees it.
+```
+
+```card id=spp-01-mutable-default
+Given `def f(x=[]): x.append(1); return len(x)`, what does the third call `f()` return?
+---
+`3`. Default arguments are evaluated once, at `def` time, so one list is shared.
+Idiom: `acc=None` and create the list inside.
+```
+
+```card id=spp-01-unboundlocal
+Why does `x += 1` inside a nested function raise `UnboundLocalError`?
+---
+Scoping (LEGB) is decided at compile time: any assignment to a name makes it local for the whole function.
+Fix: declare `nonlocal x` (or `global x`).
+```
+
+```card id=spp-01-late-binding
+What does `[f() for f in [lambda: i for i in range(3)]]` give, and how do you fix it?
+---
+`[2, 2, 2]`: closures look `i` up at call time, after the loop ended.
+Fix: freeze the value with `lambda i=i: i` or `functools.partial`.
+```
+
+```card id=spp-01-generator-call
+What happens when you call a generator function?
+---
+Nothing in the body runs; it returns a generator object.
+The body runs up to each `yield` only when `next` is called.
+```
+
+```card id=spp-01-generator-once
+True or false: calling `list(g)` twice on the same generator gives the same list both times.
+---
+False. A generator is single-pass; the second `list(g)` gives `[]`.
+```
+
+```card id=spp-01-wraps
+Why wrap a decorator's inner function with `functools.wraps(fn)`?
+---
+So `__name__`, `__doc__` and `__wrapped__` survive, which introspection, pytest and pickling rely on.
+```
+
+```card id=spp-01-frozen
+What does `@dataclass(frozen=True)` give you?
+---
+Attribute assignment raises (`FrozenInstanceError`), and with the generated `__eq__` the instances are hashable.
+```
+
+```card id=spp-01-floor-div
+What are `-7 // 2` and `round(2.5)` in Python?
+---
+`-4`: `//` floors towards $-\infty$.
+`2`: `round` uses banker's rounding.
+```
+
+```card id=spp-01-is
+When should you compare with `is` rather than `==`?
+---
+Only for `None` (and `True`/`False`). For numbers and strings identity is a CPython detail the language does not guarantee; 3.12 emits `SyntaxWarning` for `is` with an int literal.
+```
+
+```card id=spp-01-sort
+What do `sorted(xs)` and `xs.sort()` return?
+---
+`sorted()` returns a new list; `list.sort()` sorts in place and returns `None`.
+```

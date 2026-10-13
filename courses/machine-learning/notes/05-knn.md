@@ -84,3 +84,79 @@ Two classes in $\mathbb R^2$, query $x = (0, 0)$, training points and $L_2$ dist
 ## Code
 
 `src/py/knn.py`: `pairwise_distances(metric=euclidean|manhattan|chebyshev|minkowski|cosine|hamming)`, `mahalanobis`, `KNNClassifier(k, metric, weights)`, `KNNRegressor`, `choose_k_by_cv`. Test compares to `sklearn.neighbors` on the same data.
+
+## Cards
+
+```card id=ml-05-lazy
+Why is kNN called a lazy learner, and what are the costs?
+---
+No model is built at training time; the data is the model.
+Training $O(1)$, prediction $O(nd)$ per query, memory $O(nd)$.
+```
+
+```card id=ml-05-train-error
+True or false: the error of a 1-NN classifier on the training set is 0.
+---
+True. Each point is its own nearest neighbour.
+```
+
+```card id=ml-05-bigdata
+True or false: kNN (lazy learners) are recommended for large data sets.
+---
+False. Every prediction costs $O(nd)$ and the whole data set must stay in memory.
+```
+
+```card id=ml-05-regression-vote
+True or false: majority voting is not used when kNN predicts numeric values.
+---
+True. kNN regression averages the neighbours' values.
+```
+
+```card id=ml-05-train-time
+True or false: training time of kNN depends on the chosen distance metric.
+---
+False. There is no training; prediction time depends on it.
+```
+
+```card id=ml-05-categorical
+True or false: categorical features should be normalised before training a kNN.
+---
+False. They should be encoded; normalisation is for numeric features.
+```
+
+```card id=ml-05-cat-distance
+Which distance for kNN with categorical attributes, and which for mixed numeric and nominal?
+---
+Categorical: Hamming (0 if equal, 1 otherwise, summed), since nominal values have no order or spacing.
+Mixed: Gower, range-normalise numeric columns to $[0,1]$ and average per-feature dissimilarities.
+```
+
+```card id=ml-05-mahalanobis
+Give the Mahalanobis distance and when it is preferable to Euclidean.
+---
+$\sqrt{(a-b)^\top \Sigma^{-1}(a-b)}$. When features have different variances and are correlated: it whitens the data and removes double counting of correlated features.
+```
+
+```card id=ml-05-k-biasvar
+How do bias and variance change with $k$ in kNN?
+---
+Small $k$: low bias, high variance. Large $k$: high bias, low variance; $k = n$ predicts the majority class. Choose $k$ by CV.
+```
+
+```card id=ml-05-curse
+Compute the cube edge needed to capture 1 % of uniform data in $d = 10$. What does this show?
+---
+$0.01^{1/10} = 0.63$ of each edge. Neighbourhoods are no longer local: curse of dimensionality.
+```
+
+```card id=ml-05-loocv
+In LOOCV with 1-NN, why is the error not 0?
+---
+Each held-out point's neighbours are searched among the other points only, so its own label is excluded.
+```
+
+```card id=ml-05-cover-hart
+State the Cover and Hart (1967) result for 1-NN.
+---
+As $n \to \infty$ the 1-NN error is at most twice the Bayes error.
+```

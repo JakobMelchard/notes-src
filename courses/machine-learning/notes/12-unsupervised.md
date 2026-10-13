@@ -76,3 +76,82 @@ PCA on iris (4 features): eigenvalues $4.23, 0.24, 0.08, 0.02$; the first compon
 ## Code
 
 `src/py/clustering.py`: `KMeans(init="k-means++", n_init)`, `elbow`, `Agglomerative(linkage=single|complete|average|ward)` (Lance–Williams), `DBSCAN`, `silhouette_score`, `davies_bouldin`, `adjusted_rand_index`, `normalized_mutual_info`, `purity`. `src/py/pca.py`: `PCA(n_components=int|fraction, whiten)` via SVD with `explained_variance_ratio_`, `inverse_transform`, `reconstruction_error`; `pca_eig` via the covariance eigenproblem. Tests match sklearn (DBSCAN labels exactly; PCA up to sign).
+
+## Cards
+
+```card id=ml-12-kmeans-obj
+What quantity does k-means minimise?
+---
+Within-cluster sum of squares $J = \sum_j \sum_{x_i \in C_j}\|x_i - \mu_j\|^2$, the squared distance of each point to its assigned centroid.
+```
+
+```card id=ml-12-lloyd
+Why does Lloyd's algorithm converge, and to what?
+---
+Assignment and update steps each do not increase $J$, and there are finitely many partitions.
+It converges to a local minimum, not necessarily global.
+```
+
+```card id=ml-12-kmeanspp
+How does k-means++ pick seeds?
+---
+Next seed chosen with probability proportional to $D(x)^2$, the squared distance to the nearest chosen seed.
+```
+
+```card id=ml-12-kmeans-fail
+When does k-means fail?
+---
+Non-convex, elongated, nested or unequal-size/density clusters; it is also sensitive to outliers.
+```
+
+```card id=ml-12-linkage
+Single vs complete linkage: definition and behaviour?
+---
+Single: $\min d(a,b)$, chains through bridges, finds elongated clusters.
+Complete: $\max d(a,b)$, compact similar-diameter clusters, sensitive to outliers.
+```
+
+```card id=ml-12-dbscan
+Define core, border and noise points in DBSCAN.
+---
+Core: at least min_samples points within $\varepsilon$ (itself included). Border: within $\varepsilon$ of a core point but not core. Noise: the rest.
+```
+
+```card id=ml-12-dbscan-weak
+What are DBSCAN's strengths and weaknesses?
+---
+Strengths: arbitrary shapes, explicit noise, no $k$.
+Weaknesses: varying densities (single $\varepsilon$), high dimensions.
+```
+
+```card id=ml-12-silhouette
+Define the silhouette coefficient; what does a negative value mean?
+---
+$s_i = \frac{b_i - a_i}{\max(a_i, b_i)} \in [-1, 1]$, $a_i$ mean intra-cluster distance, $b_i$ mean distance to nearest other cluster.
+Negative: the point is closer to another cluster than its own.
+```
+
+```card id=ml-12-ari
+Why is ARI preferred over the Rand index and over purity?
+---
+Random partitions already get a high Rand index; ARI subtracts the chance expectation (0 = chance).
+Purity reaches 1 with $n$ singleton clusters.
+```
+
+```card id=ml-12-pca-eig
+Why is the first principal component the top eigenvector of the covariance matrix?
+---
+Maximise $v^\top S v$ s.t. $v^\top v = 1$: Lagrangian gives $Sv = \lambda v$ and the objective equals $\lambda$, so the largest eigenvalue wins.
+```
+
+```card id=ml-12-pca-scale
+Why standardise before PCA?
+---
+Otherwise PCA finds the largest-unit (largest-variance) feature, unless features share units.
+```
+
+```card id=ml-12-pca-tf
+True or false: PCA is a supervised feature-selection method.
+---
+False twice: PCA is unsupervised and extracts new combined features rather than selecting a subset.
+```

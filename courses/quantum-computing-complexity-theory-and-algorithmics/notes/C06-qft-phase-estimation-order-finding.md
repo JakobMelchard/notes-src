@@ -81,3 +81,81 @@ QFT on 3 qubits applied to $|j\rangle = |5\rangle = |101\rangle$: product form g
 ## Code
 
 `src/py/quantum/qft.py`: `qft(reg, qubits)`, `inverse_qft(reg, qubits)` as $H$ + controlled-phase + swap circuits, `qft_matrix(n)` for cross-checks. `src/py/quantum/phase_estimation.py`: `phase_estimation(U, eigenstate, t, rng)` returning the measured $m$ and $m/2^t$. `src/py/quantum/order_finding.py`: `order_finding(a, N, rng)` (permutation-based controlled $U_a^{2^j}$, inverse QFT, continued fractions), `continued_fraction`, `convergents`, `order_classical`. Tests: QFT vs DFT matrix for $n\leq5$; exact recovery of dyadic phases; $\geq40\%$ success on non-dyadic phases; orders of $7, 2, 11$ mod 15.
+
+## Cards
+
+```card id=qc-qu6-qft-def
+Define the QFT $F_N$.
+---
+$F_N|j\rangle=\frac{1}{\sqrt N}\sum_{k=0}^{N-1}e^{2\pi ijk/N}|k\rangle$, $N=2^n$.
+```
+
+```card id=qc-qu6-product
+True or false: the QFT of a basis state is entangled.
+---
+False. The product form gives $\frac{1}{\sqrt{2^n}}\bigotimes_l(|0\rangle+e^{2\pi i0.j_{n-l+1}\dots j_n}|1\rangle)$, a product state.
+```
+
+```card id=qc-qu6-gates
+Gate count of the exact QFT on $n$ qubits, and why is that not an exponential speedup over the FFT?
+---
+$n(n+1)/2$ $H$ and controlled-$R_k$ gates plus $\lfloor n/2\rfloor$ SWAPs: $\Theta(n^2)$.
+The QFT produces a state; measuring reveals only one sample.
+```
+
+```card id=qc-qu6-bit-reverse
+What does the QFT circuit compute without the final SWAPs?
+---
+$F_N$ followed by bit reversal. Fix with $\lfloor n/2\rfloor$ SWAPs or relabel qubits.
+```
+
+```card id=qc-qu6-approx-qft
+Approximate QFT: what is dropped and what is the cost?
+---
+Controlled-$R_k$ with $k>\log n+O(1)$. $O(n\log n)$ gates, error $O(n2^{-k})$; sufficient for Shor.
+```
+
+```card id=qc-qu6-pe-steps
+Phase estimation: the three steps.
+---
+$H^{\otimes t}$ on counting qubits; controlled-$U^{2^j}$ (phase kickback gives $e^{2\pi i\varphi k}|k\rangle$); inverse QFT, measure.
+```
+
+```card id=qc-qu6-pe-prob
+Phase estimation success probability for non-dyadic $\varphi$?
+---
+Nearest $t$-bit approximation w.p. $\ge4/\pi^2\approx0.405$; two nearest together $\ge8/\pi^2\approx0.81$.
+Exact only for dyadic $\varphi$.
+```
+
+```card id=qc-qu6-pe-compute
+Compute: phase estimation with $t=4$ on $\varphi=0.3$. Most likely outcome?
+---
+$2^4\cdot0.3=4.8$, so $m=5$ ($\approx0.3125$), probability $\ge0.405$ (actual $0.8756$).
+```
+
+```card id=qc-qu6-eigenstates
+Why can order finding start the work register in $|1\rangle$?
+---
+$|1\rangle=\frac{1}{\sqrt r}\sum_s|u_s\rangle$ with $U_a|u_s\rangle=e^{2\pi is/r}|u_s\rangle$.
+Phase estimation returns $s/r$ for random $s$; no eigenstate needed.
+```
+
+```card id=qc-qu6-t-size
+Why does order finding need $t\ge2n+1$ counting qubits?
+---
+Continued fractions need $|m/2^t-s/r|\le1/(2r^2)$; precision $2^{-t-1}\le1/(2N^2)$ requires $t\ge2n+1$.
+```
+
+```card id=qc-qu6-convergent
+Which convergent gives the candidate $r$, and what if $\gcd(s,r)>1$?
+---
+The convergent with denominator $\le N$ closest to $m/2^t$, not the last one.
+If $\gcd(s,r)>1$ it gives a divisor of $r$: verify $a^q\equiv1$, try multiples or lcm.
+```
+
+```card id=qc-qu6-cf-compute
+Compute: $m=427$, $t=9$, $N=21$. Candidate order?
+---
+$427/512=[0;1,5,42,2]$, convergents $0/1,1/1,5/6,\dots$; candidate $r=6$.
+```

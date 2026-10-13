@@ -109,3 +109,83 @@ in the venv against NumPy 2.5.3.
 5. Which is true of `np.linalg.eigh`?
    (a) Works for any square matrix and returns complex eigenvalues. (b) Assumes a symmetric/Hermitian input and returns real eigenvalues in ascending order. (c) Returns eigenvalues only. (d) Is slower than `eig` because it checks symmetry.
    **b.** It uses the lower (or upper) triangle without checking and calls the symmetric LAPACK routine, which is faster and more accurate.
+
+## Cards
+
+```card id=spp-02-strides
+What are the strides of `np.zeros((4, 6))`, and why?
+---
+`(48, 8)`. C order, float64: the last axis steps 8 bytes, the first steps $6 \times 8$.
+```
+
+```card id=spp-02-int-wrap
+What does `np.array([127], np.int8) + np.int8(1)` give?
+---
+`[-128]`: numpy integer arithmetic wraps, silently for arrays.
+Only the scalar-plus-scalar case also emits an overflow `RuntimeWarning`.
+```
+
+```card id=spp-02-nep50
+Under numpy 2 (NEP 50), what dtype results from a `float32` array plus a Python float?
+---
+`float32`. Python scalars are "weak" in type promotion; `float32 + float64` arrays still give `float64`.
+```
+
+```card id=spp-02-view-copy
+Which operations return views and which return copies?
+---
+Views: basic slicing, `reshape` when possible, `.T`, `view()`, `np.newaxis`.
+Copies: fancy indexing, boolean masks, `flatten()`, `astype`, most arithmetic. Check with `np.shares_memory`.
+```
+
+```card id=spp-02-broadcast-rule
+State the broadcasting rule.
+---
+Align shapes at the right, padding the shorter with leading 1s. Per axis, extents must be equal or one of them 1 (stretched with stride 0).
+Otherwise `ValueError`.
+```
+
+```card id=spp-02-broadcast-outer
+What shape do `(4, 1)` and `(4,)` broadcast to?
+---
+`(4, 4)`: an outer product, the classic surprise when elementwise was meant.
+```
+
+```card id=spp-02-add-at
+What is `b` after `b = np.zeros(3, int); b[[0, 0, 2]] += 1`?
+---
+`[1, 0, 1]`. Repeated fancy indices do not accumulate.
+`np.add.at(b, [0, 0, 2], 1)` would give `[2, 0, 1]`.
+```
+
+```card id=spp-02-vectorize
+True or false: `np.vectorize` vectorises a function.
+---
+False. It is a Python loop with broadcasting sugar; real vectorisation moves the loop into C.
+```
+
+```card id=spp-02-solve
+Why use `np.linalg.solve(A, b)` instead of `inv(A) @ b`?
+---
+`solve` uses LU with pivoting; `inv(A) @ b` is slower and less accurate.
+```
+
+```card id=spp-02-eigh
+How does `np.linalg.eigh` differ from `eig`?
+---
+`eigh` is for symmetric/Hermitian input: real eigenvalues sorted ascending, faster and stable.
+`eig` is general and returns complex values.
+```
+
+```card id=spp-02-rng
+Does the same seed to `np.random.default_rng` guarantee the same numbers across numpy releases?
+---
+No. NEP 19 refuses to guarantee a `Generator` stream across versions; only legacy `RandomState` is stream-compatible.
+Same seed, same calls, same numpy version gives identical numbers.
+```
+
+```card id=spp-02-append-loop
+What is the cost of growing an array with `np.append` in a loop, and the fix?
+---
+$O(n^2)$. Preallocate, or collect in a list and convert once.
+```

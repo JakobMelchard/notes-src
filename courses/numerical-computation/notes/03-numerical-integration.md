@@ -328,3 +328,87 @@ Fig. 2.2 weight table, the $O(N^{-1.1})$ vs $O(N^{-2})$ graded-mesh result of
 [S4 Ex. 2.12], the periodic integrands of [S4 Ex. 2.20], and the F1/S1a exam
 items above) and `test_quad2d.py` (tensor exactness, both triangle rules exact
 on $\mathcal P_1$, Duffy against an analytic integral).
+
+## Cards
+
+```card id=numc-03-nc-exactness
+What degree of exactness does an $n$-point-interval Newton–Cotes rule have, and why is Simpson exact on $\mathcal P_3$?
+---
+Degree $n$ by construction, $n+1$ when $n$ is even.
+For $f=(x-\frac12)^{n+1}$, odd about $\frac12$, both integral and rule vanish.
+```
+
+```card id=numc-03-nc-high
+True or false: Newton–Cotes converges as $n\to\infty$.
+---
+False. From $n=8$ weights change sign and $\sum|w_i|\to\infty$.
+Go composite or go Gauss.
+```
+
+```card id=numc-03-trap-bound
+State the course's composite trapezoidal error bound [S4 Thm 2.8(ii)].
+---
+$|\int_a^bf-T_h(f)|\le\frac18(b-a)h^2\|f''\|_{\infty,[a,b]}$.
+Classical sharp constant is $\frac1{12}$; use $\frac18$ in "choose $h$" questions.
+```
+
+```card id=numc-03-order
+True or false: the composite Simpson rule converges with order 3.
+---
+False, order 4 (degree of exactness 3). A rule exact on $\mathcal P_n$ gives composite order $n+1$.
+Composite trapezoidal: order 2.
+```
+
+```card id=numc-03-nonsmooth
+At what rate does the composite trapezoidal rule converge for $\int_0^1x^{0.1}dx$ on a uniform mesh, and what fixes it?
+---
+Only $O(h^{1.1})$, since $f'$ is not continuous at $0$.
+Graded mesh $x_i=(i/N)^2$ restores $O(N^{-2})$ [S4 Ex. 2.12].
+```
+
+```card id=numc-03-romberg
+Why does Romberg extrapolate in $h^2$, and what are the first two extrapolated columns?
+---
+Euler–Maclaurin: $T(h)=\int f+c_1h^2+c_2h^4+\cdots$, only even powers.
+Column 1 is composite Simpson, column 2 composite Milne [S4 Rem. 2.11].
+```
+
+```card id=numc-03-gauss-def
+How are the Gauss–Legendre nodes and weights for $n+1$ points defined, and what exactness do they give?
+---
+Nodes: zeros of $L_{n+1}$; weights $w_i=\int_{-1}^1\ell_i$.
+Exact on $\mathcal P_{2n+1}$; no $(n+1)$-point rule is exact on $\mathcal P_{2n+2}$.
+```
+
+```card id=numc-03-gauss-positive
+Why are all Gauss weights positive?
+---
+$\ell_i^2\in\mathcal P_{2n}$ is integrated exactly, so $w_i=Q(\ell_i^2)=\int\ell_i^2>0$.
+```
+
+```card id=numc-03-gauss-optimal
+Can any rule with $n+1$ nodes integrate $f=\prod_{i=0}^n(x-x_i)^2$ exactly?
+---
+No. Every node is a double root, so $Q(f)=0$, while $\int f>0$.
+```
+
+```card id=numc-03-gauss-conv
+State the Gauss convergence bound and its consequence.
+---
+$|\int_{-1}^1f-Q_n(f)|\le4\min_{v\in\mathcal P_{2n+1}}\|f-v\|_\infty$ (weights positive, sum 2).
+So Gauss converges for every $f\in C([-1,1])$, unlike Newton–Cotes.
+```
+
+```card id=numc-03-legendre-rec
+Give the three-term recurrence for Legendre polynomials.
+---
+$(n+1)L_{n+1}(x)=(2n+1)xL_n(x)-nL_{n-1}(x)$.
+Every orthogonal polynomial family has one.
+```
+
+```card id=numc-03-periodic
+Which rule should be used for a smooth periodic integrand over a full period, and which should not?
+---
+Composite trapezoidal: boundary terms cancel, exponential convergence.
+Do not use Simpson for periodic integrands.
+```

@@ -193,3 +193,83 @@ sample than the sheet states**, enumeration against the brute-force joint,
 d-separation on the six textbook cases, CPT recovery from samples, and hill
 climbing from the empty network landing within 1 % of the generating
 structure's score.
+
+## Cards
+
+```card id=ml-09-nb-rule
+State the naive Bayes assumption and decision rule.
+---
+Features conditionally independent given the class: $p(x \mid c) = \prod_j p(x_j \mid c)$.
+$\hat c = \operatorname{argmax}_c [\log p(c) + \sum_j \log p(x_j \mid c)]$.
+```
+
+```card id=ml-09-lazy
+True or false: naive Bayes is a lazy learner.
+---
+False. It is eager: it estimates the probability tables at training time.
+```
+
+```card id=ml-09-course-laplace
+How does the course's Laplace correction for a hand calculation work?
+---
+$P(F_j = v \mid C) = \frac{\#\{F_j = v, C\} + 1}{\#\{C\} + 1}$: add 1 to numerator and 1 to denominator.
+The class prior is not smoothed.
+```
+
+```card id=ml-09-laplace-must
+True or false: the Laplace corrector must be used when using naive Bayes.
+---
+False. It can be used and is needed when the zero-frequency problem arises.
+```
+
+```card id=ml-09-numeric
+True or false: if naive Bayes is applied to data that also contains numeric attributes, a probability density function must always be used.
+---
+True. Per-class mean and std, then the Gaussian density replaces the frequency. Using a density with only nominal attributes is false.
+```
+
+```card id=ml-09-missing
+How does naive Bayes handle missing values in training and at classification time?
+---
+Training: the row is left out of the count (or mean/std) for that attribute-class pair.
+Classification: the attribute is omitted from the product.
+```
+
+```card id=ml-09-bn-factor
+State the Bayesian network factorisation and count parameters for the alarm network vs the full joint.
+---
+$P(X_1, \dots, X_n) = \prod_i P(X_i \mid \text{Pa}(X_i))$.
+Alarm: $1+1+4+2+2 = 10$; full joint of five binary variables: $2^5 - 1 = 31$.
+```
+
+```card id=ml-09-collider
+When is a collider $X \to Z \leftarrow Y$ blocked, and what is explaining away?
+---
+Blocked iff neither $Z$ nor any descendant of $Z$ is observed.
+Observing it creates dependence: given the alarm, learning of an earthquake lowers the probability of burglary.
+```
+
+```card id=ml-09-local-search
+Describe local search for building a Bayesian network.
+---
+Maximise $\log P(D \mid M) - \alpha\,\#M$. Start from an initial network, score it, generate neighbours by adding, removing or reversing an arc, move to the best, repeat.
+Variants: hill climbing, simulated annealing, tabu search.
+```
+
+```card id=ml-09-dsep-search
+True or false: d-separation is used in neighbourhood search when building a Bayesian network.
+---
+False. Neighbourhood operators are add, remove and reverse an arc. Bayesian optimisation is also not used for building BNs.
+```
+
+```card id=ml-09-structure
+True or false: learning the structure of a BN is simpler than learning the probabilities.
+---
+False. Structure is a combinatorial search; probabilities are counting. Experts are better at structure, computers at probabilities.
+```
+
+```card id=ml-09-hmm
+Name the three HMM problems and their algorithms.
+---
+Evaluation $P(O \mid \lambda)$: forward algorithm. Decoding (most likely states): Viterbi. Learning $A, B, \pi$: Baum-Welch (EM).
+```

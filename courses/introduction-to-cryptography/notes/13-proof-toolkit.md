@@ -247,3 +247,66 @@ The attacks this note catalogues, one function each:
 `src/py/elgamal.py`: `hybrid_cca_attack`, `encrypt`;
 `src/py/signatures.py`: `textbook_forgery`, `schnorr_nonce_reuse_attack`;
 `src/py/dsa.py`: `nonce_reuse_attack`.
+
+## Cards
+
+```card id=crypto-13-six-steps
+Six steps of writing a reduction.
+---
+Name $\mathcal A$ (game, advantage $\varepsilon$); state the $\mathcal B$ you build against $P$; setup embedding the challenge; answer every query perfectly; extract and translate $\mathcal A$'s output; advantage arithmetic and conclusion.
+```
+
+```card id=crypto-13-litmus
+Two litmus questions for any reduction.
+---
+Is $\mathcal B$ PPT? Is $\mathcal A$'s simulated view perfect (identical to the real game in at least one of $\mathcal B$'s worlds)? If either fails, the proof is wrong.
+```
+
+```card id=crypto-13-wrong-direction
+A classmate proves $\Pi$ secure by building an adversary against $\Pi$ from one against $P$. What is wrong?
+---
+Direction inverted. Assume a $\Pi$-breaker and build a $P$-breaker; their construction shows nothing about $\Pi$.
+```
+
+```card id=crypto-13-hybrid-exp
+Hybrids $H_0,\dots,H_n$, each gap $\le\varepsilon$. When is $\Pi$ secure, and what if $n=2^\lambda$?
+---
+Secure when $n\varepsilon$ is negligible, i.e. $n$ polynomial. For exponential $n$ the bound fails even with negligible per-step $\varepsilon$.
+```
+
+```card id=crypto-13-equal-length
+Why must $|m_0|=|m_1|$ in the CPA game?
+---
+Ciphertexts generally leak length; unequal lengths make every scheme insecure by a trivial length check, so the definition would be unsatisfiable.
+```
+
+```card id=crypto-13-oracles
+Which oracles does each game give, and what is the trivial baseline?
+---
+EAV none; CPA encryption; CCA encryption and decryption (not on the challenge); MAC/signature a signing oracle.
+Baseline $\tfrac12$ for indistinguishability (report advantage), $\approx0$ for forgery and one-wayness.
+```
+
+```card id=crypto-13-attack-steps
+Four steps to show a scheme insecure.
+---
+Pick the claimed game; find exploitable structure (determinism, homomorphism, leaked bit, reused randomness); write the explicit adversary; compute a non-negligible advantage ($\approx\tfrac12$ indistinguishability, $\approx1$ forgery).
+```
+
+```card id=crypto-13-weaknesses
+Structural weakness exposed by ECB, textbook RSA, reused-nonce Schnorr.
+---
+ECB: determinism (repeat-block distinguisher). Textbook RSA: determinism plus multiplicative homomorphism. Reused-nonce Schnorr: two linear equations in $x$.
+```
+
+```card id=crypto-13-black-box
+Can a reduction case-split on what $\mathcal A$'s strategy is?
+---
+No. $\mathcal A$ is a black box; $\mathcal B$ only runs it and answers its queries as the real challenger would.
+```
+
+```card id=crypto-13-mistakes
+Common reduction mistakes besides wrong direction and imperfect simulation.
+---
+Negligible times super-polynomial; ignoring admissibility ($|m_0|=|m_1|$, no Dec on challenge, unqueried forgery); "no known attack" as proof; raw $\Pr[\text{win}]$ instead of advantage; reused keys or nonces.
+```

@@ -137,3 +137,88 @@ Frame count for "A pings B for the first time on an empty network": ARP request 
 ## Code
 
 `src/py/headers.py`: `build_ethernet/parse_ethernet` (VLAN tag skip), `build_arp/parse_arp`, `mac_to_bytes`. `src/py/pcap.py`: `synthetic_trace()` starts with the request/reply pair; `test_headers.py::test_ethernet_arp_roundtrip` checks the exact 42-byte wire image.
+
+## Cards
+
+```card id=net-02-min-frame
+Why does an Ethernet frame have a 64-byte minimum, and how is it enforced?
+---
+Collision detection on original 10 Mbit/s CSMA/CD needed a frame longer than 2x the propagation time.
+The payload is padded to 46 bytes. The 64 bytes include FCS but not the preamble.
+```
+
+```card id=net-02-ethertype-length
+How is the 2-byte EtherType/Length field interpreted?
+---
+Value at least 0x0600: EtherType (0x0800 IPv4, 0x0806 ARP, 0x86DD IPv6, 0x8100 VLAN).
+Below 0x0600: 802.3 length, LLC follows.
+```
+
+```card id=net-02-switch-learning
+What does a learning switch do with a frame arriving on port $p$ from source $S$ to destination $D$?
+---
+Learn or refresh $S \to p$. If $D$ is in the table, forward to that port only (filter if it is $p$).
+Otherwise flood to all ports except $p$. Broadcast and multicast are always flooded.
+```
+
+```card id=net-02-domains
+What ends a collision domain and what ends a broadcast domain?
+---
+A switch port ends a collision domain (a hub extends it).
+A router ends a broadcast domain (a switch extends it, a VLAN splits it).
+```
+
+```card id=net-02-stp
+Why do switched networks need the Spanning Tree Protocol?
+---
+Loops make flooded frames circulate forever (Ethernet has no TTL) and make MAC table entries flap.
+STP blocks redundant ports so the active topology is a tree rooted at the lowest bridge ID.
+```
+
+```card id=net-02-vlan-ports
+What is the difference between a VLAN access port and a trunk port?
+---
+Access: untagged, belongs to one VLAN.
+Trunk: frames carry the 4-byte 802.1Q tag with the 12-bit VLAN ID, so several VLANs share one link.
+```
+
+```card id=net-02-arp-request
+Which fields of an ARP request are filled in, and where is it sent?
+---
+All except THA (zeros); SHA/SPA are the requester's, TPA is the wanted IP.
+Sent to Ethernet broadcast with EtherType 0x0806; the reply is unicast.
+```
+
+```card id=net-02-arp-reception
+True or false: per RFC 826, only the target of an ARP request updates its cache.
+---
+False. Every receiver that already has an entry for the sender overwrites it, before the opcode is examined.
+Only the target adds a new entry. So: everybody updates, only the target adds.
+```
+
+```card id=net-02-arp-padding
+Compute: how large does a 28-byte ARP packet appear in a capture, and how much padding is that?
+---
+60 bytes (14 header + 28 ARP + 18 padding); the FCS is usually stripped by the NIC.
+18 bytes of padding.
+```
+
+```card id=net-02-arp-gateway
+A host 10.0.0.5/24 with gateway 10.0.0.1 sends to 10.0.0.77 and to 8.8.8.8. For which IP does it ARP in each case?
+---
+10.0.0.77 directly (same subnet), and 10.0.0.1 (gateway) for 8.8.8.8.
+It never ARPs for 8.8.8.8.
+```
+
+```card id=net-02-gratuitous
+What is gratuitous ARP and what is it used for?
+---
+A request/reply for one's own IP (SPA = TPA).
+Announces a new MAC (failover, VRRP) and detects duplicates (a reply means the address is in use).
+```
+
+```card id=net-02-csma-ca
+Why does Wi-Fi use CSMA/CA with ACKs instead of CSMA/CD?
+---
+Collisions cannot be detected while transmitting on the shared radio medium.
+```

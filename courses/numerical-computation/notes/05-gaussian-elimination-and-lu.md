@@ -94,8 +94,8 @@ Three facts, all examinable:
   possible test that a symmetric matrix is **not** positive definite.
 
 `chol` in MATLAB [S4 Rem. 4.17]. Example:
-$\begin{psmallmatrix}4&12&-16\\12&37&-43\\-16&-43&98\end{psmallmatrix}=CC^\top$
-with $C=\begin{psmallmatrix}2\\6&1\\-8&5&3\end{psmallmatrix}$.
+$\begin{pmatrix}4&12&-16\\12&37&-43\\-16&-43&98\end{pmatrix}=CC^\top$
+with $C=\begin{pmatrix}2\\6&1\\-8&5&3\end{pmatrix}$.
 
 Note the convention: [S4] writes $A=CC^\top$ with $C$ lower triangular. Many
 texts write $A=LL^\top$ or $A=R^\top R$; same object.
@@ -112,7 +112,7 @@ loss is **fill-in**.
 
 ## 3. Pivoting [S4 §4.4]
 
-$A=\begin{psmallmatrix}0&1\\3&2\end{psmallmatrix}$ is invertible but has **no**
+$A=\begin{pmatrix}0&1\\3&2\end{pmatrix}$ is invertible but has **no**
 LU factorisation with normalised $L$ [S4 Exercise 4.21]. Try it: $l_{11}u_{11}=0$
 forces $u_{11}=0$, and then column 1 cannot be reproduced. Swapping the rows
 fixes it.
@@ -125,10 +125,10 @@ least some pivoting [S4 Rem. 4.27]. Given $LU=PA$, solve $Ly=Pb$ then $Ux=y$
 [S4 Exercise 4.28].
 
 **Why the largest pivot** [S4 §4.4.3]. Take
-$A=\begin{psmallmatrix}\varepsilon&1\\1&1\end{psmallmatrix}$ with
+$A=\begin{pmatrix}\varepsilon&1\\1&1\end{pmatrix}$ with
 $\varepsilon=10^{-20}$. Exactly,
-$L=\begin{psmallmatrix}1&0\\\varepsilon^{-1}&1\end{psmallmatrix}$,
-$U=\begin{psmallmatrix}\varepsilon&1\\0&1-\varepsilon^{-1}\end{psmallmatrix}$;
+$L=\begin{pmatrix}1&0\\\varepsilon^{-1}&1\end{pmatrix}$,
+$U=\begin{pmatrix}\varepsilon&1\\0&1-\varepsilon^{-1}\end{pmatrix}$;
 in 16-digit arithmetic $1-10^{20}$ rounds to $-10^{20}$, and solving
 $LUx=(1,0)^\top$ returns $x=(0,1)$ instead of the correct $(-1,1)$: a completely
 wrong answer for a matrix with $\kappa\approx2.6$. The heuristic: a small pivot
@@ -236,28 +236,28 @@ $x_1=(-2+6)/4=1$. $\det A=-(4\cdot4\cdot1)=-16$ (one swap). Reproduced by
 Modelled on S2a 2.1–2.2, F2 2.1, F3 2.3a and the true/false blocks; see
 [00](00-exam-focus.md).
 
-1. *(S2a 2.1, 2024W)* $A=\begin{psmallmatrix}2&0&0\\4&3&0\\6&6&6\end{psmallmatrix}$.
+1. *(S2a 2.1, 2024W)* $A=\begin{pmatrix}2&0&0\\4&3&0\\6&6&6\end{pmatrix}$.
    (a) Compute the LU factorisation with normalised $L$. (b) For general
    $B\in\mathbb R^{n\times n}$, what does the LU factorisation cost, and what
    does back substitution on $Ux=b$ cost? (c) Given $B=LU$, how do you solve
    $Bx=b$ in $O(n^2)$?
    (a) $A$ is already lower triangular, so $U=\mathrm{diag}(2,3,6)$ and
-   $L=\begin{psmallmatrix}1&&\\2&1&\\3&2&1\end{psmallmatrix}$
+   $L=\begin{pmatrix}1&&\\2&1&\\3&2&1\end{pmatrix}$
    (check: $l_{21}u_{11}=2\cdot2=4$ ✓, $l_{31}u_{11}=6$ ✓,
    $l_{31}u_{12}+l_{32}u_{22}=0+2\cdot3=6$ ✓).
    (b) $O(n^3)$, precisely $\tfrac23n^3$; back substitution $O(n^2)$
    [S4 Rem. 4.11].
    (c) Forward-substitute $Ly=b$, back-substitute $Ux=y$: $O(n^2)+O(n^2)$.
-2. *(S2a 2.2, 2024W; F3 2.3a)* $A=\begin{psmallmatrix}0&2\\4&1\end{psmallmatrix}$.
+2. *(S2a 2.2, 2024W; F3 2.3a)* $A=\begin{pmatrix}0&2\\4&1\end{pmatrix}$.
    (a) Prove it has no LU factorisation. (b) Does it have a Cholesky
    factorisation? (c) Compute the Cholesky factorisation of
-   $B=\begin{psmallmatrix}4&2\\2&4\end{psmallmatrix}$.
+   $B=\begin{pmatrix}4&2\\2&4\end{pmatrix}$.
    (a) $A=LU$ with $L$ normalised means $a_{11}=1\cdot u_{11}=0$, so $u_{11}=0$;
    but then $a_{21}=l_{21}u_{11}=0\ne4$. Contradiction. Swapping rows gives
-   $\begin{psmallmatrix}4&1\\0&2\end{psmallmatrix}$, already triangular.
+   $\begin{pmatrix}4&1\\0&2\end{pmatrix}$, already triangular.
    (b) No: Cholesky needs SPD and $A$ is not even symmetric.
    (c) $c_{11}=\sqrt4=2$, $c_{21}=2/2=1$, $c_{22}=\sqrt{4-1}=\sqrt3$, so
-   $C=\begin{psmallmatrix}2&0\\1&\sqrt3\end{psmallmatrix}$ and $B=CC^\top$.
+   $C=\begin{pmatrix}2&0\\1&\sqrt3\end{pmatrix}$ and $B=CC^\top$.
 3. *(S2a 2.5: true or false / fill in)*
    (i) Cholesky costs twice as much as LU. **False**, about half
    [S4 Rem. 4.16].
@@ -312,3 +312,86 @@ against `scipy.sparse.csgraph.reverse_cuthill_mckee`).
 `src/cpp/lu.cpp`: packed LU with partial pivoting, solve, determinant; the
 $3\times3$ example above ($x=(1,1,2)$, $\det=-16$), a pivoting case, an $n=200$
 residual/error/growth-factor check, singular detection.
+
+## Cards
+
+```card id=numc-05-lu-cost
+What does LU factorisation cost, and what does solving with $M$ right-hand sides cost?
+---
+Factorisation $\frac23n^3+O(n^2)$; each substitution $O(n^2)$.
+$M$ right-hand sides: $\frac23n^3+2Mn^2$. Never form $A^{-1}$.
+```
+
+```card id=numc-05-no-lu
+Prove $A=\begin{pmatrix}0&2\\4&1\end{pmatrix}$ has no LU factorisation with normalised $L$.
+---
+$a_{11}=1\cdot u_{11}=0$ forces $u_{11}=0$, then $a_{21}=l_{21}u_{11}=0\ne4$.
+Swapping rows fixes it.
+```
+
+```card id=numc-05-pa-lu
+What does [S4 Thm 4.22] guarantee for invertible $A$, and how is $Ax=b$ then solved?
+---
+There is a permutation $P$ with $PA=LU$.
+Solve $Ly=Pb$, then $Ux=y$ (not $Ly=b$).
+```
+
+```card id=numc-05-pivot-bound
+What does partial (row) pivoting guarantee, and what does it not control?
+---
+It picks the largest $|a_{pk}|$, $p\ge k$, giving $|l_{ij}|\le1$ [S4 Thm 4.26].
+It does not bound $U$; full pivoting would, at $O(n^3)$ extra comparisons.
+```
+
+```card id=numc-05-small-pivot
+Why does $A=\begin{pmatrix}\varepsilon&1\\1&1\end{pmatrix}$, $\varepsilon=10^{-20}$, fail without pivoting?
+---
+$1-\varepsilon^{-1}$ rounds to $-10^{20}$; solving gives $x=(0,1)$ instead of $(-1,1)$.
+Small pivot means large $L$ entries and cancellation, though $\kappa\approx2.6$.
+```
+
+```card id=numc-05-cholesky
+Give the Cholesky formulas for SPD $A=CC^\top$.
+---
+$c_{jj}=\sqrt{a_{jj}-\sum_{k<j}c_{jk}^2}$, $c_{ij}=\frac1{c_{jj}}\big(a_{ij}-\sum_{k<j}c_{ik}c_{jk}\big)$, $i>j$.
+A non-positive radicand shows $A$ is not positive definite.
+```
+
+```card id=numc-05-chol-cost
+True or false: Cholesky costs twice as much as LU.
+---
+False. About half: $\frac13n^3$ against $\frac23n^3$ [S4 Rem. 4.16].
+```
+
+```card id=numc-05-chol-compute
+Compute the Cholesky factor of $B=\begin{pmatrix}4&2\\2&4\end{pmatrix}$.
+---
+$c_{11}=2$, $c_{21}=1$, $c_{22}=\sqrt3$: $C=\begin{pmatrix}2&0\\1&\sqrt3\end{pmatrix}$.
+```
+
+```card id=numc-05-banded
+State the banded LU cost theorem and its tridiagonal case.
+---
+$L$ keeps lower bandwidth $p$, $U$ upper bandwidth $q$; factor $O(npq)$, $Ly=b$ $O(np)$, $Ux=y$ $O(nq)$.
+Tridiagonal $p=q=1$: $O(n)$ (Thomas algorithm).
+```
+
+```card id=numc-05-crout
+True or false: Crout's algorithm computes an LU factorisation. How does it differ from Gaussian elimination?
+---
+True. It computes $L$ and $U$ entry by entry instead of sweeping the trailing submatrix.
+Same flops, different memory access pattern.
+```
+
+```card id=numc-05-ordering
+What do reverse Cuthill–McKee and minimum degree each optimise?
+---
+RCM: small bandwidth (envelope) as a proxy. Minimum degree: fill-in directly, greedily.
+2-D Poisson $900\times900$: 27 029 lexicographic, 19 315 RCM, 10 042 minimum degree nonzeros.
+```
+
+```card id=numc-05-determinant
+How is $\det A$ obtained from $PA=LU$?
+---
+$\det A=(-1)^{\#\mathrm{swaps}}\prod_k u_{kk}$.
+```

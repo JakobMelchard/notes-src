@@ -233,3 +233,84 @@ RSA-OAEP proof is the standard example of a loose one (note 10) [S40].
 distinguisher of this note), `stretch` (the hybrid argument), and
 `chacha20_encrypt`, the worked example's stream cipher as deployed (RFC 8439
 [S36], `test_prg.py::test_chacha20_cipher_rfc8439_2_4_2`).
+
+## Cards
+
+```card id=crypto-04-relaxations
+Which two relaxations of perfect secrecy define computational security?
+---
+Security only against PPT adversaries, and adversaries may succeed with negligible probability. Both are asymptotic in the security parameter $\lambda$, given as $1^\lambda$.
+```
+
+```card id=crypto-04-negligible
+Definition of a negligible function, with examples and a non-example.
+---
+$f$ is negligible if for every polynomial $p$ there is $N$ with $f(\lambda)<1/p(\lambda)$ for all $\lambda>N$.
+Negligible: $2^{-\lambda}$, $2^{-\sqrt\lambda}$, $\lambda^{-\log\lambda}$. Not: $1/\lambda^{100}$.
+```
+
+```card id=crypto-04-closure
+Closure properties of negligible functions, and why hybrids need them.
+---
+$f,g$ negligible, $p$ polynomial: $f+g$ and $p\cdot f$ are negligible. So a union bound over polynomially many negligible events stays negligible.
+```
+
+```card id=crypto-04-exponent-trap
+If $f(n)$ is negligible, is $n^{f(n)}$ negligible?
+---
+No. $n^{f(n)}=e^{f(n)\ln n}$ and $f(n)\ln n\to 0$, so it tends to 1. The polynomial sits in the exponent; the closure lemma does not apply.
+```
+
+```card id=crypto-04-eav
+EAV-security: the game and the condition.
+---
+$\mathcal A(1^\lambda)$ outputs $m_0,m_1$ with $|m_0|=|m_1|$; $b\gets\{0,1\}$, $c\gets\mathsf{Enc}_k(m_b)$; $\mathcal A$ outputs $b'$, wins iff $b'=b$.
+Secure if for every PPT $\mathcal A$: $\Pr[\text{win}]\le\tfrac12+\mathsf{negl}(\lambda)$.
+```
+
+```card id=crypto-04-comp-indist
+When are ensembles $X,Y$ computationally indistinguishable, and how does EAV-security relate?
+---
+For every PPT $D$: $|\Pr[D(X_\lambda)=1]-\Pr[D(Y_\lambda)=1]|\le\mathsf{negl}(\lambda)$.
+EAV-security is exactly $\mathsf{Enc}_k(m_0)\approx_c\mathsf{Enc}_k(m_1)$.
+```
+
+```card id=crypto-04-concrete
+Asymptotic vs concrete security, and what does a tight reduction buy?
+---
+Asymptotic: every PPT adversary has negligible advantage; says nothing at a fixed key size. Concrete: $(t,\varepsilon)$-secure, every time-$\le t$ adversary has advantage $\le\varepsilon$.
+Tight: $t'\approx t$, $\varepsilon'\approx\varepsilon$; a loose one forces larger parameters for $P$.
+```
+
+```card id=crypto-04-reduction
+Shape of a reduction proof "if $P$ secure then $\Pi$ secure", and the two questions to ask of it.
+---
+Contrapositive: from any efficient $\mathcal A$ breaking $\Pi$ build efficient $\mathcal B$ breaking $P$.
+Check: (a) is $\mathcal B$ PPT? (b) does $\mathcal B$ simulate $\mathcal A$'s world perfectly in both of its cases?
+```
+
+```card id=crypto-04-hybrid
+Hybrid argument: the bound, and its condition.
+---
+$H_0$ real, $H_q$ ideal, neighbours differ in one primitive use. Triangle inequality gives total advantage $\le q\cdot\varepsilon$.
+Negligible only if $q$ is polynomial; exponentially many hybrids prove nothing.
+```
+
+```card id=crypto-04-prg-otp
+Proof sketch: $G$ secure PRG $\Rightarrow$ $\mathsf{Enc}_k(m)=G(k)\oplus m$ is EAV-secure.
+---
+$\mathcal B(w)$ gets $(m_0,m_1)$ from $\mathcal A$, picks $b$, sends $w\oplus m_b$, outputs 1 iff $\mathcal A$ guesses $b$.
+$w=G(k)$: $\Pr=\tfrac12+\varepsilon$. $w$ uniform: one-time pad, $\Pr=\tfrac12$. So $\mathsf{Adv}^G_{\mathcal B}=\varepsilon$.
+```
+
+```card id=crypto-04-assumption
+Must every provably secure encryption scheme assume a hard computational problem?
+---
+No: the one-time pad is perfectly secret unconditionally. But a scheme with keys shorter than messages cannot be perfectly secret (Shannon), so its security must be computational; a PRG already implies $\mathrm P\ne\mathrm{NP}$.
+```
+
+```card id=crypto-04-ciphertext-length
+Message space $\{0,1\}^n$, ciphertext space $\{0,1\}^\ell$: why must $\ell\ge n$?
+---
+Correctness alone: for fixed $k$, $\mathsf{Dec}_k$ recovers $m$, so $\mathsf{Enc}_k$ is injective, requiring $2^\ell\ge 2^n$. CPA-security further forces strict expansion.
+```

@@ -80,3 +80,86 @@ $\Phi$ is false. The recursion visited 2 (for $x$) $\times$ 2 ($y$) $\times$ 2 (
 ## Code
 
 `src/py/complexity/reachability.py`: `savitch_reach(g, u, v, k, trace)` implements the REACH recursion on an explicit graph (the configuration graph of a machine would be generated on the fly); `test_savitch_recursion_depth_is_log` checks that a path of length 15 needs $k = 4$ levels and that $k = 3$ fails. The recursive TQBF evaluator is the same pattern as `decision_tree_depth` in `query_complexity.py` (B06): minimax over a tree, storing only the current path.
+
+## Cards
+
+```card id=qc-cx2-inclusions
+State the basic inclusion chain for constructible $f\ge\log n$.
+---
+$\mathrm{DTIME}(f)\subseteq\mathrm{SPACE}(f)\subseteq\mathrm{NSPACE}(f)\subseteq\mathrm{DTIME}(2^{O(f)})$.
+Last step: BFS on the $2^{O(f)}$-vertex configuration graph.
+```
+
+```card id=qc-cx2-savitch
+State Savitch's theorem and its proof idea.
+---
+$\mathrm{NSPACE}(s)\subseteq\mathrm{SPACE}(s^2)$ for $s\ge\log n$.
+REACH$(C,C',k)$ via a midpoint $C''$; depth $O(s)$, frames $O(s)$ bits.
+```
+
+```card id=qc-cx2-savitch-trap
+True or false: Savitch gives NL $\subseteq$ L.
+---
+False. It gives $\mathrm{NL}\subseteq\mathrm{SPACE}(\log^2 n)$. L vs NL is open.
+```
+
+```card id=qc-cx2-pspace-npspace
+Why is PSPACE = NPSPACE a theorem while P = NP is open?
+---
+Savitch: the square of a polynomial is a polynomial.
+Space can be reused by re-exploring; time cannot.
+```
+
+```card id=qc-cx2-tqbf-membership
+Why is TQBF in PSPACE?
+---
+Recursive evaluation tries $x_1=0$ then $1$, OR for $\exists$, AND for $\forall$, reusing space.
+$O(n+|\varphi|)$ space, $2^n$ time.
+```
+
+```card id=qc-cx2-tqbf-hardness
+TQBF hardness: why does the naive Savitch formula fail and what fixes it?
+---
+$\varphi_k$ with two copies of $\varphi_{k-1}$ doubles per level: exponential size.
+$\forall D_1\forall D_2$ lets one copy serve both pairs: size $O(p(n)^2)$.
+```
+
+```card id=qc-cx2-time-hierarchy
+State the time hierarchy theorem.
+---
+For time-constructible $f,g$ with $f(n)\log f(n)=o(g(n))$: $\mathrm{DTIME}(f)\subsetneq\mathrm{DTIME}(g)$.
+```
+
+```card id=qc-cx2-log-factor
+Where does the $\log f$ factor in the time hierarchy come from, and why does the space version lack it?
+---
+Universal simulation with a step counter costs $O(t\log t)$.
+Space simulation has only constant overhead.
+```
+
+```card id=qc-cx2-p-exptime
+Prove P $\ne$ EXPTIME.
+---
+$\mathrm P\subseteq\mathrm{DTIME}(2^n)$ and $n2^n=o(2^{n^2})$.
+So $\mathrm{DTIME}(2^n)\subsetneq\mathrm{DTIME}(2^{n^2})\subseteq\mathrm{EXPTIME}$.
+```
+
+```card id=qc-cx2-strict-chain
+Which inclusion of NL $\subseteq$ P $\subseteq$ NP $\subseteq$ PSPACE is known to be strict?
+---
+None individually. NL $\ne$ PSPACE (Savitch plus space hierarchy) shows at least one is strict.
+```
+
+```card id=qc-cx2-ph
+Define $\Sigma_k^p$ and state where PH sits.
+---
+$\{x:\exists y_1\forall y_2\cdots Q_ky_k\ V(x,y_1,\dots,y_k)=1\}$, polynomial lengths and $V$.
+$\Sigma_1^p=\mathrm{NP}$; $\mathrm{PH}\subseteq\mathrm{PSPACE}$.
+```
+
+```card id=qc-cx2-games
+Which games are PSPACE-complete and which EXPTIME-complete?
+---
+PSPACE: generalised Geography, Hex, Go with polynomial move bound, Reversi.
+EXPTIME: exponentially long plays, e.g. generalised chess, Go with ko.
+```

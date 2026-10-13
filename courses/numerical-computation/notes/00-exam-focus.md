@@ -158,9 +158,9 @@ beats direct evaluation of the Lagrange form (F1 5a).
 ### LU, Cholesky, linear systems
 
 - Compute the LU factorisation of a small matrix with normalised $L$ (S2a 2.1a
-  on a lower-triangular $3\times3$; F2 2.1 on $\begin{psmallmatrix}0&2&0\\3&4&1\\0&0&1\end{psmallmatrix}$).
+  on a lower-triangular $3\times3$; F2 2.1 on $\begin{pmatrix}0&2&0\\3&4&1\\0&0&1\end{pmatrix}$).
 - **Prove that a given matrix has no LU factorisation**, then permute and
-  factor it (S2a 2.2a on $\begin{psmallmatrix}0&2\\4&1\end{psmallmatrix}$; F2 2.1;
+  factor it (S2a 2.2a on $\begin{pmatrix}0&2\\4&1\end{pmatrix}$; F2 2.1;
   F3 2.3a "give an example where LU is impossible but possible with a pivot").
 - Cost: LU is $O(n^3)$ ($\tfrac23n^3$), back substitution $O(n^2)$; how to solve
   $Bx=b$ in $O(n^2)$ given $B=LU$ (S2a 2.1b/2.1c).

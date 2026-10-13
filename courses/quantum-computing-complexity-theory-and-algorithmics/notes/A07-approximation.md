@@ -111,3 +111,89 @@ Greedy in given order: loads after each job: (2,0,0), (2,3,0), (2,3,4), (8,3,4),
 ## Code
 
 `src/py/algorithmics/approx.py`: `vertex_cover_2approx(adj)` (maximal matching; tests compare to brute-force optimum on small graphs), `load_balancing_greedy(times, m, lpt=False)`, `set_cover_greedy(universe, sets, weights)`, `knapsack_fptas(weights, values, W, eps)` (checked against `dp.knapsack_01`). LP rounding for vertex cover is in `lp_ilp.py` (A08).
+
+## Cards
+
+```card id=qc-alg7-rho-approx
+Define a $\rho$-approximation for a minimisation problem.
+---
+A polynomial-time algorithm with $c(A(I))\le\rho\cdot\mathrm{OPT}(I)$ on every instance, $\rho\ge1$.
+A worst-case guarantee, not typical performance.
+```
+
+```card id=qc-alg7-ptas-fptas
+PTAS vs FPTAS: what is the difference? Is $n^{1/\epsilon}$ allowed?
+---
+Both give $(1+\epsilon)$-approximations. PTAS: polynomial in $n$ for fixed $\epsilon$ ($n^{1/\epsilon}$ allowed).
+FPTAS: polynomial in $n$ and $1/\epsilon$ (e.g. $n^3/\epsilon$).
+```
+
+```card id=qc-alg7-greedy-makespan
+Prove greedy list scheduling is a 2-approximation for makespan.
+---
+Lower bounds $T^*\ge\max t_j$ and $T^*\ge\frac1m\sum t_j$.
+Busiest machine $i$, last job $j$: $T_i-t_j\le$ average $\le T^*$, so $T_i\le2T^*$.
+```
+
+```card id=qc-alg7-lpt
+What ratio does LPT achieve for load balancing, and which extra lower bound does the proof use?
+---
+$3/2$. If $n>m$: $T^*\ge2t_{m+1}$ (some machine gets two of the $m+1$ largest jobs).
+Graham's tighter bound: $4/3-1/(3m)$.
+```
+
+```card id=qc-alg7-set-cover
+Greedy set cover: rule and guarantee. Can it be beaten substantially?
+---
+Pick the set minimising $w_i/|S_i\cap R|$; weight $\le H(d)\cdot\mathrm{OPT}$, $H(d)\approx\ln d$.
+No $(1-\epsilon)\ln n$ approximation unless P = NP.
+```
+
+```card id=qc-alg7-vc-matching
+Vertex cover 2-approximation via maximal matching: algorithm and ratio proof.
+---
+Output both endpoints of a maximal matching $M$: $|C|=2|M|$.
+Every cover contains a distinct endpoint of each matching edge, so $\mathrm{OPT}\ge|M|$.
+```
+
+```card id=qc-alg7-vc-lp-rounding
+Weighted vertex cover by LP rounding: rounding rule and why it is a 2-approximation.
+---
+$C=\{v:x^*_v\ge1/2\}$; covers since $x^*_u+x^*_v\ge1$.
+$w(C)\le\sum 2x^*_vw_v\le2\,\mathrm{LP}\le2\,\mathrm{OPT}$.
+```
+
+```card id=qc-alg7-knapsack-fptas
+Knapsack FPTAS: what is scaled, by which $b$, and what running time results?
+---
+Values, not weights: $b=\epsilon V/n$, $\hat v_i=\lceil v_i/b\rceil$, then the value-indexed DP.
+Time $O(n^3/\epsilon)$; value $\ge(1-\epsilon)\mathrm{OPT}$.
+```
+
+```card id=qc-alg7-strong-np-fptas
+True or false: a strongly NP-hard problem such as bin packing can have an FPTAS if P $\ne$ NP.
+---
+False. An FPTAS with $\epsilon<1/\mathrm{poly}$ would solve it exactly in polynomial time.
+Knapsack has one because it is only weakly NP-hard.
+```
+
+```card id=qc-alg7-tsp-inapprox
+Why has general TSP no $\rho$-approximation unless P = NP?
+---
+From Hamiltonian cycle: edges distance 1, non-edges $\rho n+1$.
+Yes-instances have $\mathrm{OPT}=n$, no-instances $\mathrm{OPT}>\rho n$; the approximation separates them.
+```
+
+```card id=qc-alg7-pcp
+State the PCP theorem and its consequence for MAX-3SAT.
+---
+$\mathrm{NP}=\mathrm{PCP}[O(\log n),O(1)]$.
+It is NP-hard to tell satisfiable 3-SAT from at most $(1-\epsilon)$-satisfiable, so MAX-3SAT has no PTAS.
+```
+
+```card id=qc-alg7-vc-hardness
+Vertex cover hardness: unconditional bound and the bound under UGC.
+---
+NP-hard within $\sqrt2-\epsilon$ (Khot-Minzer-Safra 2018; earlier 1.3606).
+Under the Unique Games Conjecture no $(2-\epsilon)$-approximation.
+```

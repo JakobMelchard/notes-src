@@ -170,7 +170,7 @@ pairs $\lambda,\bar\lambda$, two shifted steps with $\lambda$ and $\bar\lambda$
 can be combined into one step in real arithmetic (the *double-shift* strategy).
 
 Example (`qr_svd.qr_algorithm`, unshifted):
-$A=\begin{psmallmatrix}4&1&0\\1&3&1\\0&1&2\end{psmallmatrix}$ has
+$A=\begin{pmatrix}4&1&0\\1&3&1\\0&1&2\end{pmatrix}$ has
 $\lambda=3\pm\sqrt3,\ 3$; converges to $10^{-12}$.
 
 ## Pitfalls
@@ -267,5 +267,91 @@ iteration on a symmetric matrix and quadratic on a non-symmetric one**
 non-symmetric case where bound (ii) would fail; the failure of the power method
 when $|\lambda_1|=|\lambda_2|$ [S4 Rem. 7.2(3)]; $RQ$ preserving Hessenberg form;
 and shifted QR with deflation reaching $10^{-12}$ in $O(n)$ total iterations on
-the $\begin{psmallmatrix}4&1&0\\1&3&1\\0&1&2\end{psmallmatrix}$ example
+the $\begin{pmatrix}4&1&0\\1&3&1\\0&1&2\end{pmatrix}$ example
 ($\lambda=3\pm\sqrt3,3$).
+
+## Cards
+
+```card id=numc-09-rayleigh
+Given an approximate eigenvector $x$, how is the eigenvalue estimated? What must you never do?
+---
+Rayleigh quotient $\lambda=\dfrac{x^\top Ax}{\|x\|_2^2}$.
+Never compute eigenvalues as roots of the characteristic polynomial.
+```
+
+```card id=numc-09-power-rate
+State the convergence of the power method and its assumptions.
+---
+$A$ diagonalisable, $|\lambda_1|>|\lambda_2|$, $\alpha_1\ne0$: $|\tilde\lambda_\ell-\lambda_1|\le C|\lambda_2/\lambda_1|^\ell$.
+Linear; the eigenvector angle converges at the same rate.
+```
+
+```card id=numc-09-power-fail
+When does the power method fail or become slow?
+---
+Fails if $\lambda_1\ne\lambda_2$ but $|\lambda_1|=|\lambda_2|$ (e.g. complex-conjugate dominant pair).
+Slow when $|\lambda_2/\lambda_1|$ is near 1.
+```
+
+```card id=numc-09-inverse
+What does inverse iteration find, and how should it be implemented?
+---
+The smallest $|\lambda|$, rate $|\lambda_n/\lambda_{n-1}|^\ell$.
+Do not invert: factor $A$ once, then each solve $A\tilde x_{\ell+1}=x_\ell$ is $O(n^2)$.
+```
+
+```card id=numc-09-shift
+To which eigenvalue does inverse iteration with shift $\mu$ converge, and at what rate?
+---
+The one closest to $\mu$: $|\lambda_n-\tilde\lambda_\ell|\le C\big|\frac{\lambda_n-\mu}{\lambda_{n-1}-\mu}\big|^\ell$.
+Closer shift, faster convergence.
+```
+
+```card id=numc-09-rqi
+What convergence does Rayleigh quotient iteration achieve, and what is its price?
+---
+Cubic for symmetric $A$ (simple eigenvalue), quadratic for general diagonalisable $A$.
+Shift changes every step: fresh $O(n^3)$ factorisation per iteration.
+```
+
+```card id=numc-09-residual
+State the three residual bounds of [S4 Thm 7.10] for $r=Ax-\tilde\lambda x$, $\|x\|_2=1$.
+---
+General diagonalisable: $\le\mathrm{cond}_2(T)\|r\|_2$. Symmetric: $\le\|r\|_2$.
+Symmetric, Rayleigh quotient near simple eigenvalue: $\le C\|r\|_2^2$.
+```
+
+```card id=numc-09-qr-alg
+Write the basic QR algorithm and why its iterates share eigenvalues.
+---
+$A_\ell=Q_\ell R_\ell$, $A_{\ell+1}=R_\ell Q_\ell$.
+$A_{\ell+1}=Q_\ell^\top A_\ell Q_\ell$ is a similarity transformation.
+```
+
+```card id=numc-09-hessenberg
+Why is the basic QR algorithm $O(n^4)$ and how does Hessenberg form fix it?
+---
+$O(n)$ steps of $O(n^3)$ QR. Reduce once to Hessenberg ($O(n^3)$); then QR and $RQ$ are $O(n^2)$ and $RQ$ stays Hessenberg.
+Total $O(n^3)+O(n)\cdot O(n^2)=O(n^3)$.
+```
+
+```card id=numc-09-shifted-qr
+Give the shifted QR step and explain why Rayleigh shifts give fast convergence.
+---
+$A_\ell-\mu I=QR$, $A_{\ell+1}=RQ+\mu I$ (forgetting $+\mu I$ breaks similarity).
+It implicitly does shifted inverse iteration on $A^H$ via the last column of $Q$: bottom row goes to zero quadratically.
+```
+
+```card id=numc-09-deflation
+What is deflation in the QR algorithm?
+---
+If $A(n,[1{:}n-1])$ is numerically zero, $A(n,n)$ is an eigenvalue;
+continue on the leading $(n-1)\times(n-1)$ block.
+```
+
+```card id=numc-09-orth-iter
+What does orthogonal iteration converge to?
+---
+Power method on a $k$-dimensional subspace with re-orthonormalisation by QR each step.
+Subspaces converge to the invariant subspace of the $k$ dominant eigenvectors; $Q_\ell^\top AQ_\ell$ tends to block triangular.
+```

@@ -86,3 +86,89 @@ Telnet mixes commands into the data stream with an escape byte (IAC = 0xFF, RFC 
 ## Code
 
 `src/py/sockets_echo.py`: `send_msg/recv_msg/recv_exact` (framing), `tcp_server/tcp_client`, `udp_server/udp_client`, `start_server` (thread + port 0). `test_sockets_echo.py` runs client and server on localhost, including coalesced writes and an early close. `src/py/telnet_client_sketch.py` for the in-band alternative; `src/py/dns.py` for a binary request/response protocol with IDs.
+
+## Cards
+
+```card id=net-10-protocol-parts
+What three parts make up a protocol in this note's checklist?
+---
+Message syntax (byte layout or grammar), semantics (what each message means).
+Timing and state (who may send what when, timeouts).
+```
+
+```card id=net-10-framing
+Name the framing options for message boundaries on a stream and one trade-off each.
+---
+Length prefix: simple, binary-safe, needs a max length. Delimiter: readable, must escape it in data.
+Fixed size; TLV: extensible, can skip unknown types.
+```
+
+```card id=net-10-recv
+What can recv(n) return on a TCP socket?
+---
+1 to n bytes, or b"" when the peer sent FIN (EOF).
+Fewer bytes is not an error; send may also send fewer (sendall loops).
+```
+
+```card id=net-10-coalesce
+True or false: a server can parse each recv(1024) result as exactly one message.
+---
+False. TCP has no messages: long messages arrive in pieces and back-to-back messages coalesce.
+Fix: buffer and frame.
+```
+
+```card id=net-10-byte-order
+What is network byte order, and how do you pack a 16-bit length in Python?
+---
+Big-endian.
+struct.pack("!H", n); the ! is not optional. Never send native structs.
+```
+
+```card id=net-10-listen
+What does listen(backlog) queue, and what does accept return?
+---
+A queue of completed handshakes.
+accept returns a new socket per connection.
+```
+
+```card id=net-10-errors
+What do ECONNREFUSED, ETIMEDOUT and ECONNRESET indicate?
+---
+ECONNREFUSED: RST, nobody listens. ETIMEDOUT: SYN unanswered (filtered or host down).
+ECONNRESET: peer sent RST mid-connection.
+```
+
+```card id=net-10-eaddrinuse
+When do you get EADDRINUSE and how do you avoid it?
+---
+Binding a port still in TIME-WAIT.
+Set SO_REUSEADDR.
+```
+
+```card id=net-10-edns-lesson
+Why is DNS the cautionary tale for versioning and extensibility?
+---
+RFC 1035 left no room, so EDNS(0) had to smuggle new fields into a fake resource record in Additional (RFC 6891).
+Lesson: plan for extensibility in v1.
+```
+
+```card id=net-10-udp-retry
+Over UDP, why must retried operations carry IDs and be idempotent?
+---
+"The server did not answer" is indistinguishable from "the request was lost".
+IDs match responses; idempotency makes a duplicate retry harmless.
+```
+
+```card id=net-10-select
+What does select give you that threads do not, and vice versa?
+---
+select: one thread handles thousands of idle sockets without per-connection stacks or locks, but slow work blocks everyone.
+Threads: simple blocking code, CPU overlap; but memory per thread and synchronisation.
+```
+
+```card id=net-10-length-limit
+Why does the echo protocol use a 16-bit length prefix?
+---
+It bounds memory per message (max 65535).
+A hostile 4 GB length with a 4-byte prefix must be rejected before allocation.
+```

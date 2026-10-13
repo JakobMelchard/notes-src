@@ -250,3 +250,86 @@ Tests `test_errors.py`: against `np.finfo`, `np.spacing`, `np.linalg.cond`,
 ($\log(1+1.234567890123456\cdot10^{-10})$ and the $p=400000$,
 $q=1.234567890123456$ quadratic) and the $\kappa_{\mathrm{rel}}\le1$ bound of
 the S1a 1.4 exam item.
+
+## Cards
+
+```card id=numc-04-kappa-scalar
+Give $\kappa_{\mathrm{abs}}$ and $\kappa_{\mathrm{rel}}$ for $f:\mathbb R\to\mathbb R$, $f\in C^1$.
+---
+$\kappa_{\mathrm{abs}}(x)=|f'(x)|$, $\kappa_{\mathrm{rel}}(x)=\dfrac{|f'(x)|}{|f(x)|}|x|$.
+Trap: $|f'|$ alone is only the absolute condition number.
+```
+
+```card id=numc-04-subtraction
+What is $\kappa_{\mathrm{rel}}$ of $f(a,b)=a-b$, and what does it imply?
+---
+$\kappa_{\mathrm{rel}}=\dfrac{|a|+|b|}{|a-b|}$: subtraction of similar numbers is ill conditioned (cancellation).
+```
+
+```card id=numc-04-elementary
+Condition of addition of positives, multiplication/division and $\sqrt{\cdot}$?
+---
+Addition of positives $\kappa_{\mathrm{rel}}\le1$; multiplication and division $\kappa_{\mathrm{rel}}=1$;
+$\sqrt{\cdot}$ has $\kappa_{\mathrm{rel}}=\frac12$. All well conditioned.
+```
+
+```card id=numc-04-stable-false
+True or false: if a problem is well conditioned, any algorithm realising it is stable.
+---
+False. $\log(1+x)$ is well conditioned near 0, but $w=1+x\mapsto\log w$ has $\kappa\approx1/x$.
+Conditioning is a problem property, stability an algorithm property.
+```
+
+```card id=numc-04-sqrt-exam
+$\varphi(x)=\sqrt{2x+1}-1$, $x>0$: bound $\kappa_{\mathrm{rel}}$ and give a stable formula.
+---
+$\kappa_{\mathrm{rel}}=\frac12\big(1+\frac1{\sqrt{2x+1}}\big)\le1$, well conditioned.
+Stable: $\varphi(x)=\dfrac{2x}{\sqrt{2x+1}+1}$.
+```
+
+```card id=numc-04-quadratic
+For $x^2-2px-q=0$ with $p^2\gg q>0$, how do you compute the small root stably?
+---
+$x_1=p+\sqrt{p^2+q}$, then $x_0=-q/x_1$ (Vieta).
+The naive $p-\sqrt{p^2+q}$ cancels.
+```
+
+```card id=numc-04-one-minus-cos
+Is $1-\cos x$ near $x=0$ well conditioned, and how should it be evaluated?
+---
+Yes, $\kappa_{\mathrm{rel}}=\frac{x\sin x}{1-\cos x}\to2$. Only the formula is bad.
+Use $2\sin^2(x/2)$.
+```
+
+```card id=numc-04-matrix-kappa
+Give the relative error bound for $Ax=b$ under perturbation of $b$.
+---
+$\dfrac{\|\Delta x\|}{\|x\|}\le\kappa(A)\dfrac{\|\Delta b\|}{\|b\|}$, $\kappa(A)=\|A\|\|A^{-1}\|\ge1$.
+$\kappa_2=\sigma_{\max}/\sigma_{\min}$; $\kappa(Q)=1$ for orthogonal $Q$.
+```
+
+```card id=numc-04-digits
+$\kappa_\infty(A)=10^{12}$, backward-stable solver in double precision: how many correct digits?
+---
+About $16-12=4$, since $\varepsilon\kappa(A)\approx10^{-4}$ [S4 Rem. 4.31].
+```
+
+```card id=numc-04-eps
+Machine epsilon and unit round-off for binary64?
+---
+$\varepsilon=2^{-52}\approx2.22\cdot10^{-16}$ (gap from 1 to next double), $u=\varepsilon/2\approx1.11\cdot10^{-16}$.
+Standard model: $\mathrm{fl}(a\circ b)=(a\circ b)(1+\delta)$, $|\delta|\le u$.
+```
+
+```card id=numc-04-residual
+True or false: a small residual $b-A\hat x$ means an accurate solution.
+---
+False. Forward error $\lesssim\kappa(A)\cdot$ backward error $\eta=\frac{\|r\|}{\|A\|\|\hat x\|}$.
+Small residual only means the algorithm behaved; accuracy needs small $\kappa$.
+```
+
+```card id=numc-04-sources
+Name the four error sources [S4 §3.1].
+---
+Modelling, measurement, round-off, discretisation.
+```

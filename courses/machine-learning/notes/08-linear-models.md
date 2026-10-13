@@ -109,3 +109,82 @@ On `make_regression` with 3 true non-zero coefficients out of 10 (`linear.py` `_
 ## Code
 
 `src/py/linear.py`: `LinearRegression(solver=lstsq|normal|gd)`, `Ridge` (closed form, centred), `Lasso` (coordinate descent with `soft_threshold`), `LogisticRegression(solver=gd|newton, l2)`, `SoftmaxRegression`, `polynomial_features`. Tests match sklearn coefficients to $10^{-2}$ or better.
+
+## Cards
+
+```card id=ml-08-normal-eq
+Give the normal equations for least squares and when $X^\top X$ is singular.
+---
+$X^\top X w = X^\top y$, $\hat w = (X^\top X)^{-1}X^\top y$.
+Singular when columns are linearly dependent ($d+1 > n$, exact collinearity, all one-hot levels plus intercept).
+```
+
+```card id=ml-08-ne-vs-gd
+Normal equations vs gradient descent: when to use which?
+---
+Normal equations: no iterations or learning rate, cost $O(nd^2 + d^3)$; few features.
+GD: $O(nd)$ per step, needs a learning rate; many features, streaming data, no closed form.
+```
+
+```card id=ml-08-efficiency-tf
+True or false: gradient descent is always more efficient than the normal equation.
+---
+False. Neither is always more efficient; each wins in its regime.
+```
+
+```card id=ml-08-separable
+True or false: linear regression converges when performed on non-separable data.
+---
+True (and false for "separable data"). Separability is a classifier concept; least squares always has a solution.
+```
+
+```card id=ml-08-poly
+Advantages and disadvantages of polynomial regression vs linear regression?
+---
+Pro: fits curved relationships, still closed-form least squares (linear in parameters).
+Con: overfits as degree grows, multicollinear powers, explosive extrapolation, hard to interpret.
+```
+
+```card id=ml-08-ridge
+Give the ridge regression closed-form solution and its prior.
+---
+$\hat w = (X^\top X + \alpha I)^{-1}X^\top y$; always invertible. Gaussian prior on $w$ (MAP).
+```
+
+```card id=ml-08-lasso-ridge
+What is the difference between lasso and ridge regression?
+---
+Ridge: $L_2$ penalty, shrinks all coefficients without reaching zero, handles collinearity.
+Lasso: $L_1$ penalty, sets coefficients exactly to zero (feature selection), picks one of correlated features arbitrarily.
+```
+
+```card id=ml-08-soft-threshold
+What is the soft-thresholding operator used in lasso coordinate descent?
+---
+$S(z, \gamma) = \operatorname{sign}(z)\max(|z| - \gamma, 0)$.
+```
+
+```card id=ml-08-logistic
+What is linear in logistic regression, and what is its loss gradient?
+---
+The log-odds: $\log\frac{p}{1-p} = w^\top x + b$.
+Cross-entropy gradient $\nabla J = \frac1n X^\top(p - y)$.
+```
+
+```card id=ml-08-logit-separable
+Why must logistic regression be regularised on separable classes?
+---
+Without regularisation $\|w\| \to \infty$ and it does not converge.
+```
+
+```card id=ml-08-odds
+How do you interpret a logistic regression coefficient $w_j$?
+---
+Change in log-odds per unit $x_j$; $e^{w_j}$ is the odds ratio. Not a probability change.
+```
+
+```card id=ml-08-fit
+Fit $y = wx + b$ to $(0,1), (1,3), (2,2), (3,5)$.
+---
+$S_{xy} = 5.5$, $S_{xx} = 5$, so $w = 1.1$, $b = 2.75 - 1.65 = 1.1$.
+```

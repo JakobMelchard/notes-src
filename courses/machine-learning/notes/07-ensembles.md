@@ -97,3 +97,79 @@ AdaBoost by hand, one round: 5 samples, $w = 0.2$ each; stump misclassifies samp
 ## Code
 
 `src/py/ensemble.py`: `Bagging(base, n_estimators)` with `oob_score_`, `RandomForest(max_features="sqrt")` with `feature_importances_`, `permutation_importance`, `AdaBoost` (SAMME on `tree.DecisionTree` stumps with `sample_weight`), `GradientBoosting(loss="squared"|"log")` with Newton leaf values. Tests compare accuracy, OOB score, first-stump error and decision-function correlation with `sklearn.ensemble`.
+
+## Cards
+
+```card id=ml-07-var
+Give the variance of an average of $M$ predictors with variance $\sigma^2$ and correlation $\rho$. What does it imply?
+---
+$\rho\sigma^2 + \frac{1-\rho}{M}\sigma^2$. Averaging removes only the second term, so members must be diverse (decorrelated).
+```
+
+```card id=ml-07-homog
+Is a random forest a homogeneous or heterogeneous ensemble?
+---
+Homogeneous: all members are trees. Stacking logistic regression, SVM and MLP would be heterogeneous.
+```
+
+```card id=ml-07-parallel
+True or false: boosting is easily parallelisable.
+---
+False. Each round is fitted to the previous rounds' errors, so rounds are sequential. Bagging is parallel.
+```
+
+```card id=ml-07-oob
+What is the out-of-bag estimate and why is it free?
+---
+Each bootstrap leaves out about 37 % of samples ($(1-1/n)^n \to e^{-1}$); predicting them with trees that did not see them gives a held-out estimate without extra fits.
+```
+
+```card id=ml-07-rf
+What are the two sources of randomness in a random forest?
+---
+Bootstrap samples of rows per tree, and a random feature subset at every split ($\sqrt d$ for classification, $d/3$ for regression).
+```
+
+```card id=ml-07-rf-why
+Why does a random forest add random feature subsets on top of bootstrapping?
+---
+Otherwise a dominant feature wins the root in almost every tree; trees stay correlated and $\rho\sigma^2$ remains. Feature subsets lower $\rho$.
+```
+
+```card id=ml-07-ada-init
+True or false: in AdaBoost the weights are randomly initialised.
+---
+False. They are uniformly initialised, $w_i = 1/n$.
+```
+
+```card id=ml-07-ada-alpha
+Give the AdaBoost classifier weight and sample-weight update.
+---
+$\alpha_m = \frac12\ln\frac{1 - \epsilon_m}{\epsilon_m}$; $w_i \leftarrow w_i \exp(-\alpha_m y_i h_m(x_i))$, then normalise.
+Misclassified samples are up-weighted.
+```
+
+```card id=ml-07-ada-compute
+AdaBoost, 5 samples at weight 0.2, stump misclassifies one. Compute $\alpha$ and the new weights.
+---
+$\epsilon = 0.2$, $\alpha = \frac12\ln 4 = 0.693$. Wrong: 0.4, right: 0.1 each; normalise by 0.8: $[0.125, 0.125, 0.5, 0.125, 0.125]$.
+```
+
+```card id=ml-07-gb-ada
+How does gradient boosting differ from AdaBoost?
+---
+Gradient boosting fits each new model to the residuals (pseudo-residuals $-\partial L/\partial F$) of the previous ones; AdaBoost reweights misclassified samples.
+```
+
+```card id=ml-07-bag-boost
+Contrast bagging and boosting: what they reduce, training, noise sensitivity.
+---
+Bagging: variance; independent parallel fits on bootstraps; robust to noise.
+Boosting: bias; sequential fits on reweighted data or residuals; sensitive to label noise, can overfit with many rounds.
+```
+
+```card id=ml-07-linear-boost
+If several linear weak learners are combined by boosting, is the result linear?
+---
+No. $\operatorname{sign}\sum_m\alpha_m h_m(x)$ is piecewise linear, which is why boosted stumps can fit XOR-like data.
+```

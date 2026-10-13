@@ -84,3 +84,75 @@ kNN on 300 samples, grid $k \in \{1, 3, 5, 9, 15\}$, 5-fold CV. Scores: 0.920, 0
 ## Code
 
 `src/py/model_selection.py`: `grid_search`, `random_search`, `nested_cv`, `learning_curve`, `validation_curve`, `param_grid`, `BaseEstimator` (clone/set_params for the from-scratch models). sklearn: `GridSearchCV`, `RandomizedSearchCV`, `learning_curve` used in `exercise_template.py` (`tune_best`, `inspect_best`). The automatic version of this note — Rice's framework, metalearning features, AutoML systems — is [note 15](15-automl-and-metalearning.md).
+
+## Cards
+
+```card id=ml-04-hyperparam
+What is the difference between parameters and hyperparameters?
+---
+Parameters are learned by the fit. Hyperparameters (k in kNN, tree depth, $C$, $\gamma$, learning rate) are set before fitting and chosen by validation performance.
+```
+
+```card id=ml-04-cv-overfit
+True or false: cross-validation is a countermeasure against overfitting.
+---
+False. CV only measures the problem. Countermeasures: regularisation, dropout, batch norm, feature selection, pruning/depth limits, more data.
+```
+
+```card id=ml-04-l1-l2
+$L_1$ vs $L_2$ regularisation: effect on coefficients and implied prior?
+---
+$L_2$ (ridge): shrinks all coefficients, keeps them non-zero; Gaussian prior.
+$L_1$ (lasso): produces exact zeros (feature selection); Laplace prior.
+```
+
+```card id=ml-04-lambda
+What happens as $\lambda \to 0$ and $\lambda \to \infty$ in $\min \hat R(w) + \lambda\|w\|^2$? How is $\lambda$ chosen?
+---
+$\lambda \to 0$: unregularised, maximal variance. $\lambda \to \infty$: $w \to 0$, predicts the intercept, maximal bias.
+Chosen by CV on a log grid, never by training loss (which always prefers $\lambda = 0$).
+```
+
+```card id=ml-04-grid-automl
+True or false: state-of-the-art AutoML systems usually use grid search.
+---
+False. Random search (and Bayesian optimisation) explore more distinct values per hyperparameter at a fixed budget.
+```
+
+```card id=ml-04-random-search
+Why does random search beat grid search at a fixed budget?
+---
+It tries more distinct values of each hyperparameter; usually only one or two hyperparameters matter, so those get resolved much finer.
+```
+
+```card id=ml-04-hpo-methods
+Name three hyperparameter optimisation methods.
+---
+Grid search, random search, Bayesian optimisation (surrogate model, query where expected improvement is largest). Also successive halving / Hyperband.
+```
+
+```card id=ml-04-nested
+Why is the best grid-search CV score biased, and what protocol fixes it?
+---
+It is the maximum of many noisy estimates (winner's curse).
+Nested CV: inner CV on outer-train chooses hyperparameters, score on outer-test, report mean ± std over outer folds.
+```
+
+```card id=ml-04-learning-curve
+How do you read a learning curve for high bias vs high variance?
+---
+High bias: both curves converge to a low score; more data will not help, increase capacity.
+High variance: large persistent gap; more data or regularisation helps.
+```
+
+```card id=ml-04-validation-set
+Which can a validation set be used for: early stopping, hyperparameter tuning, significance testing?
+---
+All three.
+```
+
+```card id=ml-04-prepruning
+1000 observations; a split needs at least 200 observations in the node, each leaf at least 300. Maximum depth, not counting the root?
+---
+2. Split 1000 into 300 (leaf) and 700; 700 into 300 and 400. The 400 node cannot split without a child below 300.
+```

@@ -134,3 +134,78 @@ much as the *solve* half.
 5. Solving the LP relaxation of an integer program and rounding the result
    (a) always gives the ILP optimum (b) gives a feasible but possibly suboptimal solution (c) may give an infeasible or far-from-optimal point; branch-and-bound is needed (d) is what CBC does internally
    **c.** The relaxation only provides a bound; branch-and-bound explores integer subproblems using that bound to prune.
+
+## Cards
+
+```card id=spp-07-convex
+Why does convexity matter when choosing an optimiser?
+---
+In a convex problem every local minimum is global. Nonconvex: local methods find a stationary point; use multistart or global heuristics.
+```
+
+```card id=spp-07-nelder-mead
+Which `minimize` method uses no gradient information, and how does it work?
+---
+Nelder-Mead: a simplex of $n+1$ points that reflects, expands, contracts and shrinks. Robust but slow, no convergence guarantee.
+```
+
+```card id=spp-07-bfgs
+What does BFGS build, and from what?
+---
+An inverse-Hessian approximation $H_k$ from gradient differences, satisfying the secant condition $H_{k+1} y_k = s_k$, with a Wolfe line search.
+```
+
+```card id=spp-07-fd-grad
+What happens if you call a gradient method without `jac`, and how do you check an analytic gradient?
+---
+Finite differences: $n$ extra evaluations per gradient with $O(\sqrt\varepsilon)$ error. Verify analytic gradients with `optimize.check_grad`.
+```
+
+```card id=spp-07-ineq
+What does the SLSQP dict `{"type": "ineq", "fun": g}` mean, and how do you write $x + y \le 2$?
+---
+$g(x) \ge 0$. Write it as `2 - x - y >= 0`. This is the opposite convention to `linprog`'s $A_{ub} x \le b_{ub}$.
+```
+
+```card id=spp-07-kkt
+In the KKT conditions, what is complementary slackness and when is a constraint active?
+---
+$\lambda_i g_i(x) = 0$ with $\lambda_i \ge 0$. A constraint is active if it holds with equality and its multiplier is positive.
+```
+
+```card id=spp-07-lsq-residual
+What should you pass to `least_squares`, and why?
+---
+The residual vector $r(p)$, not its sum of squares. Gauss-Newton / Levenberg-Marquardt exploit $\nabla^2 \approx J^T J$ and converge much faster.
+```
+
+```card id=spp-07-linprog-max
+How do you express a maximisation and a $\ge$ constraint for `linprog`?
+---
+Minimise $-c^T x$; multiply the $\ge$ row by $-1$ to make it $\le$.
+```
+
+```card id=spp-07-vertex
+Where does an optimum of a feasible, bounded LP lie?
+---
+At a vertex of the feasible polytope, where $n$ constraints are active. Simplex walks vertices; interior-point crosses the interior.
+```
+
+```card id=spp-07-rounding
+True or false: rounding the LP relaxation solution solves an integer program.
+---
+False. It can be infeasible or far from optimal; the relaxation only gives a bound. Branch-and-bound is needed.
+```
+
+```card id=spp-07-pulp4
+In PuLP 4.0, how do you create a variable and read the solve status?
+---
+`prob.add_variable("x", lowBound=0)` (`LpVariable(...)` raises `TypeError`).
+`stats = prob.solve(...)`; `stats.status_str`. No solver is bundled any more.
+```
+
+```card id=spp-07-lpsum
+Why use `pulp.lpSum` instead of Python `sum` for large expressions?
+---
+`lpSum` builds the sum in one pass; `sum` copies the growing expression at every step (7x slower at 8 000 terms, ratio grows with $n$).
+```

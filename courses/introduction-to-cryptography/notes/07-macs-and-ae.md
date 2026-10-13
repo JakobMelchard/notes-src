@@ -238,3 +238,81 @@ sequence numbers or timestamps, as TLS does (note 12).
 `test_mac.py::test_hkdf_rfc5869_appendix_a` [S34],
 `test_mac.py::test_cbc_mac_over_aes_is_the_last_cbc_block`,
 `test_hashing.py::test_prf_mac_on_variable_length_messages_is_forgeable_but_hmac_is_not`.
+
+## Cards
+
+```card id=crypto-07-euf-cma
+EUF-CMA for MACs: the game, and what strong unforgeability adds.
+---
+$\mathcal A$ with oracle $\mathsf{Mac}_k(\cdot)$ outputs $(m^*,t^*)$; wins iff $\mathsf{Vrfy}_k(m^*,t^*)=1$ and $m^*\notin Q$. Any new message counts.
+sUF-CMA also forbids a new tag on a queried message; required for AE.
+```
+
+```card id=crypto-07-det-replay
+Can a deterministic MAC be secure? Does a MAC prevent replay?
+---
+Yes: no indistinguishability requirement, $F_k(m)$ is a secure MAC. No: a replayed $(m,t)$ has $m\in Q$, not a forgery. Freshness needs sequence numbers or timestamps.
+```
+
+```card id=crypto-07-prf-mac
+PRF as MAC: construction and bound.
+---
+Fixed-length $\mathsf{Mac}_k(m)=F_k(m)$, verify by recomputing (constant time). $\Pr[\text{forge}]\le\mathsf{Adv}^{PRF}_{\mathcal B}+2^{-\ell_{out}}$: with a random $f$, $f(m^*)$ is an unqueried uniform value.
+```
+
+```card id=crypto-07-xor-mac
+Proof idea: $\mathsf{Mac}_k(m):=F_k(m)\oplus m$ is EUF-CMA for a PRF $F$.
+---
+$\mathcal B^{\mathcal O}$ answers $m_i$ with $\mathcal O(m_i)\oplus m_i$; on $(m^*,t^*)$ outputs 1 iff $t^*=\mathcal O(m^*)\oplus m^*$. Real: $\Pr=\varepsilon$; random $f$: $2^{-n}$.
+So $\varepsilon\le\mathsf{Adv}^{PRF}_{\mathcal B}+2^{-n}$. The XOR is a red herring.
+```
+
+```card id=crypto-07-cbc-mac-forgery
+Forge basic CBC-MAC (zero IV, last block) on variable-length messages.
+---
+Query one-block $m_1,m_2$, get $t_1,t_2$. Output $m^*=m_1\|(m_2\oplus t_1)$ with tag $t_2$: block 2 is $E_k((m_2\oplus t_1)\oplus t_1)=E_k(m_2)=t_2$.
+```
+
+```card id=crypto-07-cbc-mac-fix
+Fixes for CBC-MAC on variable lengths, and the trap.
+---
+Prepend the message length, encrypt the final block under a separate key (EMAC/CMAC), or per-length keys. Trap: appending the length does not stop the attack.
+```
+
+```card id=crypto-07-hmac
+HMAC: formula and key handling.
+---
+$\mathrm{HMAC}_k(m)=H((k\oplus\mathrm{opad})\|H((k\oplus\mathrm{ipad})\|m))$, $\mathrm{ipad}=\mathtt{0x36}^B$, $\mathrm{opad}=\mathtt{0x5c}^B$.
+Key longer than $B$ is hashed first, shorter is zero-padded. Outer hash hides the inner chaining value, defeating length extension.
+```
+
+```card id=crypto-07-compositions
+Encrypt-then-MAC, MAC-then-Encrypt, Encrypt-and-MAC: which give AE?
+---
+EtM ($t=\mathsf{Mac}_{k_m}(c)$): always, with a strongly unforgeable MAC. MtE: only sometimes (decrypts before checking, padding oracle). E&M: no in general. Keys must be independent.
+```
+
+```card id=crypto-07-enc-and-mac
+Why is Encrypt-and-MAC not CPA-secure with a deterministic MAC (e.g. CBC-MAC)?
+---
+The tag is a deterministic function of the plaintext. Query $m_0$, keep $t_0$; submit $(m_0,m_1)$, get $(c,t)$; output 0 iff $t=t_0$. Advantage $\tfrac12$.
+```
+
+```card id=crypto-07-etm-spec
+Build AE from CPA-secure Enc and a secure MAC: the three things to state.
+---
+Independent keys $(k_E,k_M)$; $t:=\mathsf{Mac}_{k_M}(c)$ over the ciphertext $c\gets\mathsf{Enc}_{k_E}(m)$; Dec returns $\bot$ if $\mathsf{Vrfy}_{k_M}(c,t)\ne1$, verifying before decrypting.
+```
+
+```card id=crypto-07-ae
+Definition of authenticated encryption (K&L Def. 5.3), and AEAD.
+---
+CCA-security plus unforgeable encryption (ciphertext integrity). CPA plus integrity already implies CCA, so proving those two suffices.
+AEAD adds associated data: authenticated, not encrypted.
+```
+
+```card id=crypto-07-hash-mac
+Why is $\mathsf{Mac}_k(m)=F_k(H(m))$ insecure if $H$ is not collision resistant?
+---
+Given $x\ne x'$ with $H(x)=H(x')$: query $x$, get $t$, output $(x',t)$. Valid, $x'$ unqueried, probability 1. Hash-and-MAC needs collision resistance, not just one-wayness.
+```

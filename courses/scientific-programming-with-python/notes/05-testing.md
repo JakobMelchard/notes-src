@@ -93,3 +93,80 @@ Design rules that pay off in scientific code:
 5. The most reliable oracle for a new ODE integrator is
    (a) the output of the previous version (b) an analytic solution plus a check of the convergence order (c) 100 % line coverage (d) that the code runs without exceptions
    **b.** Regression values only detect change; coverage measures execution, not correctness.
+
+## Cards
+
+```card id=spp-05-discovery
+Which files, functions and classes does pytest collect by default?
+---
+Files `test_*.py` or `*_test.py`, functions `test_*`, classes `Test*` without `__init__`.
+```
+
+```card id=spp-05-assert
+Why is a plain `assert` enough in pytest?
+---
+pytest rewrites the assertion bytecode to show operands on failure, including list and dict diffs.
+```
+
+```card id=spp-05-approx
+What are the documented default tolerances of `pytest.approx`?
+---
+`rel=1e-6`, `abs=1e-12`.
+```
+
+```card id=spp-05-allclose
+What does `assert_allclose(actual, desired)` check by default, and what is the trap?
+---
+$|a - d| \le \text{atol} + \text{rtol}\,|d|$ with `rtol=1e-7`, `atol=0`.
+So `assert_allclose(x, 0)` requires exact zero: pass `atol`.
+```
+
+```card id=spp-05-xfail-strict
+What happens when a test marked `@pytest.mark.xfail(strict=True)` passes?
+---
+The run fails (strict XPASS), so fixed bugs get their marker removed.
+```
+
+```card id=spp-05-fixture-yield
+In a `@pytest.fixture` that uses `yield`, when does the code after `yield` run?
+---
+At teardown, after the test that requested the fixture.
+```
+
+```card id=spp-05-fixture-scope
+What does `scope="module"` do for a fixture, and what is its pitfall?
+---
+It runs once per test module and is shared by its tests.
+If a test mutates it, state leaks into later tests (order-dependent failures).
+```
+
+```card id=spp-05-parametrize
+What is the benefit of `@pytest.mark.parametrize` over a loop inside one test?
+---
+One test per tuple, each reported separately, so one bad case does not hide the others.
+```
+
+```card id=spp-05-oracle
+Which oracle is weakest, and which is most reliable for a new ODE integrator?
+---
+Weakest: stored regression values (they only detect change).
+Best here: an analytic solution plus a check of the convergence order.
+```
+
+```card id=spp-05-convergence
+How do you test the convergence order $p$ of a method with step $h$?
+---
+Halving $h$ must reduce the error by a factor of $2^p$.
+```
+
+```card id=spp-05-coverage
+True or false: 100 % line coverage shows the code is correct.
+---
+False. Coverage shows what is untested, not what is correct; weak assertions prove nothing.
+```
+
+```card id=spp-05-shrinking
+What does Hypothesis add over a hand-written seeded random loop?
+---
+Strategies like `st.floats(...)`, automatic shrinking to a minimal failing example, and a database of past failures.
+```

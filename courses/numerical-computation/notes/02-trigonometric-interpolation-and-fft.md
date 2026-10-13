@@ -223,3 +223,87 @@ $V_n/\sqrt n$ [S4 Thm 1.45].
 
 `src/cpp/fft.cpp`: in-place iterative radix-2 on `std::complex<double>`,
 inverse, convolution, checks against the $O(n^2)$ DFT.
+
+## Cards
+
+```card id=numc-02-trig-unique
+Why is the trigonometric interpolation problem $p(x)=\sum_{j=0}^{n-1}c_je^{ijx}$, $p(x_j)=y_j$ uniquely solvable?
+---
+With $z_j=e^{ix_j}$ the matrix is Vandermonde in the distinct $z_j$,
+so $\det=\prod_{j<k}(z_k-z_j)\ne0$ [S4 Thm 1.43].
+```
+
+```card id=numc-02-dft-unitary
+What is the key property of $\frac1{\sqrt n}V_n$, $V_n=(\omega_n^{jk})$, $\omega_n=e^{-2\pi i/n}$?
+---
+It is symmetric and unitary, so $V_n^{-1}=\frac1n\overline{V_n}$ and $c=\frac1n\overline{V_n}y$ [S4 Thm 1.45].
+Off-diagonal inner products are geometric sums equal to $0$ since $\omega_n^n=1$.
+```
+
+```card id=numc-02-idft
+How is the inverse DFT computed from the DFT?
+---
+$F_n^{-1}y=\frac1n\overline{F_n(\bar y)}$ [S4 Rem. 1.47]: conjugate, transform, conjugate, divide by $n$.
+No separate algorithm needed.
+```
+
+```card id=numc-02-dif-split
+In the decimation-in-frequency FFT with $n=2m$, what are the two half-length inputs $g$ and $h$?
+---
+$g_j=y_j+y_{j+m}$ gives the even outputs, $h_j=(y_j-y_{j+m})\omega^j$ the odd outputs [S4 Lem. 1.48].
+Input untouched, output in bit-reversed order.
+```
+
+```card id=numc-02-fft-cost
+Derive the cost of the FFT.
+---
+$A(n)\le2A(n/2)+Cn$; unrolling $\log_2 n$ times gives $A(n)\le nA(1)+Cn\log_2n=O(n\log n)$.
+Naive DFT is $O(n^2)$.
+```
+
+```card id=numc-02-ifft-factor
+What changes in the IFFT [S4 Alg. 4] compared with the FFT [S4 Alg. 3]?
+---
+$\omega=e^{+2\pi i/n}$ and a factor $\frac12$ on both $g$ and $h$ per level.
+The halvings supply the $1/n$; applying $1/n$ again is a trap.
+```
+
+```card id=numc-02-dft-compute
+Compute the DFT of $(1,0,-1,0)$.
+---
+$X_k=1-(-i)^{2k}=1-(-1)^k$, so $(0,2,0,2)$.
+```
+
+```card id=numc-02-convolution
+State the convolution theorem and the cost of fast convolution.
+---
+$\widehat{f*g}=\hat f\cdot\hat g$ componentwise [S4 Thm 1.52].
+Three FFTs: $O(n\log n)$ instead of $O(n^2)$.
+```
+
+```card id=numc-02-padding
+To linearly convolve sequences of lengths $L_1$ and $L_2$ with the DFT, how much padding is needed and what goes wrong otherwise?
+---
+Pad to $n\ge L_1+L_2-1$.
+Otherwise the DFT computes the periodic convolution and the tail wraps onto the head.
+```
+
+```card id=numc-02-circulant
+How is a circulant system $Cx=b$ solved in $O(n\log n)$?
+---
+The DFT diagonalises circulants: $x=F^{-1}(\hat b/\hat c)$ [S4 Ex. 1.59].
+```
+
+```card id=numc-02-fft-accuracy
+True or false: the FFT is less accurate than the direct DFT.
+---
+False. FFT relative error is $O(u\log n)$ versus $O(un)$ for the direct DFT [S12].
+$\kappa_2(F_n/\sqrt n)=1$.
+```
+
+```card id=numc-02-real-symmetry
+What symmetry does the DFT of a real signal have, and what does bin $k$ mean?
+---
+$X_{n-k}=\overline{X_k}$. Bin $k$ is frequency $k/T$ up to Nyquist $1/(2\Delta t)$;
+bins $k>n/2$ are negative frequencies $k-n$.
+```

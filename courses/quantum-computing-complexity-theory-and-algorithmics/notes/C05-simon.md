@@ -59,3 +59,70 @@ Probability calculation for $n=3$: $\prod_{j=1}^{2}(1-2^{-j}) = \frac12\cdot\fra
 ## Code
 
 `src/py/quantum/simon.py`: `simon_oracle(s, rng)` (random two-to-one $f$ with period $s$, returned as a table and as a permutation for `Register.apply_permutation`), `simon_sample(f, n, rng)` (one quantum run returning $y$), `simon(f, n, rng)` (collect, solve, verify), `rank_gf2`, `solve_gf2`, `nullspace_gf2` (Gaussian elimination over $\mathbb{F}_2$). `test_simon.py`: random $s$ for $n=3..5$, correct recovery in $\geq95\%$ of seeded trials; unit tests for the GF(2) solver (rank, nullspace dimension, $Ys=0$).
+
+## Cards
+
+```card id=qc-qu5-problem
+State Simon's problem.
+---
+XOR oracle for $f:\{0,1\}^n\to\{0,1\}^n$ with nonzero $s$ such that $f(x)=f(y)\iff y\in\{x,x\oplus s\}$. Find $s$.
+```
+
+```card id=qc-qu5-distribution
+Distribution of the measured $y$ in one run of Simon's algorithm?
+---
+Uniform over $s^\perp=\{y:y\cdot s=0\}$, each with probability $2^{-(n-1)}$, independent of $x_0$.
+One run gives one equation $y\cdot s=0$.
+```
+
+```card id=qc-qu5-postprocess
+Simon's classical post-processing: stop condition and method.
+---
+Collect $y$'s until rank $n-1$ over $\mathbb F_2$; Gaussian elimination gives the solution space $\{0,s\}$, $O(n^3)$.
+Verify $f(0)=f(s)$.
+```
+
+```card id=qc-qu5-runs
+Probability that $n-1$ runs already have full rank, and total query count?
+---
+$\prod_{j=1}^{n-1}(1-2^{-j})>0.2888>\frac14$.
+$O(n)$ queries; with $n-1+k$ runs failure $\le2^{-k}$.
+```
+
+```card id=qc-qu5-lower-bound
+Classical randomised lower bound for Simon's problem and its argument.
+---
+$\Omega(2^{n/2})$. Information comes only from a collision; $k$ queries collide w.p. $O(k^2/2^n)$ (birthday).
+```
+
+```card id=qc-qu5-gf2-trap
+Trap: rows $110$ and $011$. What is the nullspace over $\mathbb F_2$, and over the reals?
+---
+$\mathbb F_2$: $\{000,111\}$. Reals: spanned by $(1,-1,1)$. Arithmetic must be mod 2.
+```
+
+```card id=qc-qu5-s-in-perp
+True or false: a sample $y=s$ must be rejected because $s\notin s^\perp$.
+---
+False. $s\cdot s$ is the parity of $s$, so $s\in s^\perp$ is possible (e.g. $s=11$).
+```
+
+```card id=qc-qu5-n2
+For $n=2$, $s=11$: list $s^\perp$ and what a run returns.
+---
+$s^\perp=\{00,11\}$; $00$ (useless) or $11$ (determines $s$), each w.p. $\frac12$.
+```
+
+```card id=qc-qu5-separation
+Does Simon show BPP $\ne$ BQP?
+---
+No. It is an oracle separation for a promise problem: $O(n)$ vs $\Omega(2^{n/2})$ queries.
+For total functions the separation is at most polynomial.
+```
+
+```card id=qc-qu5-hsp
+How does Simon's algorithm relate to Shor's (hidden subgroup view)?
+---
+Both: coset state, group Fourier transform, sample from the dual, classical post-processing.
+Simon: $\mathbb Z_2^n$, $H^{\otimes n}$, Gaussian elimination. Shor: $\mathbb Z_N$, QFT, continued fractions.
+```

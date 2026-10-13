@@ -227,3 +227,88 @@ LoRA: low-rank additive updates inside existing linear layers; zero overhead aft
 - Radford et al., "Learning Transferable Visual Models From Natural Language Supervision", ICML 2021 (CLIP) [S78] -- **Lecture 13's reference 26** [S4].
 - Anthropic, "Introducing the Model Context Protocol", 2024 [S81]; Martin et al., "Knowledge Return Oriented Prompting (KROP)", 2024 [S83]; Shumailov et al., "AI models collapse when trained on recursively generated data", Nature 2024 [S82]. All three are chapters added to the 2025 edition of the lecture.
 - **Lecture 13** [S4], *Large Language Models*, is the lecture this note covers: types of LLMs, how they are trained, self-supervision, contrastive learning, prompting and prompt engineering, zero-/few-shot, chain-of-thought, tree-of-thought, best practices, RAG, MCP, problems of LLMs, hallucinations, AI slop, adversarial prompting, KROP, multiple modalities and CLIP, trends and costs. The LLM lecture did not exist before the 2024 edition [S3, S7].
+
+## Cards
+
+```card id=adl-09-bpe-compute
+Corpus `hug`x10, `pug`x5, `pun`x12, `bun`x4, `hugs`x5. What are the first three BPE merges?
+---
+`ug` (count 20), then `un` (16), then `hug` (15).
+```
+
+```card id=adl-09-ppl
+How are perplexity and bits per token related, and can PPL be compared across tokenisers?
+---
+$\mathrm{PPL} = \exp(\mathcal L)$, bits per token $= \log_2 \mathrm{PPL}$.
+No: compare bits per character (or byte) instead.
+```
+
+```card id=adl-09-ppl-compute
+A character model achieves 1.5 bits per character with $V = 16$. What is its perplexity vs uniform?
+---
+$2^{1.5} = 2.83$.
+Uniform: 4 bits, $\mathrm{PPL} = 16$.
+```
+
+```card id=adl-09-chinchilla
+What did Chinchilla find, and why are deployed models overtrained beyond it?
+---
+Scale $N$ and $D$ equally, $D_{opt} \approx 20N$, with $C \approx 6ND$.
+Inference cost is $\propto N$, so small models trained far longer are cheaper to serve.
+```
+
+```card id=adl-09-ft-memory
+How many bytes per parameter does full fine-tuning with Adam in mixed precision need?
+---
+16: bf16 weights 2 + fp32 master 4 + bf16 grads 2 + fp32 Adam $m, v$ 8.
+7B model: 112 GB before activations.
+```
+
+```card id=adl-09-lora
+Write the LoRA forward and its initialisation.
+---
+$h = W_0 x + \frac{\alpha}{r} B A x$, $W_0$ frozen, $r \ll \min(d, k)$.
+$A$ random, $B = 0$, so $\Delta W = 0$ at step 0.
+```
+
+```card id=adl-09-lora-grad
+Why does LoRA train even though $B = 0$ at init?
+---
+$\partial\mathcal L/\partial A = s B^\top g x^\top = 0$ initially, but $\partial\mathcal L/\partial B = s\,g(Ax)^\top \ne 0$ since $A$ is random.
+$A = B = 0$ would be stationary.
+```
+
+```card id=adl-09-lora-params
+LoRA parameters for one $4096 \times 4096$ matrix at $r = 16$?
+---
+$r(d + k) = 131{,}072$ vs $16.8$M, a factor 128.
+Merging $W_0 + \frac{\alpha}{r}BA$ removes inference overhead.
+```
+
+```card id=adl-09-dpo
+What does DPO remove compared to RLHF?
+---
+The reward model and the RL (PPO) loop.
+Preferences become a supervised loss on log-ratios of $\pi_\theta$ vs frozen $\pi_{ref}$.
+```
+
+```card id=adl-09-decoding
+Top-$k$ vs top-$p$ sampling?
+---
+Top-$k$: sample from the $k$ most probable tokens, renormalised.
+Top-$p$ (nucleus): smallest set with cumulative probability $\ge p$.
+```
+
+```card id=adl-09-lost-middle
+What is "lost in the middle" and what is the RAG fix?
+---
+Models use information at the start and end of a long context better than the middle.
+Put the best chunk first or last.
+```
+
+```card id=adl-09-clip
+How is CLIP trained and why does it want large batches?
+---
+Cross-entropy in both directions on the $N \times N$ similarity matrix scaled by temperature; diagonal are true pairs.
+The other $N-1$ captions are negatives, so larger $N$ is harder and more informative.
+```

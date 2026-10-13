@@ -73,3 +73,87 @@ The same construction with a random tape gives $\mathrm{BPP} \subseteq \mathrm{P
 ## Code
 
 No dedicated module. Topological evaluation of a DAG (CVP) is `topological_sort` in `src/py/algorithmics/graphs.py` (A02); the reversible-circuit and Feynman-path ideas are simulated in `src/py/complexity/query_complexity.py` (B06, `random_query_algorithm` builds a circuit as a product of unitaries) and in the quantum package (`src/py/quantum/`).
+
+## Cards
+
+```card id=qc-cx4-ppoly
+Define P/poly in two equivalent ways.
+---
+$\bigcup_k\mathrm{SIZE}(n^k)$: polynomial-size circuit families.
+Equivalently: polynomial-time TM with polynomial-length advice $a_n$ depending only on $n$.
+```
+
+```card id=qc-cx4-p-in-ppoly
+How is P $\subseteq$ P/poly proved, and what size results?
+---
+Tableau to circuit: each cell from three cells above by a constant-size step circuit.
+Size $O(T^2)$, depth $O(T)$, log-space uniform.
+```
+
+```card id=qc-cx4-undecidable
+Give an undecidable language in P/poly.
+---
+Unary HALTING $\{1^n:$ the $n$-th TM halts on empty input$\}$.
+Each $C_n$ is the constant 0 or 1; the family is not uniform.
+```
+
+```card id=qc-cx4-karp-lipton
+State Karp-Lipton.
+---
+If NP $\subseteq$ P/poly then $\mathrm{PH}=\Sigma_2^p$.
+Self-reducibility turns SAT circuits into circuits that output satisfying assignments.
+```
+
+```card id=qc-cx4-nc-ac
+Define $\mathrm{NC}^k$ and $\mathrm{AC}^k$.
+---
+Log-space uniform, polynomial size, depth $O(\log^k n)$.
+$\mathrm{NC}^k$: fan-in 2. $\mathrm{AC}^k$: unbounded fan-in $\wedge,\vee$.
+```
+
+```card id=qc-cx4-chain
+State the inclusion chain from $\mathrm{NC}^1$ to P.
+---
+$\mathrm{NC}^1\subseteq\mathrm L\subseteq\mathrm{NL}\subseteq\mathrm{AC}^1\subseteq\mathrm{NC}^2\subseteq\cdots\subseteq\mathrm{NC}\subseteq\mathrm P$.
+```
+
+```card id=qc-cx4-nl-ac1
+Why is NL $\subseteq$ $\mathrm{AC}^1$?
+---
+PATH by repeated squaring of the adjacency matrix with self-loops: $\lceil\log n\rceil$ squarings of depth $O(1)$ each.
+PATH is NL-complete under log-space reductions.
+```
+
+```card id=qc-cx4-parity-ac0
+True or false: PARITY is not in $\mathrm{NC}^1$.
+---
+False. PARITY is in $\mathrm{NC}^1$ (XOR tree) and $\mathrm{TC}^0$, but not in $\mathrm{AC}^0$.
+Depth-$d$ circuits need size $2^{\Omega(n^{1/(d-1)})}$ (Håstad).
+```
+
+```card id=qc-cx4-switching
+Where does the PARITY $\notin\mathrm{AC}^0$ proof use that the function is PARITY?
+---
+Random restrictions plus the switching lemma collapse the circuit to a shallow decision tree.
+PARITY restricted is still PARITY, with decision-tree depth equal to the number of free variables.
+```
+
+```card id=qc-cx4-arith
+Where do ADDITION and MULTIPLICATION sit in the circuit classes?
+---
+ADDITION: $\mathrm{AC}^0$ (carry look-ahead).
+MULTIPLICATION: $\mathrm{TC}^0$ and $\mathrm{NC}^1$, not $\mathrm{AC}^0$.
+```
+
+```card id=qc-cx4-cvp
+What does P-completeness of CIRCUIT VALUE say about parallelism?
+---
+CVP $\in$ NC iff NC = P. P-complete problems are believed inherently sequential.
+```
+
+```card id=qc-cx4-lower-bounds
+Best known explicit circuit lower bound for NP, and the natural proofs barrier?
+---
+About $3n$ (e.g. $(3+\frac1{86})n$, Li-Yang $3.1n$).
+Razborov-Rudich: constructive and large techniques would break pseudorandom generators.
+```

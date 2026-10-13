@@ -352,3 +352,81 @@ always run the DH value through a KDF [S34] and never use it raw.
 Tests: `test_dh.py::test_shared_value_matches_openssl`,
 `test_elgamal.py::test_messages_outside_the_group_break_ind_cpa`,
 `test_oaep.py::test_wycheproof_oaep_decrypt`.
+
+## Cards
+
+```card id=crypto-10-dh
+Diffie-Hellman key exchange, and the assumption behind passive security.
+---
+Alice sends $g^x$, Bob $g^y$; both compute $g^{xy}$ and hash it to a key. Passive security rests on DDH: $(g^x,g^y,g^{xy})\approx_c(g^x,g^y,g^z)$.
+```
+
+```card id=crypto-10-ddh-not-cdh
+Why does DH key secrecy need DDH, not CDH? What if the key is hashed?
+---
+CDH only says $g^{xy}$ cannot be computed, not that it looks random; a key must be indistinguishable from uniform. With $H(g^{xy})$, $H$ a random oracle, CDH suffices (hashed DH).
+```
+
+```card id=crypto-10-mitm
+What does plain DH fail to provide, and what attack follows?
+---
+Authentication. Man-in-the-middle runs separate exchanges with each side; Alice and Bob each share a key with the attacker, not each other. Fix: authenticate with signatures or a password.
+```
+
+```card id=crypto-10-pke-cpa
+Why is PKE security called CPA-security though no encryption oracle is given?
+---
+$\mathcal A$ has $pk$, so it is its own encryption oracle. Consequence: every CPA-secure PKE is randomised; deterministic ones (textbook RSA) lose to "encrypt $m_0$ and compare".
+```
+
+```card id=crypto-10-rsa-malleable
+Textbook RSA malleability, and small-message attack.
+---
+$(m s)^e=m^e s^e$: multiply $c$ by $s^e$ to multiply the plaintext by $s$; breaks CCA.
+If $m^e<N$ (small $e$, short $m$), no reduction happens: $m=\sqrt[e]{c}$ over the integers.
+```
+
+```card id=crypto-10-common-modulus
+Common-modulus attack on RSA.
+---
+Same $N$ and $m$ under coprime $e_1,e_2$: Bezout $ae_1+be_2=1$ gives $c_1^a c_2^b=m$. Never share a modulus across users.
+```
+
+```card id=crypto-10-shared-prime
+Two RSA moduli share one prime factor. Recover both secret keys.
+---
+$p=\gcd(N_1,N_2)$ by Euclid, $q_i=N_i/p$, $\varphi(N_i)=(p-1)(q_i-1)$, $d_i=e_i^{-1}\bmod\varphi(N_i)$. No factoring needed.
+```
+
+```card id=crypto-10-pkcs15
+Why is PKCS #1 v1.5 encryption not enough?
+---
+Randomised ($\texttt{0x00}\|\texttt{0x02}\|PS\|\texttt{0x00}\|m$), so not trivially CPA-broken, but not CCA-secure: revealing whether the plaintext starts `00 02` is Bleichenbacher's oracle. Reason TLS 1.3 dropped RSA key transport.
+```
+
+```card id=crypto-10-oaep
+RSA-OAEP: which decoding checks make it CCA-secure, and what does step 3(g) require?
+---
+Leading octet `0x00`, $lHash'=\mathrm{Hash}(L)$, and a `0x01` separator after the zero padding. All failures must give one indistinguishable error, no timing difference (else Manger's attack in $\approx|N|$ queries).
+```
+
+```card id=crypto-10-elgamal
+ElGamal encryption and decryption; why must $m\in G$?
+---
+$pk=h=g^x$; $\mathsf{Enc}_h(m)=(g^y,\ m h^y)$, fresh $y$; $\mathsf{Dec}=c_2\cdot c_1^{-x}$.
+For $m\notin G$ (order-$q$ subgroup) the Legendre symbol of $c_2$ equals that of $m$: a bit leaks.
+```
+
+```card id=crypto-10-elgamal-ddh
+Reduction: ElGamal IND-CPA under DDH.
+---
+$\mathcal B(g^a,g^b,T)$: $pk=g^a$; challenge $(g^b,\ m_\beta T)$; output 1 iff $\mathcal A$ guesses $\beta$.
+$T=g^{ab}$: real game, $\tfrac12+\varepsilon$. $T=g^z$: one-time pad in the group, $\tfrac12$. $\mathsf{Adv}^{DDH}=\varepsilon$.
+```
+
+```card id=crypto-10-hybrid-elgamal
+Why is hybrid $(\text{ElGamal}_{pk}(k),\ \mathsf{Enc}'_k(m))$ not CCA-secure even with a CCA-secure DEM? Fix?
+---
+Re-randomise the KEM part to $(c_1g^s,c_2h^s)$: same $k$, different ciphertext, so the Dec oracle returns $m$. The KEM must be CCA-secure.
+Fix DHIES/ECIES: $(g^y,\ \mathsf{Enc}'_{H(g^y,h^y)}(m))$.
+```

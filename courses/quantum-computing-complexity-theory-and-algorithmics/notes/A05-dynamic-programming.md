@@ -133,3 +133,88 @@ $\mathrm{OPT}(6,7) = 3$: substitute k→s, e→i, insert g. Cell (e, i) at row 5
 ## Code
 
 `src/py/algorithmics/dp.py`: `weighted_interval_scheduling(intervals)`, `subset_sum(weights, W)`, `knapsack_01(weights, values, W)` (returns value and chosen set), `bellman_ford(n, edges, s)` (raises or reports on a negative cycle), `floyd_warshall(D)`, `sequence_alignment(x, y, delta, alpha)` (with traceback), `lcs(x, y)`. C++ knapsack with the $O(W)$ rolling array: `src/cpp/knapsack.cpp`.
+
+## Cards
+
+```card id=qc-alg5-weighted-intervals
+Weighted interval scheduling: state the recurrence and define $p(j)$.
+---
+$\mathrm{OPT}(j)=\max(v_j+\mathrm{OPT}(p(j)),\ \mathrm{OPT}(j-1))$, $\mathrm{OPT}(0)=0$.
+$p(j)$: largest $i<j$ with $f_i\le s_j$, else 0 (intervals sorted by finish).
+```
+
+```card id=qc-alg5-memo-vs-naive
+Why is naive recursion for weighted intervals exponential but memoisation $O(n)$ after sorting?
+---
+Naive: two branches per level, Fibonacci-like ($p(j)=j-2$).
+Memoised: only $n+1$ distinct subproblems, each $O(1)$.
+```
+
+```card id=qc-alg5-knapsack
+0/1 knapsack recurrence for $\mathrm{OPT}(i,w)$ when $w_i\le w$, and the running time.
+---
+$\max(\mathrm{OPT}(i-1,w),\ v_i+\mathrm{OPT}(i-1,w-w_i))$; if $w_i>w$ only the first.
+$O(nW)$ time and space; $O(W)$ space iterating $w$ downward.
+```
+
+```card id=qc-alg5-pseudo-poly
+True or false: the $O(nW)$ DP shows knapsack is in P.
+---
+False. Input size is $\Theta(n\log W)$ bits; $W$ is exponential in that.
+$O(nW)$ is pseudo-polynomial; knapsack is NP-complete.
+```
+
+```card id=qc-alg5-bellman-ford
+Bellman-Ford: meaning of $\mathrm{OPT}(i,v)$, number of rounds, running time.
+---
+Shortest $s$-$v$ path with at most $i$ edges.
+$n-1$ rounds (shortest paths are simple without negative cycles), each $O(m)$: $O(nm)$.
+```
+
+```card id=qc-alg5-negative-cycle
+How does Bellman-Ford detect and find a negative cycle?
+---
+Run an $n$-th round; if some $d[v]$ still decreases, a negative cycle is reachable.
+Follow parent pointers back from that $v$; within $n$ steps a vertex repeats.
+```
+
+```card id=qc-alg5-floyd-warshall
+Floyd-Warshall recurrence, meaning of $k$, and running time.
+---
+$D^{(k)}_{ij}=\min(D^{(k-1)}_{ij},D^{(k-1)}_{ik}+D^{(k-1)}_{kj})$; $k$ = largest allowed intermediate vertex.
+$O(n^3)$ time, $O(n^2)$ space; negative cycle iff some $D_{ii}<0$.
+```
+
+```card id=qc-alg5-fw-loop-order
+Floyd-Warshall trap: which loop must be outermost, and why is in-place safe?
+---
+$k$ must be the outer loop.
+In round $k$, $D_{ik}$ and $D_{kj}$ do not change since $D_{kk}=0$.
+```
+
+```card id=qc-alg5-alignment
+Sequence alignment recurrence for $\mathrm{OPT}(i,j)$ and base cases.
+---
+$\min(\alpha_{x_iy_j}+\mathrm{OPT}(i-1,j-1),\ \delta+\mathrm{OPT}(i-1,j),\ \delta+\mathrm{OPT}(i,j-1))$.
+$\mathrm{OPT}(i,0)=i\delta$, $\mathrm{OPT}(0,j)=j\delta$; $O(mn)$ time.
+```
+
+```card id=qc-alg5-hirschberg
+How does Hirschberg get linear space while keeping $O(mn)$ time?
+---
+Two-row forward and backward DPs to the middle row; pick $q$ minimising $f+g$; recurse on both halves.
+Area halves per level (geometric sum): $O(mn)$ time, $O(m+n)$ space.
+```
+
+```card id=qc-alg5-edit-vs-lcs
+Compute: edit distance of kitten and sitting, and their LCS length. Does edit distance equal $m+n-2\,\mathrm{LCS}$?
+---
+Edit distance 3, LCS 4 (ittn). $6+7-8=5\ne3$.
+Equality holds only if substitutions are forbidden (LCS charges a substitution 2).
+```
+
+```card id=qc-alg5-longest-path
+Why does DP fail for longest simple path in a general graph?
+---
+No optimal substructure: subpaths of a longest simple path need not be longest simple paths. The problem is NP-hard.
+```

@@ -243,7 +243,7 @@ Modelled on F1 1, F3 2.1, S1a 1.1–1.2 and the true/false blocks; see
 2. *(S1a 1.1, 2024W)* Knots $-1,0,1$, values $2,0,0$. Give the $\ell_i$ and $p$;
    then set up $A\mathbf x=b$ for $p=\alpha+\beta x+\gamma x^2$ without solving.
    $\ell_0=\tfrac{x^2-x}{2}$, $\ell_1=1-x^2$, $\ell_2=\tfrac{x^2+x}{2}$,
-   $p=2\ell_0=x^2-x$. $A=\begin{psmallmatrix}1&-1&1\\1&0&0\\1&1&1\end{psmallmatrix}$,
+   $p=2\ell_0=x^2-x$. $A=\begin{pmatrix}1&-1&1\\1&0&0\\1&1&1\end{pmatrix}$,
    $b=(2,0,0)^\top$ (rows $1,x_i,x_i^2$).
 3. *(S1a 1.2, 2024W)* Define $\Lambda_n$ in terms of the knots and bound
    $\|f-I_nf\|_{\infty,[-1,1]}$ with it. State the growth for Chebyshev knots.
@@ -291,3 +291,89 @@ magnitudes) and `test_neville.py` (the $O(n^2)$ operation count, the
 $\|\omega^{\mathrm{Cheb}}\|=2((b-a)/4)^{n+1}$ identity of [S4 Thm 1.21], the
 Chebyshev Lebesgue bound of [S4 Thm 1.24], the three numbers of [S4 Ex. 1.26],
 the stalled columns of [S4 Ex. 1.18], and the F1/S1a exam items above).
+
+## Cards
+
+```card id=numc-01-neville-cost
+True or false: evaluating the interpolant $p_n(x)$ at one point with the Neville scheme costs $O(n)$.
+---
+False. It costs $O(n^2)$ arithmetic operations [S4 Rem. 1.6].
+The most repeated true/false item in the past papers.
+```
+
+```card id=numc-01-neville-recursion
+State the Neville recursion for $p_{j,m}$, the interpolant of $(x_k,f_k)$, $k=j..j+m$.
+---
+$p_{j,0}=f_j$, $p_{j,m}(x)=\dfrac{(x-x_j)p_{j+1,m-1}(x)-(x-x_{j+m})p_{j,m-1}(x)}{x_{j+m}-x_j}$.
+The answer is $p(x)=p_{0,n}(x)$.
+```
+
+```card id=numc-01-error-formula
+State the interpolation error formula for $f\in C^{n+1}([a,b])$ and $n+1$ knots.
+---
+$f(x)-p(x)=\omega_{n+1}(x)\,\dfrac{f^{(n+1)}(\xi)}{(n+1)!}$ for some $\xi\in(a,b)$,
+with $\omega_{n+1}(x)=\prod_{j=0}^n(x-x_j)$ [S4 Thm 1.15].
+```
+
+```card id=numc-01-divided-diff
+Define the divided differences and say how they give the Newton form coefficients.
+---
+$f[x_i]=f_i$, $f[x_0..x_k]=\dfrac{f[x_1..x_k]-f[x_0..x_{k-1}]}{x_k-x_0}$, and $d_k=f[x_0..x_k]$.
+Cost $O(n^2)$ once, then $O(n)$ per point by Horner.
+```
+
+```card id=numc-01-dd-derivative
+How is $f[x_0,\ldots,x_k]$ related to derivatives of $f$?
+---
+$f[x_0,\ldots,x_k]=\frac1{k!}f^{(k)}(\xi)$ with $\xi\in(\min x_i,\max x_i)$ [S4 Rem. 1.12].
+For coincident knots this gives $f[x_i,\ldots,x_i]=f^{(k)}(x_i)/k!$ (Hermite).
+```
+
+```card id=numc-01-chebyshev
+Give the Chebyshev points on $[-1,1]$ and the value of $\|\omega_{n+1}\|_{\infty,[a,b]}$ they achieve.
+---
+$x_i=\cos\big(\pi\frac{2i+1}{2n+2}\big)$, $i=0..n$, mapped affinely to $[a,b]$.
+$\|\omega^{\mathrm{Cheb}}_{n+1}\|_\infty=2\big(\frac{b-a}{4}\big)^{n+1}$, minimal over all knot sets.
+```
+
+```card id=numc-01-lebesgue
+Define the Lebesgue constant $\Lambda_n$ and state the error bound it gives.
+---
+$\Lambda_n=\max_{x\in[-1,1]}\sum_i|\ell_i(x)|$.
+$\|f-I_nf\|_\infty\le(1+\Lambda_n)\min_{q\in\mathcal P_n}\|f-q\|_\infty$.
+```
+
+```card id=numc-01-lebesgue-growth
+True or false: the Lebesgue constant for uniform knots grows like $O(\log n)$.
+---
+False. Uniform grows exponentially, $\sim 2^n/(e\,n\ln n)$.
+Chebyshev is logarithmic: $\Lambda_n^{\mathrm{Cheb}}\le\frac2\pi\ln(n+1)+1$.
+```
+
+```card id=numc-01-runge
+True or false: more equidistant knots always give a smaller interpolation error.
+---
+False (Runge, $f=(1+25x^2)^{-1}$ on $[-1,1]$): $f^{(n+1)}$ grows like $5^{n+1}(n+1)!$,
+beating the $(n+1)!$, and $|\omega_{n+1}|$ is huge near $\pm1$.
+```
+
+```card id=numc-01-extrapolation
+For Neville extrapolation with $h_i=q^i$, $0<q<1$, and $f\in C^{n+1}$, how fast does column $m$ converge, and when does it fail?
+---
+$|f(x_0)-p_{i,m}(x_0)|\le C h_i^{m+1}$: each column buys an order [S4 Thm 1.17].
+Fails if $f$ is not smooth: for $|x|^{3/2}$, $D(h)=\sqrt h$ and all columns stall at $O(\sqrt h)$.
+```
+
+```card id=numc-01-spline-dim
+Compute $\dim S^{3,2}(\Delta)$ on $n+1$ knots and how many extra conditions interpolation leaves.
+---
+$\dim=n(p+1)-(n-1)(r+1)=4n-3(n-1)=n+3$.
+Interpolation fixes $n+1$, so two more: complete, periodic, natural or not-a-knot.
+```
+
+```card id=numc-01-spline-order
+What accuracy does a cubic spline achieve for $f\in C^4$, and which end condition is the trap?
+---
+Complete, periodic, not-a-knot: $\|f-s\|_\infty\le Ch^4\|f^{(4)}\|_\infty$, derivative $O(h^3)$.
+Natural spline is only $O(h^2)$ near the boundary unless $f''$ vanishes there.
+```

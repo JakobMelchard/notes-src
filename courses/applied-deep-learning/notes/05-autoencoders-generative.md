@@ -216,3 +216,89 @@ Collapse: $q_\phi(z \mid x) = p(z)$ for all $x$, KL $= 0$, decoder independent o
 - Sajjadi, M. et al. (2018). Assessing generative models via precision and recall; Kynkaanniemi, T. et al. (2019). Improved precision and recall metric.
 - Theis, L., van den Oord, A., Bethge, M. (2016). A note on the evaluation of generative models. Salimans et al. (2016) [S60], improved techniques for training GANs, is Lecture 7's own source for evaluating them.
 - **Lecture 7** [S4], *Autoencoders and Generative Adversarial Networks*, is the lecture this note covers. **Scope caveat:** the lecture gives diffusion 3.5 minutes of its 75 (one chapter, "Diffusion", at 49:48) whereas this note treats it at length. That is deliberate -- diffusion is a plausible project topic -- but do not infer from the note's length that the course weights it that way.
+
+## Cards
+
+```card id=adl-05-elbo
+Write the ELBO and state the gap to $\log p_\theta(x)$.
+---
+$\mathcal L = \mathbb E_q[\log p_\theta(x \mid z)] - \mathrm{KL}(q_\phi(z \mid x) \| p(z))$.
+Gap is exactly $\mathrm{KL}(q_\phi(z \mid x) \| p_\theta(z \mid x))$.
+```
+
+```card id=adl-05-kl
+Closed-form KL between $\mathcal N(\mu, \mathrm{diag}\,\sigma^2)$ and $\mathcal N(0, I)$?
+---
+$\frac12 \sum_j (\mu_j^2 + \sigma_j^2 - \log\sigma_j^2 - 1)$.
+Zero iff $\mu = 0$ and $\sigma^2 = 1$.
+```
+
+```card id=adl-05-kl-compute
+Compute the KL term for $\mu = (0, 1, -0.5)$, $\sigma^2 = (1, 1, 0.25)$.
+---
+Per-dim terms $0$, $1$, $0.8863$.
+$\mathrm{KL} = \frac12(1.8863) = 0.943$ nats.
+```
+
+```card id=adl-05-reparam
+What is the reparameterisation trick and when does it not apply?
+---
+$z = \mu_\phi + \sigma_\phi \odot \epsilon$, $\epsilon \sim \mathcal N(0, I)$, so gradients pass through $\mu, \sigma$.
+Not for discrete latents: use Gumbel-softmax or VQ-VAE.
+```
+
+```card id=adl-05-collapse
+What is posterior collapse and two fixes?
+---
+$q_\phi(z \mid x) \approx p(z)$, KL $\to 0$, decoder ignores $z$.
+Fixes: KL warm-up (anneal $\beta$ 0 to 1), free bits, weaker decoder.
+```
+
+```card id=adl-05-blurry
+Why are VAE samples blurry?
+---
+Under a per-pixel Gaussian/Bernoulli likelihood the decoder outputs the conditional mean of all $x$ near $z$, an average.
+The likelihood is a poor perceptual metric.
+```
+
+```card id=adl-05-dstar
+What is the optimal GAN discriminator for fixed $G$, and what does $G$ then minimise?
+---
+$D^*(x) = p_d / (p_d + p_g)$.
+$V(D^*, G) = -\log 4 + 2\,\mathrm{JS}(p_d \| p_g)$; minimum at $p_g = p_d$, $D^* = 1/2$.
+```
+
+```card id=adl-05-nonsat
+Why use the non-saturating generator loss $-\log D(G(z))$?
+---
+$\log(1 - D(G(z)))$ has small gradient when $D$ confidently rejects samples.
+Same fixed point, large gradient exactly when $G$ is bad.
+```
+
+```card id=adl-05-mode-collapse
+True or false: GAN losses tell you whether mode collapse is happening.
+---
+False. Losses are not a single objective and are uninformative.
+Measure coverage (e.g. modes hit, precision/recall).
+```
+
+```card id=adl-05-wgan
+What does WGAN replace JS with, and how does WGAN-GP enforce its constraint?
+---
+Wasserstein-1, useful gradients even for disjoint supports; critic must be 1-Lipschitz.
+Gradient penalty $\lambda\,\mathbb E[(\|\nabla f(\hat x)\| - 1)^2]$ on interpolates, $\lambda = 10$.
+```
+
+```card id=adl-05-ddpm-forward
+What is the closed form $q(x_t \mid x_0)$ in DDPM, and why does it matter for training?
+---
+$\mathcal N(\sqrt{\bar\alpha_t} x_0, (1-\bar\alpha_t) I)$, $\bar\alpha_t = \prod_{s \le t}(1 - \beta_s)$.
+Sample a random $t$ in one shot: one network evaluation per step regardless of $T$.
+```
+
+```card id=adl-05-ddpm-loss
+State DDPM's simple training loss.
+---
+$\mathbb E\|\epsilon - \epsilon_\theta(\sqrt{\bar\alpha_t}x_0 + \sqrt{1-\bar\alpha_t}\epsilon, t)\|^2$.
+A denoising autoencoder trained at all noise levels.
+```

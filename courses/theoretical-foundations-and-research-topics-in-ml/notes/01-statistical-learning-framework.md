@@ -146,3 +146,73 @@ Bayes predictor with a soft $\eta$: if instead $\eta(x)=x$ on $[0,1]$ (uniform $
 - Hastie, Tibshirani & Friedman, *ESL* (2009): Ch. 2.4 (statistical decision theory, Bayes classifier, squared loss), Ch. 7.2–7.4 (optimism of the training error).
 - Devroye, Györfi & Lugosi, *A Probabilistic Theory of Pattern Recognition* (1996): Ch. 2 (Bayes rule for zero-one loss).
 - Vapnik, *The Nature of Statistical Learning Theory* (1995): Ch. 1 (setting of the learning problem, risk minimisation).
+
+## Cards
+
+```card id=tfml-01-bayes-classifier
+What is the Bayes optimal classifier for zero-one loss, and its Bayes risk?
+---
+$h^\star(x)=\mathrm{sign}(\eta(x)-\tfrac12)$ with $\eta(x)=P(y=+1\mid x)$.
+$L^\star=\mathbb E_x\min\{\eta(x),1-\eta(x)\}$.
+Proof: minimise the conditional error pointwise in $x$.
+```
+
+```card id=tfml-01-bayes-squared-loss
+What is the Bayes predictor for squared loss, and why?
+---
+$h^\star(x)=\mathbb E[y\mid x]$, with $L^\star=\mathbb E\,\mathrm{Var}(y\mid x)$.
+$\mathbb E[(h-y)^2\mid x]=(h-m)^2+\mathrm{Var}(y\mid x)$; cross term vanishes since $\mathbb E[y-m\mid x]=0$.
+```
+
+```card id=tfml-01-erm-optimism-chain
+State the expectation chain for the ERM output $h_S$ (Theorem 1.3b).
+---
+$$\mathbb E_S L_S(h_S)\le\min_{h\in\mathcal H}L_{\mathcal D}(h)\le\mathbb E_S L_{\mathcal D}(h_S)$$
+So the expected generalisation gap of ERM is non-negative.
+```
+
+```card id=tfml-01-unbiased-only-fixed-h
+True or false: $\mathbb E_S L_S(h)=L_{\mathcal D}(h)$ holds for the ERM output $h_S$.
+---
+False. Only for $h$ fixed before seeing $S$. $h_S$ depends on $S$, so its training error is biased downward (selection bias). A held-out test set restores unbiasedness.
+```
+
+```card id=tfml-01-error-decomposition
+Write the approximation/estimation decomposition of excess risk. What does enlarging $\mathcal H$ do?
+---
+$L_{\mathcal D}(h_S)-L^\star=(L_{\mathcal D}(h_S)-L_{\mathcal D}(h_{\mathcal H}))+(L_{\mathcal D}(h_{\mathcal H})-L^\star)$, estimation plus approximation.
+Larger $\mathcal H$: approximation error down, estimation error (typically) up. More data reduces estimation error only.
+```
+
+```card id=tfml-01-est-vs-gap
+Is the estimation error the same as the generalisation gap?
+---
+No. $\varepsilon_{\mathrm{est}}=L_{\mathcal D}(h_S)-L_{\mathcal D}(h_{\mathcal H})$ compares two true risks; the gap $L_{\mathcal D}(h_S)-L_S(h_S)$ compares true and empirical risk of one hypothesis.
+```
+
+```card id=tfml-01-memoriser
+What does the memorising classifier show, and under which condition on $\mathcal D$?
+---
+With atomless $\mathcal D_{\mathcal X}$: $L_S(h_S)=0$ but $L_{\mathcal D}(h_S)=P(y=+1)$, e.g. $\tfrac12$.
+ERM over all functions fails; $\mathcal H$ must be restricted. Zero training error is not evidence of learning.
+```
+
+```card id=tfml-01-noisy-threshold
+Noisy threshold: $x\sim\mathrm{Unif}[0,1]$, labels $\mathrm{sign}(x-\theta)$ flipped w.p. $\eta<\tfrac12$. Give $L_{\mathcal D}(h_t)$ and $L^\star$.
+---
+$L_{\mathcal D}(h_t)=\eta+(1-2\eta)|t-\theta|$, $L^\star=\eta$, $h^\star=h_\theta$.
+```
+
+```card id=tfml-01-realisable-vs-assumption
+Realisable case (note 01) vs realisability assumption (note 03): what is the difference?
+---
+Realisable: labels are a deterministic $f$ of $x$, $\eta\in\{0,1\}$.
+Realisability assumption is stronger: $f\in\mathcal H$, i.e. some $h\in\mathcal H$ has $L_{\mathcal D}(h)=0$.
+```
+
+```card id=tfml-01-surrogates
+Why use hinge or logistic loss instead of zero-one loss?
+---
+They are convex upper bounds on $\ell_{0\text{-}1}(\mathrm{sign}\,g(x),y)$, while $\ell_{0\text{-}1}$ is not convex in $g$.
+Used for optimisation; the reported quantity is still $0$-$1$ risk.
+```

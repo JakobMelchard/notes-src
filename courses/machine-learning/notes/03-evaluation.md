@@ -136,3 +136,83 @@ Bias–variance numerically: a 1-NN on $n = 200$ noisy points and a linear fit. 
 
 `src/py/metrics.py`: `confusion_matrix`, `precision_recall_f1(average=binary|macro|micro)`, `roc_curve`, `roc_auc`, `roc_auc_rank` (Mann–Whitney form), `precision_recall_curve`, `average_precision`, `log_loss`, `mse`, `rmse`, `mae`, `r2`, `classification_report`, and the WEKA family added in the source pass: **`rse`, `rrse`, `rae`, `correlation_coefficient`, `regression_report`** [S13].
 `src/py/model_selection.py`: `kfold`, `stratified_kfold`, `cross_val_score`, `cross_val_predict`, `paired_t_test`, `corrected_resampled_t_test`, `mcnemar_test`.
+
+## Cards
+
+```card id=ml-03-prf
+Give the formulas for precision, recall and specificity.
+---
+Precision $= \frac{TP}{TP+FP}$, recall $= \frac{TP}{TP+FN}$, specificity $= \frac{TN}{TN+FP}$.
+```
+
+```card id=ml-03-compute
+Compute precision, recall, $F_1$ and specificity for TP = 30, FP = 10, FN = 20, TN = 940.
+---
+P $= 0.75$, R $= 0.6$, $F_1 = 2(0.75)(0.6)/1.35 = 0.667$, specificity $= 940/950 = 0.989$.
+```
+
+```card id=ml-03-micro-macro
+What is the difference between micro- and macro-averaged measures?
+---
+Macro: metric per class, then unweighted mean, every class counts equally.
+Micro: pool TP/FP/FN over classes, compute once; large classes dominate (micro-F1 = accuracy for single-label).
+```
+
+```card id=ml-03-auc
+What does AUC measure, and why can it mislead on imbalanced data?
+---
+$P(s(x_+) > s(x_-))$: probability a random positive outranks a random negative; 0.5 = random.
+With rare positives a small FPR still means many more FP than TP; use the PR curve.
+```
+
+```card id=ml-03-fscore-reg
+True or false: F-score is an important performance metric for evaluating regression techniques.
+---
+False. F-score is a classification metric.
+```
+
+```card id=ml-03-relative-err
+What are RAE and RSE, and what value means "no better than the baseline"?
+---
+$\text{RAE} = \frac{\sum |p_i - a_i|}{\sum |\bar a - a_i|}$, $\text{RSE} = \frac{\sum (p_i - a_i)^2}{\sum (\bar a - a_i)^2}$, $\text{RRSE} = \sqrt{\text{RSE}}$.
+Denominator is the 0R (mean) baseline error; value 1 means no better than it. $R^2 = 1 - \text{RSE}$.
+```
+
+```card id=ml-03-pearson
+True or false: the Pearson coefficient has a value range from $-1$ to 1.
+---
+True. $r = \frac{S_{pa}}{\sqrt{S_{pp}S_{aa}}} \in [-1, 1]$.
+```
+
+```card id=ml-03-lpo
+True or false: leave-$p$-out CV is computationally expensive on large data sets.
+---
+True. Every subset of size $p$ is a test set in turn: $\binom np$ fits.
+```
+
+```card id=ml-03-bootstrap
+In the bootstrap, how is the training set drawn and what fraction is out-of-bag?
+---
+Sample of size $n$ drawn with replacement; about 36.8 % of rows are out-of-bag and serve as the test set (.632 rule corrects the pessimism).
+```
+
+```card id=ml-03-paired-t
+When does a paired $t$-test apply to model comparison, and why is the plain version over CV folds anti-conservative?
+---
+It needs several matched pairs of scores (k-fold CV or repeated hold-out), not a single split.
+Fold training sets overlap, so scores are correlated and variance is underestimated; fix with the corrected resampled $t$-test.
+```
+
+```card id=ml-03-mcnemar
+State McNemar's test statistic and its 5 % rejection threshold.
+---
+$\chi^2 = \frac{(|b-c|-1)^2}{b+c}$, $b$ = A right and B wrong, $c$ = A wrong and B right; 1 dof.
+Reject when $\chi^2 > 3.84$. It uses the disagreements only.
+```
+
+```card id=ml-03-bias-var
+State the bias-variance decomposition for squared loss, and where kNN with $k=1$ and $k=n$ sits.
+---
+Expected error = bias$^2$ + variance + $\sigma^2$ (irreducible).
+$k = 1$: bias near 0, variance maximal. $k = n$: predicts the global mean, variance near 0, bias maximal.
+```

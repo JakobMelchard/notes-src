@@ -288,3 +288,85 @@ nonlinear BVP against a fine finite-difference reference).
 `src/cpp/rk4.cpp`: RK4 (observed order 4, oscillator energy, blow-up
 $=R(-5)^{20}$ at $z=-5$) and adaptive Dormand–Prince RK45 on Van der Pol
 $\mu=5$ against a fixed-step reference.
+
+## Cards
+
+```card id=numc-11-euler-consistency
+Define the consistency error of explicit Euler and bound it.
+---
+$\tau_{eE}(t,h)=y(t+h)-[y(t)+hf(t,y(t))]$, $|\tau_{eE}|\le\frac12h^2\|y''\|_\infty$.
+```
+
+```card id=numc-11-euler-convergence
+What is the convergence order of explicit Euler, and why is one order lost from consistency?
+---
+$\max_i|y(t_i)-y_i|\le Ce^{LT}h$: order 1.
+Local error $O(h^2)$ accumulates over $N\sim1/h$ steps.
+```
+
+```card id=numc-11-implicit-euler
+Give the implicit Euler step and how it is solved.
+---
+$y_{i+1}=y_i+hf(t_{i+1},y_{i+1})$.
+Newton on $G(y)=y-y_i-hf(t_{i+1},y)$ with $G'=I-h\,\partial_yf$.
+```
+
+```card id=numc-11-rk4
+Write the RK4 stages and update.
+---
+$k_1=f(t_0,y_0)$, $k_2=f(t_0+\frac h2,y_0+\frac h2k_1)$, $k_3=f(t_0+\frac h2,y_0+\frac h2k_2)$, $k_4=f(t_0+h,y_0+hk_3)$.
+$y_1=y_0+\frac h6[k_1+2k_2+2k_3+k_4]$.
+```
+
+```card id=numc-11-rk4-simpson
+Which quadrature rule does RK4 reduce to for $y'=f(t)$?
+---
+Simpson's rule: $\frac h6[f(t_0)+4f(t_0+\frac h2)+f(t_0+h)]$.
+```
+
+```card id=numc-11-heun
+Give the Butcher tableau of Heun's method and its order.
+---
+$c_2=1$, $a_{21}=1$, $b=(\frac12,\frac12)$. Order 2.
+```
+
+```card id=numc-11-theta
+What are the special cases and orders of the $\theta$-scheme $y_1=y_0+hf(t_0+\theta h,\theta y_1+(1-\theta)y_0)$?
+---
+$\theta=0$ explicit Euler, $\theta=1$ implicit Euler, $\theta=\frac12$ implicit midpoint.
+Order 1 for $\theta\ne\frac12$, order 2 for $\theta=\frac12$.
+```
+
+```card id=numc-11-stab-functions
+Give $R(z)$ for explicit Euler, implicit Euler and the $\theta=\frac12$ scheme.
+---
+$1+z$; $\frac1{1-z}$; $\frac{1+z/2}{1-z/2}$.
+Polynomial for explicit, rational for implicit methods.
+```
+
+```card id=numc-11-a-stable
+Define A-stability. True or false: some explicit RK method is A-stable.
+---
+$|R(z)|\le1$ for all $\mathrm{Re}\,z\le0$.
+False: explicit $R$ is a polynomial, unbounded as $z\to-\infty$.
+```
+
+```card id=numc-11-euler-step
+Largest stable step for explicit Euler on $y'=-1000y$?
+---
+$|1+h\lambda|\le1\iff h\le2/|\lambda|=0.002$.
+```
+
+```card id=numc-11-stiff
+Why do implicit methods win on stiff problems like [S4 Ex. 9.12] with eigenvalues $-2$, $-40(1\pm i)$?
+---
+Explicit Euler needs $h\le1/40$ forever, even after fast modes decay.
+Implicit Euler is A-stable, so $h$ is set by accuracy alone. Stability, not accuracy, is the issue.
+```
+
+```card id=numc-11-shooting
+Describe the shooting method and its main weakness.
+---
+Guess $y'(0)=s_0$, solve the IVP, solve $y(T;s_0)=y_T$ by Newton; $\partial_{s_0}y$ solves the variational IVP $v(0)=0$, $v'(0)=1$.
+Weakness: sensitivity $Ce^{LT}\varepsilon$, e.g. $e^{100}$ for $L=T=10$.
+```

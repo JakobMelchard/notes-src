@@ -220,3 +220,89 @@ Laptop 192.168.1.10 fetches `http://www.example.com/`:
 ## Code
 
 `src/py/headers.py` — `parse_frame()` walks the encapsulation Ethernet → IP → TCP/UDP and returns one dict per layer; `summarize()` prints a tcpdump-style line. `src/py/pcap.py` — `synthetic_trace()` is the worked HTTP example as bytes.
+
+## Cards
+
+```card id=net-01-nodal-delay
+What are the four components of nodal delay on one link?
+---
+$d_{\text{nodal}} = d_{\text{proc}} + d_{\text{queue}} + L/R + d/s$
+$L/R$ is transmission (push bits onto the wire), $d/s$ is propagation (one bit crosses).
+```
+
+```card id=net-01-store-forward
+Compute: a 1 kB packet crosses three 10 Mbit/s store-and-forward links of 100 km each, propagation $2\cdot10^8$ m/s, no queueing or processing.
+---
+Transmission $3 \cdot 8000/10^7 = 2.4$ ms, propagation $3 \cdot 0.5 = 1.5$ ms.
+Total 3.9 ms.
+```
+
+```card id=net-01-bdp
+What is the bandwidth-delay product and where does it reappear?
+---
+$R \cdot \text{RTT}$: the bits in flight needed to keep a pipe full.
+It reappears as the TCP window.
+```
+
+```card id=net-01-traffic-intensity
+What is traffic intensity and what happens as it approaches 1?
+---
+$I = La/R$ with arrival rate $a$.
+As $I \to 1$ queueing delay grows without bound; full queues drop packets.
+```
+
+```card id=net-01-switching
+How does packet switching differ from circuit switching in resource allocation and guarantees?
+---
+Circuit: resources reserved end to end, fixed bandwidth and delay.
+Packet: no reservation, store and forward, best effort; statistical multiplexing shares links.
+```
+
+```card id=net-01-end-to-end
+What does the end-to-end argument say, and what is its consequence for IP and TCP?
+---
+A function can only be implemented completely and correctly at the endpoints; in the network it is at best a performance optimisation.
+So IP stays unreliable and TCP in the hosts provides reliability. It is a paper (Saltzer, Reed, Clark), not an RFC.
+```
+
+```card id=net-01-robustness
+What is the robustness principle and why is it now considered double-edged?
+---
+RFC 761: "be conservative in what you do, be liberal in what you accept from others".
+RFC 9413: tolerating sloppy senders freezes bugs into the protocol and ossifies it.
+```
+
+```card id=net-01-demux
+Give the EtherTypes for IPv4, IPv6, ARP and the IP protocol numbers for ICMP, TCP, UDP, ICMPv6, OSPF.
+---
+EtherType 0x0800 IPv4, 0x86DD IPv6, 0x0806 ARP.
+Protocol 1 ICMP, 6 TCP, 17 UDP, 58 ICMPv6, 89 OSPF (IANA registries).
+```
+
+```card id=net-01-src-mac
+True or false: the source MAC of a packet arriving at your laptop from a far server is the server's MAC.
+---
+False. A router re-encapsulates in a new L2 frame per hop, so the source MAC is your router's.
+The IP header survives end to end; the Ethernet header changes on every hop.
+```
+
+```card id=net-01-ietf
+How does the IETF make decisions, and who can join?
+---
+"Rough consensus and running code", without formal voting.
+No formal membership; anyone can participate (volunteers, often employer-funded).
+```
+
+```card id=net-01-icann
+When was ICANN formed and what changed in 2016?
+---
+1998, taking over the IANA functions (Jon Postel alone before) under a US Department of Commerce contract.
+2016: transition to a multi-stakeholder model free of US oversight.
+```
+
+```card id=net-01-bcp14
+What is BCP 14 and when do MUST, SHOULD, MAY carry normative meaning?
+---
+BCP 14 = RFC 2119 + RFC 8174.
+They are normative only in capitals.
+```

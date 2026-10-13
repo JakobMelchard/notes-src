@@ -234,3 +234,89 @@ Final: AS 4 reaches p1 through a customer (it earns money either way), AS 1 reac
 ## Code
 
 `src/py/linkstate.py`: `dijkstra`, `dijkstra_trace` (the table above), `routing_table`; test cross-checks `networkx`. `src/py/distvector.py`: `DVNetwork` with `split_horizon`/`poison_reverse`, `count_to_infinity_demo`; test cross-checks networkx's Bellman-Ford. `src/py/pathvector.py`: `PathVectorNetwork.step()` (UPDATE exchange with withdrawal), `GaoRexford` policy (`rank`, `export`), loop rejection (RFC 4271 §9.1.2) logged in `net.log`; with `ShortestPath` the test checks hop counts against networkx. `src/py/ospf.py`: RFC 2328 Appendix B and C constants, `hello_dead_pair`, `adjacency_possible` (§10.5), `which_is_newer`/`install` (§13.1). `src/py/bgp_decision.py`: RFC 4271 §9.1.1 `degree_of_preference`, §9.1.2.2 `TIE_BREAKS` and `select`, §10 `TIMERS`. Both are exercised section by section in `src/py/test_rfc_vectors.py`.
+
+## Cards
+
+```card id=net-07-dijkstra-step
+What is one iteration of Dijkstra's algorithm?
+---
+Pick $w \notin N'$ with minimal $D(w)$, add it to $N'$.
+For each neighbour $v \notin N'$: $D(v) \leftarrow \min(D(v), D(w) + c(w,v))$, update $p(v)$ on improvement.
+```
+
+```card id=net-07-dijkstra-condition
+What condition does Dijkstra's correctness need, and what is its complexity?
+---
+Non-negative link costs.
+$O(|V|^2)$ naive, $O(|E| \log |V|)$ with a heap.
+```
+
+```card id=net-07-ospf-encap
+How is OSPF encapsulated and addressed?
+---
+IP protocol 89, multicast to AllSPFRouters 224.0.0.5 and AllDRouters 224.0.0.6.
+Both are in 224.0.0.0/24, never forwarded: OSPF never leaves the link.
+```
+
+```card id=net-07-dr
+Why does OSPF elect a designated router on a broadcast LAN?
+---
+So $n$ routers form $O(n)$ adjacencies instead of $n^2/2$.
+All routers synchronise with the DR and BDR only.
+```
+
+```card id=net-07-hello-dead
+True or false: RFC 2328 defines default OSPF Hello and Dead intervals of 10 s and 40 s.
+---
+False. Appendix C.3 gives a LAN sample of 10 s and says Dead should be some multiple of Hello ("say 4").
+10/40 is what implementations ship.
+```
+
+```card id=net-07-hello-match
+Which Hello parameters must match for an OSPF adjacency to form?
+---
+Network mask, HelloInterval and RouterDeadInterval (§10.5).
+On a mismatch the adjacency silently never forms.
+```
+
+```card id=net-07-lsa-newer
+In what order does OSPF decide which copy of an LSA is newer?
+---
+LS sequence number, then LS checksum (larger wins), then the one at MaxAge.
+Then if ages differ by more than MaxAgeDiff (15 min), the younger wins; else same instance.
+```
+
+```card id=net-07-bellman-ford
+State the Bellman equation used by distance vector routing.
+---
+$D_x(y) = \min_{v \in N(x)} [\, c(x,v) + D_v(y) \,]$
+Only neighbours' vectors are needed.
+```
+
+```card id=net-07-poison-reverse
+What do split horizon and poisoned reverse do, and what can they not fix?
+---
+Split horizon: do not advertise a route to the neighbour it came from; poisoned reverse: advertise it with cost infinity.
+Both kill 2-node loops; neither fixes loops through three or more nodes.
+```
+
+```card id=net-07-bgp-phases
+How is BGP best-path selection organised in RFC 4271 §9.1?
+---
+Phase 1: degree of preference (LOCAL_PREF for iBGP routes, from policy for eBGP).
+Phase 2 ties, in order: AS_PATH, ORIGIN, MED, eBGP over iBGP, IGP cost to NEXT_HOP, BGP ID, peer address.
+```
+
+```card id=net-07-med
+When are MED values comparable in BGP tie-breaking?
+---
+Only between routes learnt from the same neighbouring AS.
+A route with no MED counts as MED 0. Lowest wins.
+```
+
+```card id=net-07-oldest-route
+True or false: "oldest route wins" is a BGP tie-break step in RFC 4271.
+---
+False; it is a vendor addition for stability.
+The RFC goes from interior cost to lowest BGP Identifier to lowest peer address.
+```

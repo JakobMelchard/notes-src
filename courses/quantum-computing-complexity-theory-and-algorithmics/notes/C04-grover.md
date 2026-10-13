@@ -74,3 +74,78 @@ Inversion about the mean as a picture: $D$ maps each amplitude $a_x\mapsto 2\mu 
 ## Code
 
 `src/py/quantum/grover.py`: `oracle(n, marked)`, `diffusion(n)`, `grover(n, marked, iterations=None, rng=None)`, `success_probability(n, M, k)` (analytic $\sin^2((2k+1)\theta/2)$), `amplitude_amplification(A, good, k)`. `test_grover.py` checks analytic vs simulated probabilities to $10^{-9}$, $P>0.9$ at $k_{\text{opt}}$ for $n=4..6$, and overshooting.
+
+## Cards
+
+```card id=qc-qu4-diffusion
+Define the Grover iteration and the diffusion operator.
+---
+$G=D\,O_f$, $D=2|\psi\rangle\langle\psi|-I=H^{\otimes n}(2|0^n\rangle\langle0^n|-I)H^{\otimes n}$.
+```
+
+```card id=qc-qu4-minus-d
+Which operator does the gate circuit $H^{\otimes n}X^{\otimes n}C^{n-1}ZX^{\otimes n}H^{\otimes n}$ realise?
+---
+$-D$, not $D$. The sign is a harmless global phase per iteration.
+```
+
+```card id=qc-qu4-rotation
+State after $k$ Grover iterations, with $\theta$ defined.
+---
+$\cos(\frac{2k+1}{2}\theta)|\alpha\rangle+\sin(\frac{2k+1}{2}\theta)|\beta\rangle$, $\sin\frac\theta2=\sqrt{M/N}$.
+$G$ is a product of two reflections: rotation by $\theta$.
+```
+
+```card id=qc-qu4-kopt
+Optimal iteration count and its success guarantee.
+---
+$k_{\rm opt}\approx\frac\pi4\sqrt{N/M}$ for $M\ll N$.
+$P\ge1-M/N$.
+```
+
+```card id=qc-qu4-overshoot
+True or false: running more Grover iterations than $k_{\rm opt}$ keeps the success probability high.
+---
+False. $P_k$ is periodic; past $k_{\rm opt}$ it decreases, reaching $\approx0$ near $2k_{\rm opt}+1$.
+```
+
+```card id=qc-qu4-quarter
+Show that for $M=N/4$ one iteration succeeds with certainty.
+---
+$\sin\frac\theta2=\frac12$, so $\theta=\pi/3$; after one iteration the angle is $3\theta/2=\pi/2$, $P_1=1$.
+```
+
+```card id=qc-qu4-n8
+Compute: $N=8$, $M=1$. Optimal iterations and success probability?
+---
+$\theta\approx0.7227$, $k_{\rm opt}=2$, $P_2=\sin^2(5\theta/2)\approx0.945$.
+A third iteration drops it to $0.330$.
+```
+
+```card id=qc-qu4-unknown-m
+How is Grover run when $M$ is unknown?
+---
+Quantum counting: phase estimation of $G$ (eigenvalues $e^{\pm i\theta}$).
+Or BBHT: random $k\in[0,m)$, double $m$ on failure; expected $O(\sqrt{N/M})$.
+```
+
+```card id=qc-qu4-amp-amp
+Amplitude amplification: iterate and speedup.
+---
+$Q=-AS_0A^\dagger S_f$, $S_0=I-2|0\rangle\langle0|$.
+$O(1/\sqrt p)$ iterations instead of $O(1/p)$ repetitions.
+```
+
+```card id=qc-qu4-bbbv
+BBBV lower bound: statement and key step.
+---
+$\Omega(\sqrt N)$ queries. Some $x$ gets total query magnitude $\le T/N$.
+The state then differs by $\le2T/\sqrt N$, which must be $\Omega(1)$.
+```
+
+```card id=qc-qu4-np
+Why does Grover not solve NP-complete problems efficiently?
+---
+$\sqrt{2^n}=2^{n/2}$ is still exponential, and it is optimal for black-box search.
+For SAT total cost $O(2^{n/2}m)$.
+```

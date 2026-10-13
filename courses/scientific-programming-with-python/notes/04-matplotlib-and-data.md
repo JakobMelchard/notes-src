@@ -98,3 +98,79 @@ Where pandas is the wrong tool: homogeneous numeric arrays (use numpy), data lar
 5. Why does `df[df.x > 0]["y"] = 1` not modify `df` in pandas 3?
    (a) Boolean indexing is not allowed in pandas. (b) The first indexing returns an object that behaves as a copy under Copy-on-Write; the assignment writes to that temporary and pandas raises a `ChainedAssignmentError` warning. (c) `y` is read-only. (d) It does modify `df`, but only the first matching row.
    **b.** Use `df.loc[df.x > 0, "y"] = 1`. In pandas ≤ 2 the same mistake raised `SettingWithCopyWarning`, a class that no longer exists [S16].
+
+## Cards
+
+```card id=spp-04-hierarchy
+How do `Figure`, `Axes` and `Axis` relate?
+---
+A Figure contains one or more Axes (plotting areas). Each Axes has two Axis objects and holds the plotted artists.
+```
+
+```card id=spp-04-oo-style
+Why prefer `fig, ax = plt.subplots()` and `ax.plot(...)` over `plt.plot(...)`?
+---
+`plt.plot` acts on whatever figure/axes is current, which breaks inside functions and loops.
+```
+
+```card id=spp-04-plot-returns
+What does `ax.plot(...)` return?
+---
+A list of `Line2D` artists, which you can restyle later (`line.set_color`).
+```
+
+```card id=spp-04-savefig
+How does `fig.savefig` pick the format, and when use vector vs raster?
+---
+From the file extension. Vector (pdf, svg) for line plots; raster png at `dpi=200+` for images and dense scatter.
+```
+
+```card id=spp-04-agg
+How do you make matplotlib work in headless scripts and tests?
+---
+Call `matplotlib.use("Agg")` before importing pyplot.
+```
+
+```card id=spp-04-imshow-origin
+Where does `ax.imshow(Z)` place row 0 of `Z` by default?
+---
+At the top (`origin="upper"`, image convention). Use `origin="lower"` with `extent` for data grids.
+```
+
+```card id=spp-04-colormap
+Which colour maps should you use for sequential data, and when diverging?
+---
+Perceptually uniform maps (`viridis`, the default, `magma`, `cividis`), never `jet`.
+Diverging maps only when zero is meaningful.
+```
+
+```card id=spp-04-transform
+What does `df.groupby("sample")["y"].transform("mean")` return, versus `agg`?
+---
+A Series aligned to the original rows holding each row's group mean. `agg` reduces to one row per group.
+```
+
+```card id=spp-04-chained
+In pandas 3, what does `df[mask]["col"] = v` do?
+---
+Nothing to `df`: under Copy-on-Write it writes a temporary and raises a `ChainedAssignmentError` warning.
+Use `df.loc[mask, "col"] = v`.
+```
+
+```card id=spp-04-str-dtype
+In pandas 3, what is the dtype of `pd.Series(["a", "b"])`?
+---
+The dedicated `str` dtype (PDEP-14), not `object`. It holds only strings and missing values.
+```
+
+```card id=spp-04-ddof
+What are `pd.Series([1., 2., 3.]).std()` and `np.std([1., 2., 3.])`?
+---
+`1.0` (pandas `ddof=1`) vs `0.8165` (numpy `ddof=0`).
+```
+
+```card id=spp-04-nan-int
+What happens to an integer pandas column when NaNs appear, and the remedy?
+---
+It becomes float. Use the nullable `Int64` dtype.
+```

@@ -157,3 +157,89 @@ $1\times1$ conv mixes channels at each position independently (weights `[C_out, 
 - Lin et al. 2014 [S42], Network in Network (global average pooling, $1\times1$ conv). Yu & Koltun 2016, dilated convolutions. Luo et al. 2016, effective receptive field. Odena et al. 2016, checkerboard artifacts. Dumoulin & Visin 2018 [S38], *A guide to convolution arithmetic for deep learning* -- **Lecture 3's own reference 1** [S4], and the source of the output-size formulas, which `src/py/shape_formulas.py` re-derives and checks against torch over 936 configurations.
 - Ioffe & Szegedy 2015 [S28], batch norm. Wu & He 2018, group norm. Yosinski et al. 2014, transferability of features. Kornblith et al. 2019, do better ImageNet models transfer better.
 - DeVries & Taylor 2017 [S33], cutout. Zhong et al. 2020, random erasing. Zhang et al. 2018, mixup. Yun et al. 2019, CutMix. Cubuk et al. 2020, RandAugment.
+
+## Cards
+
+```card id=adl-02-out-size
+What is the output size of a conv with input $i$, kernel $k$, padding $p$, stride $s$?
+---
+$o = \lfloor (i + 2p - k)/s \rfloor + 1$.
+Dilation $d$: substitute $k_{eff} = d(k-1) + 1$.
+```
+
+```card id=adl-02-resnet-stem
+Compute the output of the ResNet stem on $224\times224$: $7\times7$ conv, stride 2, padding 3, then $3\times3$ max pool, stride 2, padding 1.
+---
+Conv: $\lfloor(224+6-7)/2\rfloor + 1 = 112$.
+Pool: $\lfloor(112+2-3)/2\rfloor + 1 = 56$.
+```
+
+```card id=adl-02-rf
+State the receptive-field recursion.
+---
+$r_l = r_{l-1} + (k_l - 1)\prod_{j<l} s_j$, with $r_0 = 1$.
+Downsampling makes later layers grow $r$ faster.
+```
+
+```card id=adl-02-conv-params
+Parameter count and MACs of one conv layer?
+---
+Params $k^2 C_{in} C_{out} + C_{out}$ (bias dropped before BN), independent of image size.
+MACs $k^2 C_{in} C_{out} H_o W_o$, FLOPs $\approx 2\,$MACs.
+```
+
+```card id=adl-02-xcorr
+True or false: deep learning frameworks implement true convolution.
+---
+False. They implement cross-correlation (no kernel flip) and call it conv.
+The flip is irrelevant because $w$ is learned.
+```
+
+```card id=adl-02-equivariance
+Equivariance vs invariance in a CNN: which operations give which?
+---
+Stride-1 conv is translation-equivariant, $f(Tx) = Tf(x)$.
+Pooling gives local invariance; global average pooling approximate global translation invariance. Rotation and scale are not built in.
+```
+
+```card id=adl-02-resnet
+Why do residual blocks allow very deep networks to train?
+---
+$\partial y_L/\partial x_0 = \prod_l (I + J_l)$ contains the identity path, so early layers get an $O(1)$ gradient.
+Identity is easy ($F = 0$), so deeper is never worse at init.
+```
+
+```card id=adl-02-degradation
+What is the degradation problem ResNet addressed, and is it overfitting?
+---
+A 56-layer plain net has higher training error than a 20-layer one.
+Not overfitting: it is an optimisation failure.
+```
+
+```card id=adl-02-bottleneck
+Why does a bottleneck block use $1\times1$ convs, and how much cheaper is it at $C = 256$?
+---
+$1\times1$ convs shrink to $C/4$ for the $3\times3$ conv and expand back.
+$69{,}632$ params vs $1{,}179{,}648$ for two full-width $3\times3$ convs.
+```
+
+```card id=adl-02-transfer
+Feature extraction vs fine-tuning a pretrained backbone: what differs?
+---
+Feature extraction: freeze backbone, train only the head; robust with $10^2$-$10^3$ images.
+Fine-tuning: unfreeze top blocks, small backbone LR and larger head LR; more data or domain shift means unfreeze more.
+```
+
+```card id=adl-02-small-images
+Why can a pretrained ResNet do worse than a 3-layer CNN on $32\times32$ inputs?
+---
+The stride-2 $7\times7$ conv plus stride-2 max pool reduce $32\times32$ to $8\times8$ before the first block.
+Fix: upsample to $\ge 128$ or replace the stem with a $3\times3$ stride-1 conv.
+```
+
+```card id=adl-02-checkerboard
+What causes checkerboard artifacts in transposed convolutions and how do you avoid them?
+---
+Kernel size not divisible by stride.
+Use $k = 4, s = 2$, or nearest-neighbour upsample followed by a $3\times3$ conv.
+```

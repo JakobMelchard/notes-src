@@ -82,3 +82,77 @@ answers re-computed in the venv against SciPy 1.18.1.
 5. `scipy.stats.norm(2, 0.5).ppf(0.975)` returns
    (a) the probability of 0.975 (b) about 2.98, the 97.5 % quantile (c) 1.96 (d) the density at 0.975
    **b.** `ppf` is the inverse CDF: $2 + 1.96 \cdot 0.5 = 2.98$; (c) would be the standard normal.
+
+## Cards
+
+```card id=spp-03-import
+Does `import scipy` alone load subpackages like `integrate`?
+---
+No. Import them explicitly: `from scipy import integrate`.
+```
+
+```card id=spp-03-quad
+What does `scipy.integrate.quad(f, a, b)` return and what method does it use?
+---
+`(value, abserr)`, from adaptive 21-point Gauss-Kronrod.
+```
+
+```card id=spp-03-trap-simpson
+What are the error orders of `trapezoid` and `simpson`, and what are they for?
+---
+$O(h^2)$ and $O(h^4)$. They integrate tabulated data (do not use `quad` on tabulated data).
+```
+
+```card id=spp-03-ivp-form
+What form must an ODE have for `solve_ivp`?
+---
+A first-order system $y' = f(t, y)$. Rewrite $x'' = -\omega^2 x$ as $y = (x, v)$ with $v = x'$.
+```
+
+```card id=spp-03-stiff
+Which `solve_ivp` methods suit stiff problems, and why not `RK45`?
+---
+`Radau`, `BDF`, `LSODA`. Explicit methods like `RK45` would need tiny steps for stability.
+```
+
+```card id=spp-03-odeint
+What is the argument-order trap between `odeint` and `solve_ivp`?
+---
+Legacy `odeint` wants `f(y, t)`; `solve_ivp` wants `fun(t, y)`.
+```
+
+```card id=spp-03-interp1d
+What is the status of `interp1d`, and what should new code use?
+---
+Legacy (no updates, no warning). Use `np.interp` for linear and `CubicSpline` / `make_interp_spline` otherwise.
+```
+
+```card id=spp-03-sparse-format
+Which sparse format for repeated matvec and row slicing, and how do you build it?
+---
+CSR. Build in COO or LIL, then `.tocsr()`; do not modify CSR structure in a loop. CSC is what `spsolve` wants.
+```
+
+```card id=spp-03-rfft
+`rfft` of a real signal of length 1000 sampled at 500 Hz: how many bins, up to which frequency?
+---
+501 bins ($n/2+1$), spacing $f_s/n = 0.5$ Hz, up to Nyquist $f_s/2 = 250$ Hz.
+```
+
+```card id=spp-03-circular
+What do you get if you multiply FFTs for convolution without zero-padding?
+---
+Circular convolution. For linear convolution pad to $m \ge 2n - 1$.
+```
+
+```card id=spp-03-ppf
+What does `scipy.stats.norm(2, 0.5).ppf(0.975)` return?
+---
+About 2.98, the 97.5 % quantile: `ppf` is the inverse CDF, $2 + 1.96 \cdot 0.5$.
+```
+
+```card id=spp-03-sos
+Why design filters with `output="sos"`?
+---
+Second-order sections are numerically robust; the `(b, a)` transfer-function form is ill-conditioned above order about 8.
+```

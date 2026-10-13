@@ -141,3 +141,88 @@ AS 1 learns prefix P from customer AS 5 with path (5, 9, 9, 9) (AS 9 did **path 
 ## Code
 
 `src/py/subnet.py::ForwardingTable` (LPM lookup, IPv4 and IPv6, `demo_table()` above). Algorithms: `linkstate.py`, `distvector.py`, `pathvector.py` (Gao–Rexford policy class `GaoRexford`, `demo()` builds the four-AS example). Specification-level: `src/py/bgp_decision.py` (RFC 4271 §9.1.1, §9.1.2.2, §10) and `src/py/ospf.py` (RFC 2328 Appendices B and C, §13.1), both covered by `test_rfc_vectors.py`.
+
+## Cards
+
+```card id=net-06-planes
+How do the forwarding (data) plane and routing (control) plane differ?
+---
+Forwarding: per packet, nanoseconds, hardware; picks the next hop from the FIB.
+Routing: seconds to minutes, software; fills the tables from neighbours' messages and policy.
+```
+
+```card id=net-06-lpm
+Compute: table 10.0.0.0/8 R1, 10.128.0.0/9 R2, 10.192.0.0/10 R3, default R4. Next hop for 10.200.1.1, 10.130.1.1, 10.1.1.1, 11.0.0.1?
+---
+R3, R2, R1, R4.
+Longest matching prefix wins.
+```
+
+```card id=net-06-ecmp
+How does equal-cost multipath pick among several next hops?
+---
+By hashing the 5-tuple, so one flow stays on one path.
+```
+
+```card id=net-06-admin-distance
+True or false: administrative distance values are defined in an RFC.
+---
+False; they are Cisco's: connected 0, static 1, eBGP 20, OSPF 110, RIP 120, iBGP 200.
+Within one protocol the metric decides; across protocols the distance.
+```
+
+```card id=net-06-routing-families
+What does each router know and compute in distance vector, link state and path vector routing?
+---
+DV: neighbours' vectors, Bellman-Ford (RIP). LS: whole topology via flooded LSAs, Dijkstra (OSPF, IS-IS).
+PV: full AS path per prefix, policy-based selection, loops detected by own AS in path (BGP).
+```
+
+```card id=net-06-bgp-tcp
+Why does BGP run over TCP, and on which port?
+---
+TCP port 179 between configured peers.
+It transfers large incremental tables and needs reliable ordered delivery without its own retransmission.
+```
+
+```card id=net-06-local-pref
+May LOCAL_PREF be sent to an external peer?
+---
+No; it MUST NOT (iBGP only, RFC 4271).
+That is why it expresses your own policy, not somebody else's.
+```
+
+```card id=net-06-ibgp
+Why does iBGP not re-advertise routes learnt from iBGP?
+---
+To prevent loops: inside an AS the AS path does not grow.
+Hence full mesh or route reflectors.
+```
+
+```card id=net-06-valley-free
+State the valley-free export rule (Gao-Rexford).
+---
+To customers: everything. To providers and peers: only own and customer routes.
+Not in RFC 4271; it is Gao and Rexford 2001.
+```
+
+```card id=net-06-import-pref
+Which routes does an AS prefer on import, and why?
+---
+Customer (they pay) over peer (free) over provider (costs).
+So a customer route wins even with a longer AS path.
+```
+
+```card id=net-06-hot-potato
+What is hot-potato routing and what does it cause?
+---
+Hand traffic to the neighbour at the nearest exit (lowest IGP cost to NEXT_HOP).
+Paths are often asymmetric.
+```
+
+```card id=net-06-bgp-timers
+Give RFC 4271's suggested HoldTime, KeepaliveTime and MRAI values.
+---
+HoldTime 90 s, Keepalive = HoldTime/3 = 30 s, ConnectRetry 120 s.
+MRAI 30 s on eBGP, 5 s on iBGP; all jittered by U(0.75, 1.0).
+```

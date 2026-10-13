@@ -96,7 +96,7 @@ evaluate on the untouched test split. Recipe details and when it fails: ADL 02.
 stride 1, no padding: $o = 32 - 3 + 1 = 30$, output $16\times30\times30$,
 parameters $16(27 + 1) = 448$ [S7]. Conv3, conv3, pool 2/2, conv3, conv3:
 $r = 3, 5, 6, 10, 14$ [S9]. Max pool 2/2 of rows $(1,1,2,4 \mid 5,6,7,8 \mid
-3,2,1,0 \mid 1,2,3,4)$: $\begin{psmallmatrix}6&8\\3&4\end{psmallmatrix}$ [S9].
+3,2,1,0 \mid 1,2,3,4)$: $\begin{pmatrix}6&8\\3&4\end{pmatrix}$ [S9].
 Stride-2 pools for $64\times64$ with size-preserving convs: 64, 32, 16, 8, 4;
 three or four, so the last map is $8\times8$ or $4\times4$: enough pooling that
 $r$ covers the object, not so much that spatial layout disappears.

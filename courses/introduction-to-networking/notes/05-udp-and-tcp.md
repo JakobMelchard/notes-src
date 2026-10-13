@@ -194,3 +194,89 @@ What to read off: doubling in slow start; a loss with enough data behind it is r
 ## Code
 
 `src/py/headers.py`: `build_udp/parse_udp`, `build_tcp/parse_tcp`, `parse_tcp_options`, `pseudo_header`. `src/py/tcp_sim.py`: `TCPSim` (sequence/ack bookkeeping, `update_rto` per RFC 6298, slow start/AIMD/fast retransmit) with scripted losses via `Link(drop={...})`; `python tcp_sim.py` prints scenario 2. `src/py/tcp_fsm.py`: `Endpoint` (open/send/close/receive, RFC 9293 §3.3.2 and §3.4 numbering), `Segment` (prints the RFC's `<SEQ=…><ACK=…><CTL=…>` notation); `python tcp_fsm.py` prints Figures 6 and 12. `src/py/pcap.py::synthetic_trace()` is scenario 1's shape as bytes (same ISNs and 18-byte request, but one 40-byte response segment instead of 3 × 1000), and `test_tcp_fsm.py::test_pcap_synthetic_trace_is_a_legal_walk` checks it segment by segment against the state machine.
+
+## Cards
+
+```card id=net-05-udp-checksum
+Is the UDP checksum mandatory, and what does it cover?
+---
+Optional over IPv4 (0 = not computed), mandatory over IPv6.
+Covers a pseudo-header (src IP, dst IP, zero, protocol, UDP length), the header and data.
+```
+
+```card id=net-05-pseudo-header
+Why does the UDP/TCP checksum include a pseudo-header, and what is the price?
+---
+A datagram delivered to the wrong host or protocol fails the check.
+Price: layer violation; UDP must know IP addresses and NAT must fix the checksum.
+```
+
+```card id=net-05-handshake
+Give flags, seq and ack of the three-way handshake with ISNs $x$ and $y$.
+---
+SYN seq $x$; SYN+ACK seq $y$ ack $x+1$; ACK seq $x+1$ ack $y+1$.
+The SYN consumes one number, so the first data byte is $x+1$.
+```
+
+```card id=net-05-ack-meaning
+What does TCP ack number 1019 mean?
+---
+The next byte expected; all bytes up to 1018 have arrived (cumulative).
+Not "last received".
+```
+
+```card id=net-05-mss
+What is the MSS on Ethernet, and what is the default if the MSS option is absent?
+---
+MTU minus 40 = 1460 on Ethernet.
+Default 536 when the option is absent (RFC 9293).
+```
+
+```card id=net-05-rto-formula
+Give the RFC 6298 RTO update, including the order of updates.
+---
+RTTVAR first, with the old SRTT: $\tfrac34\text{RTTVAR} + \tfrac14|\text{SRTT} - R'|$; then $\text{SRTT} = \tfrac78\text{SRTT} + \tfrac18 R'$.
+$\text{RTO} = \text{SRTT} + \max(G, 4\,\text{RTTVAR})$; if below 1 s, round up to 1 s (rule 2.4).
+```
+
+```card id=net-05-rto-compute
+Compute: first RTT sample 100 ms. RTO by the formula and after rule 2.4?
+---
+SRTT = 0.1, RTTVAR = 0.05, RTO = 0.1 + 4 x 0.05 = 0.3 s.
+Rounded up to 1 s by rule 2.4 (Linux uses a 200 ms floor and keeps 0.3 s).
+```
+
+```card id=net-05-fast-retransmit
+When does fast retransmit fire, and why do small transfers often time out instead?
+---
+On three duplicate ACKs (four ACKs with the same number): retransmit without waiting for the timer.
+It needs at least 3 segments after the lost one in flight.
+```
+
+```card id=net-05-reno-loss
+Compute (Reno): cwnd 32 MSS full window. cwnd and ssthresh after a timeout vs after 3 dup ACKs?
+---
+Both: ssthresh = max(FlightSize/2, 2 SMSS) = 16.
+Timeout: cwnd = 1, slow start. 3 dup ACKs: cwnd = 19 in fast recovery, then 16 and congestion avoidance.
+```
+
+```card id=net-05-slow-start
+Compute: cwnd 8 MSS, ssthresh 16 MSS, no loss. cwnd after 2 RTTs and after 4?
+---
+Slow start doubles to 16 after one RTT, then congestion avoidance adds 1 MSS per RTT.
+17 after two RTTs, 19 after four.
+```
+
+```card id=net-05-window-throughput
+Compute: maximum throughput of one TCP flow with a 65535-byte window and 200 ms RTT.
+---
+$65535 \cdot 8 / 0.2 \approx 2.6$ Mbit/s regardless of link speed.
+Fix: window scaling, shift at most 14 (RFC 7323).
+```
+
+```card id=net-05-time-wait
+Who enters TIME-WAIT, for how long, and why?
+---
+The side that closes first, for 2 MSL (RFC 9293: MSL 2 min, so 4 min; Linux 60 s).
+To retransmit the final ACK if needed and let old segments die before the port pair is reused.
+```

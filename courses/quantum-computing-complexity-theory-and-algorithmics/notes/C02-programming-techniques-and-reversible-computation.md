@@ -72,3 +72,78 @@ Total: 3 Toffolis, 2 CNOTs, one ancilla returned clean. Verify on $a=b=c=1$: $w=
 ## Code
 
 `src/py/quantum/sim.py`: `TOFFOLI`, `apply_controlled(U, controls, targets)` (multi-control), `apply_permutation` (classical bijections such as XOR oracles and modular multiplication). `src/py/quantum/deutsch_jozsa.py` builds both oracle forms (`xor_oracle`, `phase_oracle`) from a Python function; `test_deutsch_jozsa.py` checks the phase-kickback equivalence numerically.
+
+## Cards
+
+```card id=qc-qu2-reversible
+Which of NOT, CNOT, AND, OR, fan-out are reversible?
+---
+NOT and CNOT are reversible. AND, OR and fan-out are not.
+```
+
+```card id=qc-qu2-toffoli-universal
+Show Toffoli is universal for reversible classical computation.
+---
+Toffoli$(a,b,1)$ gives NAND; Toffoli$(a,1,0)=(a,1,a)$ gives fan-out.
+NAND plus fan-out is universal, using constant ancillas.
+```
+
+```card id=qc-qu2-oracles
+Define the XOR oracle and the phase oracle.
+---
+XOR: $U_f|x\rangle|y\rangle=|x\rangle|y\oplus f(x)\rangle$.
+Phase: $O_f|x\rangle=(-1)^{f(x)}|x\rangle$.
+```
+
+```card id=qc-qu2-xor-to-phase
+How is a phase oracle obtained from an XOR oracle?
+---
+Put the target in $|-\rangle$: $U_f|x\rangle|-\rangle=(-1)^{f(x)}|x\rangle|-\rangle$. One query; ancilla unchanged.
+```
+
+```card id=qc-qu2-bennett
+Bennett's compute-copy-uncompute: steps and cost.
+---
+Run $C$ (gives $f(x)$ and garbage $g(x)$), CNOT $f(x)$ into $y$, run $C^{-1}$.
+Cost $2|C|+m$ gates; ancillas returned to $|0\rangle$.
+```
+
+```card id=qc-qu2-garbage
+Why must garbage be uncomputed?
+---
+Garbage tags each path with $g(x)$, making paths distinguishable and killing interference.
+In the note's example $P(1)$ drops from 1 to $\frac12$.
+```
+
+```card id=qc-qu2-controlled-u
+How is controlled-$U$ built from CNOTs and single-qubit gates?
+---
+$U=e^{i\alpha}AXBXC$ with $ABC=I$: apply $C$, CNOT, $B$, CNOT, $A$ to the target and $P(\alpha)$ to the control.
+2 CNOTs, 4 single-qubit gates.
+```
+
+```card id=qc-qu2-multi-control
+Compute: Toffolis and ancillas for $C^k$-NOT with clean ancillas, using the AND chain.
+---
+$2(k-1)$ Toffolis plus 1 CNOT, with $k-1$ ancillas; depth $O(k)$.
+For $k=5$: 8 Toffolis, 4 ancillas.
+```
+
+```card id=qc-qu2-toffoli-cost
+Cost of Toffoli in Clifford+T?
+---
+6 CNOTs and 7 T gates.
+```
+
+```card id=qc-qu2-parallelism
+True or false: computing all $2^n$ values of $f$ in superposition solves SAT.
+---
+False. Measuring $\sum_x|x\rangle|f(x)\rangle$ gives a random $x$, like random guessing.
+Interference is needed; Grover gives only $\Theta(\sqrt{2^n})$.
+```
+
+```card id=qc-qu2-deferred
+State the principle of deferred measurement.
+---
+Mid-circuit measurements can be moved to the end by replacing classically controlled gates with quantum-controlled ones.
+```

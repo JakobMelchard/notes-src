@@ -128,3 +128,88 @@ SpMV `y[i] = sum over row i` is embarrassingly parallel over rows: `#pragma omp 
 5. **Explain strong and weak scaling and what efficiency each reports.** Strong: fixed problem, $E = T_1/(p\,T_p)$, limited by Amdahl and synchronisation. Weak: problem size grows with $p$, $E = T_1/T_p$ for the scaled problem, limited by communication growth and shared resources; it is the relevant measure for "can I run a $p$ times bigger simulation on $p$ times the cores".
 
 Code: `src/cpp/omp_examples.cpp` (`race_counter`, `false_sharing`, `unbalanced`, `heavy_sum`, scaling table), `src/cpp/threads_cpp.cpp` (`TaskManager`, `counters`, `false_sharing_ns`, `heavy_sum` - the same material in plain C++17), `src/py/scaling.py` (`amdahl`, `gustafson`, `karp_flatt`, `strong_scaling_table`); tests `src/py/test_scaling.py`. Sources: [S8] [S11] [S19] [S20] [S21] [S34] [S35].
+
+## Cards
+
+```card id=nssc-07-fork-join
+Describe the OpenMP fork-join model.
+---
+The initial thread runs serially; at `omp parallel` it becomes primary thread of a team.
+All members execute the block and join at the implicit barrier at its end.
+```
+
+```card id=nssc-07-sharing
+What are the default data-sharing attributes in an OpenMP region?
+---
+Variables declared outside: shared. Declared inside, `omp for` loop variables, `private(...)`: private.
+`default(none)` forces you to classify every variable.
+```
+
+```card id=nssc-07-firstprivate
+Distinguish `firstprivate` and `lastprivate`.
+---
+`firstprivate` initialises each private copy from the original.
+`lastprivate` copies the sequentially-last iteration's value back.
+```
+
+```card id=nssc-07-race
+What is a data race?
+---
+Two threads access the same location without synchronisation and at least one writes.
+In C++ it is undefined behaviour.
+```
+
+```card id=nssc-07-race-fixes
+Rank `reduction`, `atomic` and `critical` for fixing a racy counter by cost.
+---
+`reduction` cheapest (private copies), then `atomic` (hardware RMW, single scalar update),
+then `critical` (lock around a block). Rule: accumulate privately, synchronise once.
+```
+
+```card id=nssc-07-reduction-repro
+True or false: an OpenMP floating-point reduction is bit-reproducible across runs.
+---
+False. Private copies are combined in an unspecified order.
+Reduce deterministically yourself if you need reproducibility.
+```
+
+```card id=nssc-07-schedule
+When should you use `static` vs `dynamic` scheduling?
+---
+`static` for uniform iteration cost; deterministic, the only one guaranteeing same assignment.
+`dynamic` when cost varies, chunk large enough that the queue is not the bottleneck.
+```
+
+```card id=nssc-07-false-sharing
+What is false sharing and how is it fixed?
+---
+Threads write different variables in one cache line, invalidating each other's copies.
+Pad to a line (`alignas`) or accumulate locally and write once.
+```
+
+```card id=nssc-07-amdahl
+Compute: Amdahl speedup for 10 % serial work on 16 cores and on infinitely many.
+---
+$S = 1/(0.1 + 0.9/16) = 6.4$; limit $1/f = 10$.
+```
+
+```card id=nssc-07-gustafson-trap
+How do Amdahl's $f$ and Gustafson's $s$ differ?
+---
+$f$ is measured against the 1-processor time, independent of $p$.
+$s$ against the $p$-processor time, depends on $p$. Same law, two normalisations.
+```
+
+```card id=nssc-07-karp-flatt
+State the Karp-Flatt metric and how to read it.
+---
+$e(p) = \dfrac{1/S(p) - 1/p}{1 - 1/p}$.
+Constant $e$: genuine serial section. Rising $e$: overhead or shared resource.
+```
+
+```card id=nssc-07-scaling
+Distinguish strong and weak scaling.
+---
+Strong: fixed problem, $S = T_1/T_p$, $E = S/p$.
+Weak: problem size $\propto p$, ideal is constant time.
+```

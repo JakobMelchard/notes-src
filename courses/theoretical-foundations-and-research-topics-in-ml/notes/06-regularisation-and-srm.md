@@ -265,3 +265,85 @@ $k$-fold CV averages unbiased estimates of the risk of the algorithm trained on 
 - A. Blumer, A. Ehrenfeucht, D. Haussler, M. Warmuth, "Occam's razor", *Inf. Proc. Letters* 24 (1987); J. Rissanen, "Modeling by shortest data description", *Automatica* 14 (1978).
 - A. N. Tikhonov, "On the stability of inverse problems", *Dokl. Akad. Nauk SSSR* 39 (1943).
 - Hastie, Tibshirani, Friedman, *The Elements of Statistical Learning*, Ch. 7 (model assessment and selection, cross-validation, effective number of parameters).
+
+## Cards
+
+```card id=tfml-06-srm-rule
+State the SRM rule for a nested structure $\mathcal H=\bigcup_k\mathcal H_k$ with weights $w_k$.
+---
+$$h_S^{\mathrm{SRM}}\in\arg\min_{h\in\mathcal H}\bigl[L_S(h)+\varepsilon_{k(h)}(n,w_{k(h)}\delta)\bigr]$$
+$k(h)$ = smallest $k$ with $h\in\mathcal H_k$; $\sum_kw_k\le1$, fixed before seeing data.
+```
+
+```card id=tfml-06-srm-guarantee
+State the SRM guarantee and its proof chain.
+---
+W.p. $\ge1-\delta$, $\forall h^*$: $L_{\mathcal D}(h^{\mathrm{SRM}}_S)\le L_{\mathcal D}(h^*)+2\varepsilon_{k^*}(n,w_{k^*}\delta)$.
+Union bound over $k$ costs $\sum_kw_k\delta\le\delta$; then $L_{\mathcal D}(h_S)\le L_S(h_S)+\mathrm{pen}(h_S)\le L_S(h^*)+\mathrm{pen}(h^*)\le L_{\mathcal D}(h^*)+2\mathrm{pen}(h^*)$.
+```
+
+```card id=tfml-06-nonuniform-def
+How does nonuniform learnability differ from agnostic PAC?
+---
+The sample size $m^{\mathrm{NUL}}(\varepsilon,\delta,h)$ may depend on the competitor $h$, not only on $\varepsilon,\delta$.
+```
+
+```card id=tfml-06-nonuniform-characterisation
+Characterise nonuniform learnability (binary, $0$-$1$ loss).
+---
+Nonuniformly learnable iff a countable union of classes each with finite VC dimension (uniform convergence).
+$\Leftarrow$ by SRM; $\Rightarrow$ via $\mathcal H_k=\{h:m(\tfrac18,\tfrac17,h)\le k\}$ and no-free-lunch.
+```
+
+```card id=tfml-06-nonuniform-trap
+True or false: a nonuniformly learnable class is PAC learnable, and nonuniform learning contradicts NFL.
+---
+Both false. A countable union of finite-VC classes (e.g. all polynomial thresholds) typically has infinite VC dimension. NFL is not violated since sample size depends on the competitor.
+```
+
+```card id=tfml-06-occam-mdl
+State the Occam / MDL bound and the role of Kraft's inequality.
+---
+Prefix-free code, $\ell\in[0,1]$: w.p. $\ge1-\delta$, $\forall h$: $L_{\mathcal D}(h)\le L_S(h)+\sqrt{(|h|+\log(2/\delta))/(2n)}$.
+Kraft: $\sum_h2^{-|h|}\le1$, so $w_h=2^{-|h|}$ are valid weights for singleton classes.
+```
+
+```card id=tfml-06-stability-identity
+What identity links on-average-replace-one stability to the generalisation gap?
+---
+$\mathbb E_S[L_{\mathcal D}(A(S))-L_S(A(S))]=\mathbb E_{S,z',i}[\ell(A(S^{(i)}),z_i)-\ell(A(S),z_i)]$.
+Proof: swap the names of the i.i.d. $z_i$ and $z'$. Holds for any algorithm and loss.
+```
+
+```card id=tfml-06-rlm-stability
+RLM with $\lambda\|w\|^2$: under which conditions is it stable, with which rate?
+---
+Loss convex and $\rho$-Lipschitz in $w$: $\|A(S^{(i)})-A(S)\|\le\frac{2\rho}{\lambda n}$, loss change $\le\frac{2\rho^2}{\lambda n}$.
+Key: $f_S$ is $2\lambda$-strongly convex, so $f_S(v)-f_S(u)\ge\lambda\|v-u\|^2$.
+```
+
+```card id=tfml-06-rlm-oracle
+State the RLM oracle inequality and the optimised rate.
+---
+$\mathbb EL_{\mathcal D}(A(S))\le\min_w[L_{\mathcal D}(w)+\lambda\|w\|^2]+\frac{2\rho^2}{\lambda n}$.
+With $\|w^*\|\le B$, $\lambda=\sqrt{2\rho^2/(B^2n)}$: excess $\le2\rho B\sqrt{2/n}$. In expectation only.
+```
+
+```card id=tfml-06-stability-trap
+Is stability a property of the class or the algorithm?
+---
+Of the algorithm. ERM over a large class can be unstable; RLM over the same class is stable because of strong convexity, not a VC argument.
+```
+
+```card id=tfml-06-validation-bound
+Validation bound for $k$ candidates chosen independently of $V$ ($n_v$ points)?
+---
+W.p. $\ge1-\delta$, $\forall j$: $|L_{\mathcal D}(h_j)-L_V(h_j)|\le\sqrt{\log(2k/\delta)/(2n_v)}$.
+Selected $\hat h$: $L_{\mathcal D}(\hat h)\le\min_jL_{\mathcal D}(h_j)+2\sqrt{\log(2k/\delta)/(2n_v)}$. Report error on an untouched test set.
+```
+
+```card id=tfml-06-cross-validation
+What does $k$-fold cross-validation actually estimate?
+---
+The risk of the algorithm trained on $n(1-1/k)$ points, slightly pessimistic for the final model. Folds are dependent, so independent-style standard errors are understated.
+```

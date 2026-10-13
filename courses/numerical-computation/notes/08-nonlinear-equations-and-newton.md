@@ -331,3 +331,87 @@ on a large-residual one [S4 Thm 6.17]; **the [S4 Ex. 6.20] $F$ with
 $x_0=(-0.5,1.4)$, $H_0=F'(x_0)$**, checking $x^\ast=(0,1)$ and the
 Newton > Broyden > steepest-descent ordering; Sherman–Morrison against
 `numpy.linalg.inv`).
+
+## Cards
+
+```card id=numc-08-newton-1d
+Give the 1-D Newton iteration and compute two steps for $f=x^2-2$ from $x_0=2$.
+---
+$x_{n+1}=x_n-f(x_n)/f'(x_n)$, here $x_{n+1}=\frac12(x_n+2/x_n)$.
+$x_1=1.5$, $x_2=1.41\overline{6}$.
+```
+
+```card id=numc-08-contraction
+Define a contraction near $x^\ast$ and state what it gives for $x_{n+1}=\Phi(x_n)$.
+---
+$\|\Phi(x)-\Phi(y)\|\le q\|x-y\|$, $q\in(0,1)$, on $B_\varepsilon(x^\ast)$.
+Local linear convergence: $\|x^\ast-x_{n+1}\|\le q\|x^\ast-x_n\|$ [S4 Thm 6.5].
+```
+
+```card id=numc-08-fp-criterion
+In 1-D with $\Phi\in C^1$, what decides whether a fixed-point iteration converges locally? Example?
+---
+$|\Phi'(x^\ast)|<1$. For $2-x^2-e^x=0$: $\Phi_1=\sqrt{2-e^x}$ has $|\Phi_1'|=1.59$, diverges;
+$\Phi_2=\ln(2-x^2)$ has $0.63$, converges.
+```
+
+```card id=numc-08-order-p
+When does a fixed-point iteration converge with order $p\ge2$?
+---
+$\Phi\in C^p$ and $\Phi^{(j)}(x^\ast)=0$ for $j=1..p-1$ [S4 Thm 6.8].
+Then $|x^\ast-x_{n+1}|\le C|x^\ast-x_n|^p$.
+```
+
+```card id=numc-08-newton-quad
+Conditions for local quadratic convergence of 1-D Newton, and the proof route?
+---
+$f\in C^2$, $f(x^\ast)=0$, $f'(x^\ast)\ne0$, $x_0$ close enough.
+Fixed-point theory: $\Phi_{\mathrm{Newton}}'(x^\ast)=ff''/(f')^2=0$ [S4 Cor. 6.9].
+```
+
+```card id=numc-08-double-root
+Does Newton converge quadratically for $g(x)=x^2$ from $x_0=1$?
+---
+No. Double root, $g'(0)=0$; iteration is $x_{n+1}=x_n/2$, linear with rate $\frac12$.
+Multiplicity $m$: rate $1-1/m$.
+```
+
+```card id=numc-08-newton-rd
+How is one Newton step in $\mathbb R^d$ carried out, and what does it cost?
+---
+Solve $f'(x_n)\delta=-f(x_n)$ by LU ($\frac23d^3$), set $x_{n+1}=x_n+\delta$.
+Never invert the Jacobian.
+```
+
+```card id=numc-08-stopping
+What stopping criterion does [S4 §6.4] recommend for Newton and why?
+---
+$\|x_{n+1}-x_n\|\le\mathrm{tol}$: with quadratic convergence it estimates $\|x_n-x^\ast\|$.
+An unscaled $|f(x_n)|<\tau$ depends on how $f$ is scaled.
+```
+
+```card id=numc-08-simplified
+What convergence do simplified Newton and damped Newton have?
+---
+Simplified (frozen $f'(x_0)$): linear. Damped with $\lambda_n\in(0,1]$: linear unless $\lambda_n\to1$.
+```
+
+```card id=numc-08-armijo
+True or false: the Armijo rule chooses the step length in a descent method. State it.
+---
+True. Largest $q^k$ with $g(x_n+q^kd_n)<g(x_n)+\sigma(\nabla g(x_n)\cdot d_n)q^k$, $\sigma,q\in(0,1)$.
+```
+
+```card id=numc-08-gauss-newton
+What does Gauss–Newton drop, and when does it converge quadratically?
+---
+Drops $(F'')^\top F$; each step is linear least squares $\min\|F'(x_n)\Delta x+F(x_n)\|_2$.
+Quadratic iff $F(x^\ast)=0$ and $F'(x^\ast)$ full rank; large residual gives linear.
+```
+
+```card id=numc-08-broyden
+State the secant condition and Broyden's update. What convergence results?
+---
+$H_{n+1}s=y$, $s=x_{n+1}-x_n$, $y=f(x_{n+1})-f(x_n)$; $H_{n+1}=H_n+\frac{(y-H_ns)s^\top}{\|s\|_2^2}$.
+Local superlinear; inverse updated cheaply by Sherman–Morrison–Woodbury.
+```

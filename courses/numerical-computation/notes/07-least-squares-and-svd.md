@@ -147,7 +147,7 @@ $AA^+A=A$; $(A^+)^+=A$; $\|A^+\|_2=\sigma_r^{-1}$.
 **Computing the SVD** [S4 §5.3.6]. Via eigenvalues, but *not* of $A^\top A$ or
 $AA^\top$, which are typically ill conditioned (they square $\kappa$ and destroy
 the small $\sigma_i$). Instead use the symmetric
-$\begin{psmallmatrix}0&A^\top\\A&0\end{psmallmatrix}$, whose eigenvalues are
+$\begin{pmatrix}0&A^\top\\A&0\end{pmatrix}$, whose eigenvalues are
 $\pm\sigma_i$. Our `qr_svd.jacobi_svd` takes the other standard route
 (one-sided Jacobi, §5 below), which never forms $A^\top A$ either.
 
@@ -191,17 +191,17 @@ Item 5 is the long essay question F2 actually set.
 1. *(S2a 2.3, 2024W)* A rectangle has sides $a,b$. Three independent
    measurements give $a\approx15$, $b\approx21$, $a+b\approx39$ (cm). Find the
    refined $a,b$ by least squares.
-   $A=\begin{psmallmatrix}1&0\\0&1\\1&1\end{psmallmatrix}$, $y=(15,21,39)^\top$.
-   $A^\top A=\begin{psmallmatrix}2&1\\1&2\end{psmallmatrix}$,
+   $A=\begin{pmatrix}1&0\\0&1\\1&1\end{pmatrix}$, $y=(15,21,39)^\top$.
+   $A^\top A=\begin{pmatrix}2&1\\1&2\end{pmatrix}$,
    $A^\top y=(54,60)^\top$. Solving:
    $a=(2\cdot54-60)/3=16$, $b=(2\cdot60-54)/3=22$. (Residual
    $(-1,-1,1)$, $\|r\|_2=\sqrt3$. Sanity check: $a+b=38\ne39$; least squares
    spreads the inconsistency.)
 2. *(F2 2.4, 2022W)* Solve the least-squares problem for
-   $\begin{psmallmatrix}1&1\\2&0\\0&2\end{psmallmatrix}x=\begin{psmallmatrix}1\\1\\-5\end{psmallmatrix}$.
-   $A^\top A=\begin{psmallmatrix}5&1\\1&5\end{psmallmatrix}$,
+   $\begin{pmatrix}1&1\\2&0\\0&2\end{pmatrix}x=\begin{pmatrix}1\\1\\-5\end{pmatrix}$.
+   $A^\top A=\begin{pmatrix}5&1\\1&5\end{pmatrix}$,
    $A^\top b=(3,-9)^\top$; $\det=24$, so
-   $x=\tfrac1{24}\begin{psmallmatrix}5&-1\\-1&5\end{psmallmatrix}\begin{psmallmatrix}3\\-9\end{psmallmatrix}=\tfrac1{24}(24,-48)^\top=(1,-2)^\top$.
+   $x=\tfrac1{24}\begin{pmatrix}5&-1\\-1&5\end{pmatrix}\begin{pmatrix}3\\-9\end{pmatrix}=\tfrac1{24}(24,-48)^\top=(1,-2)^\top$.
 3. *(S2a 2.3a / 2.5, 2024W)* Define the least-squares solution for $m>n$. State
    the normal equations. Is $m<n$ over- or underdetermined?
    $\|b-Ax\|_2=\min_y\|b-Ay\|_2$ [S4 Def. 5.2]; $A^\top Ax=A^\top b$
@@ -242,7 +242,7 @@ Item 5 is the long essay question F2 actually set.
 `src/py/pseudoinverse.py` (new): `min_norm_solution` ([S4 §5.3.2]), `lstsq_svd`
 ([S4 Exercise 5.13]), `pinv` ([S4 (5.6)]), `numerical_rank` ([S4 Rem. 5.16]),
 `project_range` / `project_kernel` ([S4 Exercise 5.12]), `svd_via_symmetric`
-(the $\begin{psmallmatrix}0&A^\top\\A&0\end{psmallmatrix}$ route of [S4 §5.3.6]).
+(the $\begin{pmatrix}0&A^\top\\A&0\end{pmatrix}$ route of [S4 §5.3.6]).
 
 Tests: `test_qr_svd.py` (against `numpy.linalg.qr/lstsq/svd/matrix_rank`;
 Eckart–Young) and `test_pseudoinverse.py` (the four Penrose identities;
@@ -250,3 +250,88 @@ $\|A^+\|_2=\sigma_r^{-1}$ [S4 Exercise 5.19]; the minimum-norm property against
 `numpy.linalg.lstsq` and `scipy.linalg.pinv`; **the $\varepsilon=10^{-7}$
 normal-equations-vs-QR digit loss of [S4 Ex. 5.6]**; the $\pm\sigma_i$ spectrum
 of the symmetric embedding; and the S2a 2.3 / F2 2.4 exam items above).
+
+## Cards
+
+```card id=numc-07-normal-eq
+State the normal equations and the exam trap about them.
+---
+$A^\top Ax=A^\top b$ [S4 (5.3)], equivalent to minimising $\|b-Ax\|_2$.
+Not $A^\top Ax=b$ (marked false in S2a 2.5c).
+```
+
+```card id=numc-07-unique
+When does the least-squares problem have exactly one solution?
+---
+For $m\ge n$ with linearly independent columns: then $A^\top A$ is invertible [S4 Thm 5.5].
+```
+
+```card id=numc-07-qr-why
+Why prefer QR over the normal equations for least squares, and at what cost?
+---
+$\kappa(A^\top A)=\kappa(A)^2$, so normal equations lose twice the digits.
+QR costs $2mn^2$ against $mn^2$ for $m\gg n$.
+```
+
+```card id=numc-07-qr-steps
+Give the steps of least squares via QR and the residual.
+---
+$[Q,R]=\mathrm{qr}(A)$, $b^\ast=(Q^\top b)_{1:n}$, back-substitute $R^\ast x=b^\ast$.
+Residual norm is $\|\tilde b\|_2$, the remaining part of $Q^\top b$.
+```
+
+```card id=numc-07-compute
+Solve least squares for $A=\begin{pmatrix}1&1\\2&0\\0&2\end{pmatrix}$, $b=(1,1,-5)^\top$.
+---
+$A^\top A=\begin{pmatrix}5&1\\1&5\end{pmatrix}$, $A^\top b=(3,-9)^\top$, $\det=24$.
+$x=(1,-2)^\top$.
+```
+
+```card id=numc-07-underdetermined
+Is $m<n$ over- or underdetermined, and which solution is chosen?
+---
+Underdetermined. Choose the minimum-norm solution $x^\ast=\widetilde V\widetilde\Sigma^{-1}U^\top b$,
+which is orthogonal to $\ker A$.
+```
+
+```card id=numc-07-svd-reveals
+If $\sigma_1\ge\cdots\ge\sigma_r>\sigma_{r+1}=\cdots=0$, what does the SVD reveal?
+---
+$r=\mathrm{rank}A$; $U(:,1{:}r)$ is an orthonormal basis of $\mathrm{Im}A$;
+$V(:,r{+}1{:}n)$ of $\ker A$.
+```
+
+```card id=numc-07-svd-norms
+Express $\|A\|_2$, $\|A\|_F$ and $\kappa_2(A)$ via singular values. How are $\sigma_i$ related to $A^\top A$?
+---
+$\|A\|_2=\sigma_1$, $\|A\|_F^2=\sum\sigma_i^2$, $\kappa_2=\sigma_1/\sigma_n$.
+$\sigma_i^2$ are the eigenvalues of $A^\top A$ (and $AA^\top$).
+```
+
+```card id=numc-07-low-rank
+State the best rank-$\nu$ approximation and its errors.
+---
+Truncated SVD $A_\nu$, optimal in both norms: $\|A-A_\nu\|_2=\sigma_{\nu+1}$,
+$\|A-A_\nu\|_F=\sqrt{\sum_{i>\nu}\sigma_i^2}$ [S4 Thm 5.15].
+```
+
+```card id=numc-07-pinv
+Define the pseudoinverse $A^+$ and what $A^+b$ is.
+---
+$A^+=\widetilde V\widetilde\Sigma^{-1}\widetilde U^\top$; $A^+b$ is the minimum-norm least-squares solution.
+Geometrically: project onto $\mathrm{range}A$, then invert $A:(\ker A)^\perp\to\mathrm{range}A$.
+```
+
+```card id=numc-07-svd-compute
+Why should the SVD not be computed from the eigenvalues of $A^\top A$, and what is used instead?
+---
+$A^\top A$ squares $\kappa$ and destroys small $\sigma_i$.
+Use the symmetric $\begin{pmatrix}0&A^\top\\A&0\end{pmatrix}$ with eigenvalues $\pm\sigma_i$.
+```
+
+```card id=numc-07-rank-fp
+How is the numerical rank determined in floating point?
+---
+All computed $\sigma_i$ are nonzero, so choose a cut-off $\epsilon$ a little above machine precision:
+$r=\#\{\sigma_i\ge\epsilon\}$ [S4 Rem. 5.16].
+```

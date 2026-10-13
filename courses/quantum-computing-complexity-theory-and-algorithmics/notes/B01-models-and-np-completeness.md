@@ -86,3 +86,87 @@ Cover $\{a, b\}$: $81 + 69 = 150 = (2112)_4$: digit $e_0$ is already 2 (both end
 ## Code
 
 `src/py/complexity/sat.py`: `brute_force_sat`, `dpll` (cross-check), `sat_to_3sat` (clause splitting), `three_sat_to_vertex_cover` (returns vertices, edges, $k_{IS}$, $k_{VC}$), `assignment_to_independent_set`, `independent_set_exists`, `vertex_cover_exists`, `vertex_cover_to_subset_sum` (base-4 construction), `subset_sum_exists` (exact pruned search). `test_sat.py` checks on 30 seeded tiny CNFs that satisfiability is preserved along SAT $\to$ 3SAT $\to$ IS/VC $\to$ SUBSET SUM and that a satisfying assignment maps to an actual cover and subset.
+
+## Cards
+
+```card id=qc-cx1-multitape
+Overhead of simulating a $k$-tape TM with time $T(n)$ on a 1-tape TM?
+---
+$O(T(n)^2)$ time; space preserved up to a constant.
+So polynomial time does not depend on the number of tapes.
+```
+
+```card id=qc-cx1-ram-cost
+Why does complexity theory use logarithmic cost for RAMs rather than unit cost?
+---
+Under unit cost, repeated squaring builds $2^{2^n}$ in $n$ steps, breaking polynomial equivalence with TMs.
+Under logarithmic cost RAM and TM simulate each other polynomially.
+```
+
+```card id=qc-cx1-np-verifier
+Define NP via verifiers.
+---
+$x\in L\iff\exists c\in\{0,1\}^{p(|x|)}:V(x,c)=1$, with polynomial $p$ and polynomial-time $V$.
+```
+
+```card id=qc-cx1-ntm-verifier
+Why does an NTM definition of NP give a verifier?
+---
+WLOG binary choices; the certificate is the choice sequence $c\in\{0,1\}^{q(n)}$.
+The verifier simulates the branch following $c$.
+```
+
+```card id=qc-cx1-karp
+Define a Karp reduction $A\le_pB$. How does it differ from a Cook reduction?
+---
+Polynomial-time $f$ with $x\in A\iff f(x)\in B$: one query, answer taken as is.
+Cook/Turing reductions allow many adaptive oracle queries.
+```
+
+```card id=qc-cx1-direction
+To prove a new problem $B$ NP-hard, which direction must the reduction go?
+---
+Known-hard $A\le_pB$: map $A$-instances to $B$-instances.
+Reducing $B$ to SAT only shows $B\in$ NP.
+```
+
+```card id=qc-cx1-cook-levin
+Cook-Levin: what checks that row $i+1$ follows from row $i$, and what is the formula size?
+---
+Constant-size $2\times3$ windows that must match legal patterns from $\delta$.
+Tableau $p(n)\times p(n)$: formula size $O(p(n)^2)$.
+```
+
+```card id=qc-cx1-sat-3sat
+True or false: the SAT to 3SAT clause splitting produces an equivalent formula.
+---
+False: equisatisfiable only. It adds fresh variables $y_i$; the yes/no answer is preserved, not the set of models.
+```
+
+```card id=qc-cx1-3sat-is
+3SAT to Independent Set: construct $G$ and $k$.
+---
+A triangle per clause on its literal occurrences, edges between all $x$ and $\neg x$ occurrences; $k=m$ (clauses).
+VC then with $|V|-k=2m$.
+```
+
+```card id=qc-cx1-vc-subset-sum
+In VC to SUBSET SUM, why are base-4 digits used, and why is there no contradiction with the $O(nW)$ DP?
+---
+Each digit sums to at most 3, so no carries.
+$W\approx k\cdot4^m$ is exponential in the instance size; the DP is only pseudo-polynomial.
+```
+
+```card id=qc-cx1-ladner
+What does Ladner's theorem say, and what are candidate examples?
+---
+If P $\ne$ NP there are NP problems neither in P nor NP-complete (NP-intermediate).
+Candidates: FACTORING, GRAPH ISOMORPHISM.
+```
+
+```card id=qc-cx1-factoring
+Why does Shor's algorithm not imply NP $\subseteq$ BQP?
+---
+FACTORING (decision) is in NP $\cap$ coNP and not known to be NP-hard.
+An NP-complete problem in coNP would give NP = coNP.
+```

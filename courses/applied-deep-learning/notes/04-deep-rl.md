@@ -212,3 +212,88 @@ PPO with GAE ($\gamma = 0.99$, $\lambda = 0.95$, $\epsilon = 0.2$, entropy coeff
 - Henderson, P. et al. (2018) [S93]. Deep reinforcement learning that matters. Seeds and evaluation.
 - Towers, M. et al. (2023) [S95]. Gymnasium. API reference for `reset` / `step`.
 - **Lecture 6** [S4], *Deep Reinforcement Learning*, is the lecture this note covers. Its own first reference is **Amini & Soleimany, MIT 6.S191** [S17], whose framing (classes of learning problems; key concepts; quality/value/policy functions; Q-function to the policy) is the lecture's structure. It also spends 14 minutes on **reward shaping, auxiliary tasks and hindsight experience replay** [S53] and works Karpathy's *Pong from pixels* [S55] as its running example.
+
+## Cards
+
+```card id=adl-04-return
+Define the return $G_t$ and its recursion.
+---
+$G_t = \sum_k \gamma^k r_{t+k} = r_t + \gamma G_{t+1}$.
+The recursion computes all returns in one backward pass over an episode.
+```
+
+```card id=adl-04-return-compute
+Compute $G_0$ with $\gamma = 0.5$ for $r = (0, 0, 0, 8)$.
+---
+$G_0 = 0.125 \cdot 8 = 1$.
+With $\gamma = 0.99$: $0.99^3 \cdot 8 \approx 7.76$.
+```
+
+```card id=adl-04-reinforce
+State the REINFORCE gradient estimator. Why does the transition model not appear?
+---
+$\nabla_\theta J = \mathbb E[\sum_t \nabla_\theta \log \pi_\theta(a_t \mid s_t)\, G_t]$.
+$\rho_0$ and $P$ do not depend on $\theta$, so they drop out of $\nabla \log p_\theta(\tau)$.
+```
+
+```card id=adl-04-baseline
+Why does a state-dependent baseline $b(s_t)$ keep the policy gradient unbiased, and why not an action-dependent one?
+---
+$\mathbb E_a[\nabla \log \pi\, b(s)] = b(s)\nabla \sum_a \pi(a \mid s) = b(s)\nabla 1 = 0$.
+$b(s, a)$ cannot be pulled out of the sum over $a$.
+```
+
+```card id=adl-04-gae
+What does GAE's $\lambda$ interpolate between?
+---
+$\hat A_t = \sum_l (\gamma\lambda)^l \delta_{t+l}$: $\lambda = 0$ is one-step TD (low variance, biased), $\lambda = 1$ Monte-Carlo minus baseline.
+Default $\lambda \approx 0.95$.
+```
+
+```card id=adl-04-ppo
+In PPO's clipped objective, what happens for $\hat A_t > 0$ once $\rho_t > 1 + \epsilon$?
+---
+The objective becomes $(1+\epsilon)\hat A_t$, constant in $\theta$: gradient zero.
+A trust region without a KL constraint; $\epsilon = 0.2$.
+```
+
+```card id=adl-04-dqn
+Write the DQN target and name its two stabilisers.
+---
+$y = r + \gamma(1-d)\max_{a'} Q(s', a'; \theta^-)$, no gradient through $y$.
+Experience replay (breaks correlation) and a target network $\theta^-$ (fixed target).
+```
+
+```card id=adl-04-double-dqn
+What bias does Double DQN remove and how?
+---
+Maximisation bias $\mathbb E[\max_a X_a] \ge \max_a \mathbb E[X_a]$.
+Select $\arg\max$ with the online network, evaluate with the target network.
+```
+
+```card id=adl-04-triad
+What is the deadly triad?
+---
+Function approximation + bootstrapping + off-policy training together can diverge.
+DQN has all three; symptoms: unbounded Q-values, sudden collapse.
+```
+
+```card id=adl-04-shaping
+Which reward shaping leaves optimal policies unchanged, and why?
+---
+Potential-based $R' = R + \gamma\Phi(s') - \Phi(s)$.
+Terms telescope, so every return from $s_0$ shifts by $-\Phi(s_0)$ and the argmax is unchanged.
+```
+
+```card id=adl-04-truncation
+When bootstrapping the value target, should you mask on `terminated`, `truncated`, or both?
+---
+Only on `terminated`. A time-limit truncation is not a terminal state, so $V(s_{T_{\max}})$ is still valid.
+```
+
+```card id=adl-04-eval
+How should an RL agent be evaluated per the note?
+---
+Held-out eval seeds, greedy/mean policy over 100+ episodes, mean and standard error plus success rate.
+3 to 5 training seeds, median with quartiles; never a single seed.
+```

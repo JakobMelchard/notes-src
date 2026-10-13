@@ -182,3 +182,89 @@ Attention already gives the decoder direct access to every encoder state, so the
 - Sutskever, Vinyals, Le 2014, seq2seq. Bahdanau, Cho, Bengio 2015 [S49], attention. Bengio et al. 2015, scheduled sampling. Huszár 2015, critique of scheduled sampling. Vaswani et al. 2017 [S62], transformer.
 - Graves, Fernández, Gomez & Schmidhuber 2006 [S48], *Connectionist temporal classification: labelling unsegmented sequence data with recurrent neural networks*, ICML. Hannun 2017, *Sequence modeling with CTC*, Distill — the explainer on **Lecture 4's own reading list** [S4].
 - **Lecture 4** [S4] is the lecture this note covers; its chapter list (modelling sequences with CNNs, memory, unfolding, parameter sharing, BPTT, vanishing/exploding gradients, clipping, RNN variations, teacher forcing, vector-to-sequence, bidirectional, encoder-decoder, LSTM/GRU, short-term prediction, CNN+RNN for OCR, **CTC**, translation with attention, "should you still use RNNs?") is the order of this note.
+
+## Cards
+
+```card id=adl-03-rnn-jacobian
+What is $\partial h_t / \partial h_{t-1}$ for a tanh RNN, and when do gradients vanish?
+---
+$\mathrm{diag}(1 - h_t^2)\, W_h$, norm bounded by $\sigma_{max}(W_h)$.
+If $\sigma_{max}(W_h) < 1$ (sigmoid: $< 4$) the gradient decays geometrically in $t - k$.
+```
+
+```card id=adl-03-clipping
+True or false: gradient clipping fixes both exploding and vanishing gradients in RNNs.
+---
+False. Clipping $g \leftarrow g \min(1, c/\|g\|)$ bounds exploding steps (direction kept).
+It does nothing against vanishing.
+```
+
+```card id=adl-03-lstm-cell
+Write the LSTM cell-state update and say why it carries gradient over long spans.
+---
+$c_t = f_t \odot c_{t-1} + i_t \odot \tilde c_t$.
+Direct path Jacobian $\mathrm{diag}(f_t)$: no weight matrix, no $\tanh'$; with $f \approx 1$ the gradient passes unchanged.
+```
+
+```card id=adl-03-forget-bias
+How should the LSTM forget-gate bias be initialised, and why?
+---
+To 1-2 so the gates start open and long memory is available from the start.
+PyTorch initialises all biases uniformly, so set `bias_hh[H:2H]` manually.
+```
+
+```card id=adl-03-gru
+How does a GRU relate to an LSTM in gates and parameters?
+---
+One state; update gate $z$ ties forget and input ($f = 1 - z$, $i = z$), reset gate lets the candidate ignore the past.
+Three gate blocks vs four: 25% fewer parameters at equal $H$.
+```
+
+```card id=adl-03-lstm-params
+Compute the parameters of `nn.LSTM(input_size=16, hidden_size=64)`.
+---
+Per gate block $H(H+F) + 2H = 64 \cdot 80 + 128 = 5{,}248$.
+LSTM $4 \cdot 5{,}248 = 20{,}992$; GRU would be $15{,}744$.
+```
+
+```card id=adl-03-tbptt
+What does truncated BPTT trade off, and what must you not forget?
+---
+$O(k)$ cost per update instead of $O(T)$, but no gradient for dependencies longer than $k$ steps.
+`detach()` $h$ (and $c$) at chunk boundaries, or memory grows until OOM.
+```
+
+```card id=adl-03-exposure-bias
+What is exposure bias and what is one remedy?
+---
+Teacher forcing trains on ground-truth history; at inference the model sees its own outputs, so errors compound.
+Remedy: scheduled sampling (anneal ground-truth probability), or beam search.
+```
+
+```card id=adl-03-ctc-collapse
+What does the CTC map $\mathcal B$ do, and what is the blank for?
+---
+Squash repeated symbols, then delete blanks: $a\,a\,\varnothing\,a\,b \mapsto a\,a\,b$.
+The blank separates repeated labels and doubles as "nothing here".
+```
+
+```card id=adl-03-ctc-length
+When is the CTC loss infinite?
+---
+When $T < L + (\text{number of adjacent repeats in } l)$, so $p(l \mid x) = 0$.
+Time downsampling can make targets impossible; `zero_infinity=True` hides this.
+```
+
+```card id=adl-03-ctc-greedy
+True or false: greedy (best-path) CTC decoding returns the most likely label sequence.
+---
+False. A label's probability sums over many paths, so a label with no dominant path can win.
+Prefix beam search fixes this.
+```
+
+```card id=adl-03-adding
+In the adding problem, what MAE does the constant predictor 1 reach, and why does it matter?
+---
+MAE $1/3$ (MSE $1/6$). A model has learned something only if MAE is well below $0.33$.
+Plateau there means it predicts the mean.
+```

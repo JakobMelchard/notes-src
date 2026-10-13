@@ -159,3 +159,77 @@ Run of the learner on $d=3$, target $c=x_1\wedge\bar x_3$: start $h=x_1\bar x_1x
 - Mohri, Rostamizadeh & Talwalkar, *FoML* (2018): Ch. 2.1 (PAC model, axis-aligned rectangles Ex. 2.4), Ch. 2.2 (consistent case), Ch. 2.3 (inconsistent case), Ch. 2.4 (deterministic vs stochastic scenarios, Bayes error).
 - Kearns & Vazirani, *An Introduction to Computational Learning Theory* (1994): Ch. 1 (rectangles, conjunctions, efficient PAC).
 - D. Wolpert, "The lack of a priori distinctions between learning algorithms", *Neural Computation* 8 (1996) (original No-Free-Lunch results).
+
+## Cards
+
+```card id=tfml-03-pac-definition
+Define PAC learnability (realisable) with the correct quantifier order.
+---
+$\exists A,n_{\mathcal H}$ such that $\forall\varepsilon,\delta\in(0,1)$, $\forall\mathcal D$ realisable by $\mathcal H$, $\forall n\ge n_{\mathcal H}(\varepsilon,\delta)$: $P_S(L_{\mathcal D}(A(S))\le\varepsilon)\ge1-\delta$.
+Algorithm and sample complexity are fixed before the adversarial $\mathcal D$.
+```
+
+```card id=tfml-03-agnostic-pac
+How does agnostic PAC differ from PAC, and which implies which?
+---
+No realisability; require $L_{\mathcal D}(A(S))\le\min_{h\in\mathcal H}L_{\mathcal D}(h)+\varepsilon$ w.p. $\ge1-\delta$.
+Agnostic PAC implies PAC, since then $\min_{\mathcal H}L_{\mathcal D}=0$.
+```
+
+```card id=tfml-03-finite-class-bounds
+State the ERM sample complexity bounds for a finite class, agnostic and realisable.
+---
+Agnostic: $n\le\lceil 2\log(2|\mathcal H|/\delta)/\varepsilon^2\rceil$ (Hoeffding at $\varepsilon/2$ plus union bound).
+Realisable: $n\le\lceil\log(|\mathcal H|/\delta)/\varepsilon\rceil$.
+```
+
+```card id=tfml-03-conjunction-learner
+Describe the efficient PAC learner for boolean conjunctions and its sample bound.
+---
+Start with all $2d$ literals; delete each literal falsified by a positive example. Time $O(nd)$.
+$n\le(d\log3+\log(1/\delta))/\varepsilon$ since $|\mathcal H|\le3^d+1$.
+```
+
+```card id=tfml-03-conjunction-consistency
+Why does the conjunction learner classify negatives correctly?
+---
+Target literals are satisfied by every positive, so never deleted. Hence $h$ contains all literals of $c$, so $h\le c$ pointwise and $c(x)=0$ gives $h(x)=0$.
+```
+
+```card id=tfml-03-rectangles
+State the tightest-fit sample bound for axis-aligned rectangles in $\mathbb R^2$ and the proof idea.
+---
+$n\ge\frac4\varepsilon\log\frac4\delta$. $R_S\subseteq R$, so error is $\mathcal D(R\setminus R_S)$.
+Four strips of mass $\varepsilon/4$; each missed w.p. $\le e^{-n\varepsilon/4}$; union bound over 4.
+```
+
+```card id=tfml-03-nfl
+State the No-Free-Lunch theorem with its condition.
+---
+For any $A$ and $n\le|\mathcal X|/2$ there is $\mathcal D$, realisable by some $f$, with $\mathbb E_SL_{\mathcal D}(A(S))\ge\tfrac14$, hence $P(L_{\mathcal D}(A(S))\ge\tfrac18)\ge\tfrac17$.
+```
+
+```card id=tfml-03-nfl-proof-idea
+What is the key step in the NFL proof?
+---
+Take $|C|=2n$, all $2^{2n}$ labellings, uniform marginal. A sample leaves $\ge n$ points unseen. Pair labellings differing only at an unseen point: $A$ errs on it in exactly half, giving error $\ge\tfrac12\cdot\tfrac12$. Reverse Markov gives $\tfrac17$.
+```
+
+```card id=tfml-03-nfl-trap
+True or false: NFL says all learning algorithms are equally good and contradicts learnability of finite classes.
+---
+False. For each algorithm there is a bad distribution. The bad $\mathcal D$ is realisable by some $f$, but not by a fixed small $\mathcal H$, so no contradiction.
+```
+
+```card id=tfml-03-all-functions
+Why is the class of all functions on an infinite domain not PAC learnable?
+---
+For any $n=n_{\mathcal H}(\varepsilon,\delta)$ with $\varepsilon<\tfrac18,\delta<\tfrac17$, NFL applies ($n\le|\mathcal X|/2$) and gives risk $\ge\tfrac18$ w.p. $\ge\tfrac17$. Inductive bias is necessary.
+```
+
+```card id=tfml-03-efficient-pac
+PAC learnable vs efficiently PAC learnable?
+---
+PAC: polynomial sample complexity (information-theoretic). Efficient: also polynomial running time in $1/\varepsilon,1/\delta$, instance and target size.
+ERM can be NP-hard for a PAC learnable class (3-term DNF, agnostic halfspaces).
+```

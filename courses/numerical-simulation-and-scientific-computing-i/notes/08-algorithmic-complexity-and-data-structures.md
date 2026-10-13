@@ -84,3 +84,86 @@ $10^6$ particles must find the grid cell they fall in and be summed into cell de
 5. **Explain amortised $O(1)$ for `push_back`.** Capacity doubles on overflow; the copies over $n$ pushes sum to $1 + 2 + 4 + \dots + n < 2n$, so the total is $O(n)$ and the average per push is $O(1)$ even though individual pushes cost $O(n)$.
 
 Code: `src/cpp/containers_bench.cpp`; CSR construction in `src/cpp/csr.cpp` (`poisson2d`), mesh arrays in `src/cpp/vtk_writer.cpp` (`square_triangles`), mesh connectivity in `src/py/delaunay.py`. Sources: [S14] [S22] [S34] [S35].
+
+## Cards
+
+```card id=nssc-08-bigo
+Define $f(n) = O(g(n))$, and $\Omega$ and $\Theta$.
+---
+$f(n) \le c\,g(n)$ for all $n \ge n_0$ (upper bound).
+$\Omega$ lower bound, $\Theta$ both.
+```
+
+```card id=nssc-08-push-back
+Explain amortised $O(1)$ for `vector::push_back`.
+---
+Capacity grows geometrically; copies over $n$ pushes sum to $1 + 2 + \dots + n < 2n$.
+Total $O(n)$, average $O(1)$, though one push may cost $O(n)$.
+```
+
+```card id=nssc-08-recurrences
+Solve the recurrences for mergesort, binary search and Strassen.
+---
+$2T(n/2) + n \Rightarrow \Theta(n\log n)$; $T(n/2) + 1 \Rightarrow \Theta(\log n)$;
+$7T(n/2) + n^2 \Rightarrow n^{2.81}$.
+```
+
+```card id=nssc-08-map-vs-hash
+Give the lookup complexity and structure of `std::map` and `std::unordered_map`.
+---
+`map`: red-black tree, $O(\log n)$, ordered iteration.
+`unordered_map`: hash table, $O(1)$ average, $O(n)$ worst.
+```
+
+```card id=nssc-08-list
+Why is a linked list slow to traverse although traversal is $O(n)$?
+---
+Each node is a separate heap allocation reached by pointer; prefetcher cannot help.
+Every node can be a cache miss, ~90 ns vs 0.3 ns per contiguous element.
+```
+
+```card id=nssc-08-invalidation
+When does `vector` insertion invalidate iterators and pointers?
+---
+All of them if reallocation happens; otherwise everything from the insertion point on.
+`v.reserve(n)` avoids it when size is known.
+```
+
+```card id=nssc-08-erase-front
+Compute: complexity of calling `v.erase(v.begin())` $n$ times on a vector of $n$ elements, and a fix.
+---
+$O(n^2)$, each erase shifts the rest.
+Use `deque::pop_front`, an index, or `remove_if` + one erase ($O(n)$).
+```
+
+```card id=nssc-08-node-elems
+Which structure answers "all elements sharing node $i$" efficiently?
+---
+CSR-style adjacency `offset[n+1]`, `elems[...]`, built in $O(m)$ by counting then filling.
+Query $O(\deg i)$. Not `vector<vector<int>>` or `multimap`.
+```
+
+```card id=nssc-08-assembly
+How should sparse-matrix entries be assembled before solving?
+---
+COO triplets, sort by (row, col), sum duplicates, convert to CSR by counting rows.
+Never `std::map<pair,double>` in the solve loop.
+```
+
+```card id=nssc-08-soa
+When is struct-of-arrays preferred over array-of-structs?
+---
+When loops touch one component at a time: SIMD and full cache-line use.
+```
+
+```card id=nssc-08-rcm
+What does reverse Cuthill-McKee renumbering achieve?
+---
+Reduces matrix bandwidth and improves SpMV cache behaviour.
+```
+
+```card id=nssc-08-unsigned
+True or false: `for (size_t i = n-1; i >= 0; --i)` terminates.
+---
+False. An unsigned `i` is always $\ge 0$, so the loop never ends.
+```

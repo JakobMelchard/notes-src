@@ -128,3 +128,86 @@ Column `income` with 5 % NaN, skewed, one value of $10^9$; column `city` with 30
 ## Code
 
 `src/py/preprocessing.py`: `StandardScaler`, `MinMaxScaler`, `RobustScaler`, `OneHotEncoder`, `OrdinalEncoder`, `SimpleImputer`, `knn_impute`, `zscore_outliers`, `iqr_outliers`, `winsorize`, `variance_threshold`, `correlation_filter`, `anova_f`, `mutual_information_discrete`, `random_oversample`, `random_undersample`, `smote`, `class_weights`. sklearn equivalents used in `exercise_template.make_preprocessor`.
+
+## Cards
+
+```card id=ml-02-scaling-need
+Which models need feature scaling and which do not? Why?
+---
+Need it: kNN, SVM, k-means, PCA, neural nets, regularised linear models (distances, kernels, penalties, gradients depend on units).
+Do not: decision trees and random forests (splits use only the ordering).
+```
+
+```card id=ml-02-zscore-minmax
+z-score vs min-max scaling: formulas and when to use which?
+---
+z-score $(x-\mu)/\sigma$: assumes roughly Gaussian data, keeps distribution shape, more robust to outliers.
+Min-max $(x - \min)/(\max - \min)$: fixed range, for skewed or bounded data and NN inputs; sensitive to outliers.
+Both for numerical features only; encode categorical ones instead.
+```
+
+```card id=ml-02-onehot-tf
+True or false: 1-hot encoding is used to transform numerical into categorical attributes.
+---
+False. It is the other way round: it turns a categorical attribute into 0/1 numeric indicator columns.
+```
+
+```card id=ml-02-knn-onehot
+True or false: when kNN is used with 1-of-n encoding, min-max scaling is needed to perform the Euclidean distance.
+---
+False on its own: one-hot columns are already in $[0,1]$. It becomes true only if other attributes have different ranges.
+```
+
+```card id=ml-02-target-enc
+Why is target encoding prone to leakage, and how is it done correctly?
+---
+A row's encoding contains its own label. Compute it out-of-fold and smooth towards the global mean:
+$\tilde\mu_c = \frac{n_c \bar y_c + m \bar y}{n_c + m}$.
+```
+
+```card id=ml-02-missing
+MCAR, MAR, MNAR: what do they mean and which is harmless to drop?
+---
+MCAR: completely at random. MAR: depends on observed values. MNAR: depends on the missing value itself (high incomes unreported).
+Only MCAR is harmless to drop.
+```
+
+```card id=ml-02-selection-types
+Contrast filter, wrapper and embedded feature selection.
+---
+Filter: model-free per-feature scores (correlation, MI, ANOVA F); fast, ignores interactions.
+Wrapper: subset search with the model in the loop (forward, backward, RFE); expensive, nest in CV.
+Embedded: selection during fitting (lasso, tree splits).
+```
+
+```card id=ml-02-infogain
+True or false: information gain is an unsupervised feature-selection method.
+---
+False. It uses the target, so it is supervised.
+```
+
+```card id=ml-02-pca-selection
+True or false: PCA is a supervised feature-selection method.
+---
+False on both counts: PCA ignores the target, and it extracts new combined features rather than selecting a subset.
+```
+
+```card id=ml-02-fs-purpose
+True or false: feature selection is primarily useful to improve the effectiveness of machine learning.
+---
+False. The primary gain is efficiency (fewer dimensions, less computation, redundancy and noise); better predictions are a by-product.
+```
+
+```card id=ml-02-smote
+How does SMOTE create a synthetic point, and name one danger.
+---
+$x_{\text{new}} = x_i + \lambda (x_{nn} - x_i)$, $\lambda \sim U(0,1)$, with $x_{nn}$ one of $k$ minority neighbours.
+Danger: applied before the split it leaks test information; it interpolates through majority regions when classes overlap.
+```
+
+```card id=ml-02-outliers
+Name two univariate outlier detection rules from the note.
+---
+$|z| > 3$; Tukey fences $[Q_1 - 1.5\,\text{IQR},\, Q_3 + 1.5\,\text{IQR}]$.
+Never remove outliers from the test set to improve a score.
+```

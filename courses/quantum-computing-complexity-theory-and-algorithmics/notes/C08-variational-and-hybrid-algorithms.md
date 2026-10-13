@@ -70,3 +70,83 @@ Ansatz that reaches it exactly: $|10\rangle\to R_y(\theta)$ on qubit 0 followed 
 ## Code
 
 `src/py/quantum/vqe.py`: `h2_hamiltonian()` (Pauli-sum and dense forms), `expectation(state, pauli_terms)`, `hardware_efficient_ansatz(theta, n, layers)`, `parameter_shift_gradient`, `vqe(H, n, layers, rng)`; tests: converged energy within $10^{-3}$ of exact diagonalisation, parameter-shift gradient matches finite differences. `src/py/quantum/qaoa.py`: `maxcut_hamiltonian(edges)`, `qaoa_state(gammas, betas, edges, n)`, `qaoa(edges, n, p, rng)`, `barren_plateau_variance(n_list, samples, rng)`; tests: $p=2$ ratio $\geq0.85$ on a small graph, most likely sample of the optimised ring state is a maximum cut, gradient variance decreasing in $n$.
+
+## Cards
+
+```card id=qc-qu8-variational
+State the variational principle.
+---
+$\langle\psi|H|\psi\rangle\ge E_0$ for normalised $|\psi\rangle$, with equality iff $|\psi\rangle$ is a ground state.
+VQE returns an upper bound on $E_0$.
+```
+
+```card id=qc-qu8-pauli
+How is $\langle H\rangle$ estimated on hardware?
+---
+Decompose $H=\sum_jc_jP_j$, $c_j=2^{-n}\mathrm{tr}(P_jH)$.
+Measure each $P_j$ in its eigenbasis ($H$ for $X$, $S^\dagger H$ for $Y$).
+```
+
+```card id=qc-qu8-shots
+Shots needed to estimate $\langle H\rangle$ to precision $\epsilon$?
+---
+$M=O((\sum_j|c_j|)^2/\epsilon^2)$; standard error per Pauli $\le M^{-1/2}$.
+```
+
+```card id=qc-qu8-param-shift
+State the parameter-shift rule and its condition.
+---
+$\partial_\theta E=\frac12[E(\theta+\frac\pi2)-E(\theta-\frac\pi2)]$ for $U(\theta)=e^{-i\theta P/2}$ with $P^2=I$.
+Exact, since $E=A+B\cos\theta+C\sin\theta$; $2L$ evaluations for $L$ parameters.
+```
+
+```card id=qc-qu8-maxcut-h
+MaxCut cost Hamiltonian, and the classical benchmark ratio.
+---
+$C=\sum_{(i,j)\in E}\frac12(I-Z_iZ_j)$, diagonal with $C|z\rangle=C(z)|z\rangle$.
+Goemans-Williamson: $0.878$.
+```
+
+```card id=qc-qu8-qaoa
+Write the QAOA state with $p$ layers.
+---
+$e^{-i\beta_pB}e^{-i\gamma_pC}\cdots e^{-i\beta_1B}e^{-i\gamma_1C}|+\rangle^{\otimes n}$, $B=\sum_iX_i$.
+```
+
+```card id=qc-qu8-qaoa-edge
+Compute $F_1(\gamma,\beta)$ for a single edge and its maximum.
+---
+$\frac12(1+\sin4\beta\sin\gamma)$; maximum 1 at $\beta=\pi/8$, $\gamma=\pi/2$.
+```
+
+```card id=qc-qu8-qaoa-limit
+Why is $|+\rangle^{\otimes n}$ the QAOA start, and what does $p\to\infty$ correspond to?
+---
+It is the ground state of $-B$. Large $p$ Trotterises the adiabatic path from $-B$ to $-C$; $\max F_p\to\max C$.
+```
+
+```card id=qc-qu8-qaoa-ratios
+QAOA $p=1$ ratio on 3-regular graphs, and on the ring with $p$ layers?
+---
+3-regular: $\ge0.6924$. Ring $C_n$: $\frac{2p+1}{2p+2}$ ($0.75$ at $p=1$).
+```
+
+```card id=qc-qu8-qaoa-speedup
+True or false: QAOA is a proven quantum speedup for MaxCut.
+---
+False. For fixed $p$, $F_p$ is classically computable (light cone); Goemans-Williamson beats low-$p$ guarantees.
+```
+
+```card id=qc-qu8-barren
+State the barren plateau result. Does switching optimisers help?
+---
+For 2-design ansätze: $\mathbb E[\partial_kE]=0$, $\mathrm{Var}[\partial_kE]=\Theta(2^{-n})$.
+No: it is a property of ansatz and cost function. Mitigate with local costs, shallow circuits, warm starts.
+```
+
+```card id=qc-qu8-h2
+VQE for H$_2$: which parity sector holds the ground state and what is $E_0$?
+---
+Odd sector $\{|01\rangle,|10\rangle\}$ ($[H,Z_0Z_1]=0$).
+$E_0=-1.8571$ Ha, below the even block's $-1.2445$.
+```

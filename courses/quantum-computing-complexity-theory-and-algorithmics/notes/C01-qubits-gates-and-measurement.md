@@ -99,3 +99,86 @@ Measuring qubit 0 in the $X$ basis instead: apply $H\otimes I$ first, $\frac{1}{
 ## Code
 
 `src/py/quantum/sim.py`: `Register(n)`, `apply_gate(U, targets)`, `apply_controlled(U, controls, targets)`, `measure(qubits, rng)`, `probabilities()`, `partial_trace(keep)`, gate constants `X, Y, Z, H, S, T, CNOT, CZ, SWAP, TOFFOLI` and `Rx, Ry, Rz, phase`. `test_sim.py` checks each gate against explicit Kronecker products in the big-endian convention, the Bell-state partial trace $I/2$, and measurement statistics.
+
+## Cards
+
+```card id=qc-qu1-ordering
+Course ordering convention: which qubit is most significant, and how does Qiskit differ?
+---
+Qubit 0 is leftmost in the ket and most significant ("big-endian"); top wire; $A\otimes B$ for $A$ on qubit 0.
+Qiskit uses the reverse order.
+```
+
+```card id=qc-qu1-operator-order
+A circuit applies $A$ first, then $B$. Which operator is it?
+---
+$BA$: circuits read left to right, matrix products right to left.
+```
+
+```card id=qc-qu1-phase
+Global vs relative phase: which is observable?
+---
+Global phase $e^{i\gamma}$ is unobservable; relative phase $\alpha|0\rangle+e^{i\varphi}\beta|1\rangle$ is.
+A controlled phase becomes relative (phase kickback).
+```
+
+```card id=qc-qu1-hadamard-n
+State $H^{\otimes n}|x\rangle$ and compute $H^{\otimes 2}|11\rangle$.
+---
+$2^{-n/2}\sum_y(-1)^{x\cdot y}|y\rangle$.
+$H^{\otimes2}|11\rangle=\frac12(|00\rangle-|01\rangle-|10\rangle+|11\rangle)$.
+```
+
+```card id=qc-qu1-identities
+What are $HXH$, $HZH$, and SWAP in terms of CNOTs?
+---
+$HXH=Z$, $HZH=X$.
+$\mathrm{SWAP}=\mathrm{CNOT}_{01}\mathrm{CNOT}_{10}\mathrm{CNOT}_{01}$.
+```
+
+```card id=qc-qu1-kickback
+State the phase kickback identity, with the CNOT special case.
+---
+If $U|u\rangle=e^{i\varphi}|u\rangle$, controlled-$U$ maps $(\alpha|0\rangle+\beta|1\rangle)|u\rangle\mapsto(\alpha|0\rangle+e^{i\varphi}\beta|1\rangle)|u\rangle$.
+$\mathrm{CNOT}|c\rangle|-\rangle=(-1)^c|c\rangle|-\rangle$.
+```
+
+```card id=qc-qu1-no-cloning
+Prove no-cloning.
+---
+Cloning $|\psi\rangle$ and $|\phi\rangle$ with a unitary gives $\langle\phi|\psi\rangle=\langle\phi|\psi\rangle^2$, so $\langle\phi|\psi\rangle\in\{0,1\}$.
+Only orthogonal or identical states can be cloned.
+```
+
+```card id=qc-qu1-cnot-copy
+True or false: CNOT copies $\alpha|0\rangle+\beta|1\rangle$ onto a $|0\rangle$ ancilla.
+---
+False. It gives the entangled $\alpha|00\rangle+\beta|11\rangle$, not $(\alpha|0\rangle+\beta|1\rangle)^{\otimes2}$. It copies only basis states.
+```
+
+```card id=qc-qu1-entangled-test
+Is $\frac12(|00\rangle+|01\rangle+|10\rangle-|11\rangle)$ entangled?
+---
+Yes. Amplitude matrix $\frac12\begin{pmatrix}1&1\\1&-1\end{pmatrix}$ has $\det=-\frac12\ne0$: rank 2. It is $\mathrm{CZ}|{+}{+}\rangle$.
+```
+
+```card id=qc-qu1-universality
+Why is $\{H,T,\mathrm{CNOT}\}$ universal although countable?
+---
+Universality is approximate: the generated group is dense.
+Solovay-Kitaev: precision $\varepsilon$ costs $O(\log^c(1/\varepsilon))$ gates.
+```
+
+```card id=qc-qu1-measurement
+Measuring a subset $Q$ of qubits: probability of outcome $y$ and post-measurement state?
+---
+$p(y)=\sum_{x:x_Q=y}|a_x|^2$.
+State $\frac{1}{\sqrt{p(y)}}\sum_{x:x_Q=y}a_x|x\rangle$.
+```
+
+```card id=qc-qu1-noise
+Which two noise effects does the lecture name, and what do they limit?
+---
+Gate infidelity (coherent accumulation of gate errors) and decoherence (environment destroys relative phases).
+Both bound usable circuit depth.
+```

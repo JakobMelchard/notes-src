@@ -257,3 +257,80 @@ oracle never exists (note 07).
 Tests: `test_standard_vectors.py::test_sp800_38a_f2_cbc_aes128`,
 `test_standard_vectors.py::test_sp800_38a_f5_ctr_aes128` (each on the library
 AES and on `aes.PureAES`), `test_private_key.py::test_padding_oracle_recovers_plaintext`.
+
+## Cards
+
+```card id=crypto-06-cpa
+CPA game: how does it differ from EAV?
+---
+$\mathcal A$ gets an encryption oracle $\mathsf{Enc}_k(\cdot)$ before and after the challenge $c\gets\mathsf{Enc}_k(m_b)$, with $|m_0|=|m_1|$. Secure iff advantage negligible.
+```
+
+```card id=crypto-06-deterministic
+Why can no deterministic scheme be CPA-secure?
+---
+Query $\mathsf{Enc}_k(m_0)$, submit $(m_0,m_1)$, compare with the challenge: equal iff $b=0$. Win prob 1, advantage $\tfrac12$. So CPA-secure schemes are randomised or stateful (rules out ECB, textbook RSA).
+```
+
+```card id=crypto-06-cca
+CCA game, and which modification turns it into the CPA game?
+---
+Enc and Dec oracles in both phases; Dec may not be queried on $c^*$. For CPA: delete the Dec oracle and with it the $c^*$ restriction; everything else stays.
+```
+
+```card id=crypto-06-cca-clauses
+In the CCA game, what happens if you drop $|m_0|=|m_1|$ or the restriction on querying $c^*$?
+---
+Either way no scheme is secure: unequal lengths are trivially distinguished, and decrypting $c^*$ reveals $b$.
+```
+
+```card id=crypto-06-prf-scheme
+Construction 3.28: the scheme, its assumption and bound.
+---
+$\mathsf{Enc}_k(m)=(r,\ F_k(r)\oplus m)$, $r\gets\{0,1\}^n$ fresh. If $F$ is a PRF it is CPA-secure:
+$\mathsf{Adv}^{\mathrm{cpa}}\le\mathsf{Adv}^{PRF}_{\mathcal B}+q/2^n$ ($q/2^n$: challenge $r^*$ hits a query $r$).
+```
+
+```card id=crypto-06-drop-r
+Engineer proposes $c:=F_k(r)\oplus m$ with fresh $r$, $r$ not sent. Recommend it if CCA is not needed?
+---
+No, and not for security: the receiver cannot recompute $F_k(r)$, so the scheme is not correct. Check correctness first.
+```
+
+```card id=crypto-06-modes
+Which of ECB, CBC, CTR are EAV-, CPA-, CCA-secure?
+---
+ECB: none (deterministic, equal blocks give equal ciphertext blocks).
+CBC (random unpredictable IV) and CTR (fresh nonce): EAV and CPA, neither CCA (malleable).
+```
+
+```card id=crypto-06-ecb-attack
+Explicit EAV adversary against ECB.
+---
+$m_0=0^{2n}$, $m_1=0^n\|1^n$. Output 0 iff $c_1=c_2$. $m_0$ gives $c_1=c_2=E_k(0^n)$, $m_1$ gives $c_1\ne c_2$ ($E$ injective). Advantage $\tfrac12$.
+```
+
+```card id=crypto-06-iv
+IV/nonce requirements for CBC and CTR.
+---
+CBC: IV uniform and unpredictable (predictable IV: BEAST). CTR (and GCM): nonce unique per key; reuse gives a two-time pad.
+```
+
+```card id=crypto-06-cbc-cca
+Show CBC is not CCA-secure with one decryption query.
+---
+Submit one-block $m_0=0^\ell$, $m_1=1^\ell$, get $(c_0,c_1)$. Query Dec on $(c_0\oplus 10^{\ell-1},c_1)$ (legal, differs from $c^*$): it returns $m_b\oplus 10^{\ell-1}$, revealing $b$. Advantage $\tfrac12$.
+```
+
+```card id=crypto-06-pkcs7
+PKCS#7 padding for AES.
+---
+Append $p$ bytes each equal to $p$, $1\le p\le 16$; an already aligned message gets a whole block of `0x10`. Decryption strips and validates it.
+```
+
+```card id=crypto-06-padding-oracle
+Padding-oracle attack on CBC: mechanism, cost, fix.
+---
+$m_i=D_k(c_i)\oplus c_{i-1}$: editing $c_{i-1}$ controls $m_i$'s tail; force valid padding 1, 2, ... to learn $D_k(c_i)$ byte by byte.
+$\le 256$ guesses per byte (128 avg): linear in length. Fix: encrypt-then-MAC, verify before decrypting.
+```

@@ -246,3 +246,81 @@ definition [S28]. Tests:
 `test_hashing.py::test_constants_derived_from_their_definition_match_fips180_4`,
 `test_standard_vectors.py::test_rfc6234_sha256_vectors` [S23],
 `test_hashing.py::test_sha256_length_extension_forges_a_secret_prefix_mac`.
+
+## Cards
+
+```card id=crypto-08-notions
+Three hash security notions, and their implications.
+---
+Collision resistance: find $x\ne x'$, $H(x)=H(x')$. Second preimage: given $x$, find $x'\ne x$. Preimage: given $y$, find $x'$ with $H(x')=y$.
+CR $\Rightarrow$ second-preimage $\Rightarrow$ (mostly) preimage; converses fail.
+```
+
+```card id=crypto-08-birthday
+Birthday bound for an $n$-bit hash.
+---
+Collision prob among $q$ digests $\approx q^2/2^{n+1}$, crossing $\tfrac12$ at $q\approx 1.177\cdot 2^{n/2}$. Only $n/2$-bit collision resistance; preimage costs $\approx 2^n$.
+```
+
+```card id=crypto-08-ell-bits
+True or false: a hash with output length $\ell$ can achieve up to $\ell$ bits of collision resistance.
+---
+False: the generic birthday attack caps it at $\ell/2$ bits. 128-bit collision security needs a 256-bit hash.
+```
+
+```card id=crypto-08-80bit
+Engineer claims a proved collision-resistant hash with 80-bit output. Why not use it?
+---
+The birthday attack finds a collision in $\approx 2^{40}$ evaluations whatever the design, so the claim cannot hold in any useful sense.
+```
+
+```card id=crypto-08-md
+Merkle-Damgard construction.
+---
+Pad and append the length: $m\|10\cdots0\|\langle|m|\rangle$ (length-strengthening). $z_0=\mathrm{IV}$, $z_i=h(z_{i-1},m_i)$, output $z_t$.
+```
+
+```card id=crypto-08-md-thm
+Thm 6.4 (Merkle-Damgard): statement and proof idea.
+---
+$h$ collision resistant $\Rightarrow$ length-strengthened MD hash collision resistant.
+Walk the chains back: different lengths give an $h$-collision on the final call; equal lengths give some differing pair $(z_{i-1},m_i)$ with equal outputs.
+```
+
+```card id=crypto-08-length-ext
+Length extension on Merkle-Damgard: what it does and its consequence.
+---
+The digest is the chaining state: from $H(m)$ and $|m|$, not $m$, compute $H(m\|\mathrm{pad}(m)\|m')$ by resuming the chain.
+So $H(k\|m)$ is not a MAC. SHA-256/512 affected; SHA-3 and HMAC not.
+```
+
+```card id=crypto-08-sponge
+Why does the sponge (SHA-3) resist length extension?
+---
+State is rate $r$ plus capacity $c$; the capacity is never output, so the digest is not the full state and the permutation cannot be resumed. Security $\approx 2^{c/2}$.
+```
+
+```card id=crypto-08-davies-meyer
+Davies-Meyer compression function: formula and role of each part.
+---
+$h(z_{i-1},m_i)=E_{m_i}(z_{i-1})\oplus z_{i-1}$: the message block is the key. The feed-forward XOR prevents inverting via $E^{-1}$. SHA-256 is SHACAL-2 in this mode.
+```
+
+```card id=crypto-08-rom
+Random oracle model: the two superpowers and the caveat.
+---
+The reduction sees every hash query and can program answers. Enables proofs for RSA-FDH, OAEP, Fiat-Shamir.
+Caveat: schemes exist that are secure in the ROM but insecure under every concrete hash (Canetti-Goldreich-Halevi); heuristic only.
+```
+
+```card id=crypto-08-passwords
+How should passwords be stored, and why?
+---
+$H(\mathrm{salt}\|\mathrm{pwd})$ with a slow, salted hash (bcrypt/scrypt/Argon2). Salt defeats precomputed rainbow tables; slowness defeats brute force.
+```
+
+```card id=crypto-08-merkle-tree
+Proof idea: $H=h(h(x_1\|x_2)\|h(x_3\|x_4))$ is collision resistant if $h$ is.
+---
+If the top inputs $(a,b)\ne(a',b')$: top-level $h$-collision. Else $a=a'$, $b=b'$ but some half differs: bottom-level $h$-collision.
+```

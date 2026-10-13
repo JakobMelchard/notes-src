@@ -220,3 +220,65 @@ No TLS code, but the TLS 1.3 building blocks are all implemented:
 sec. 7.1 [S18] is HKDF, RFC 5869 [S34]), `hmac` (the Finished MAC);
 `src/py/signatures.py`: `rsassa_pkcs1_v15_sign` (certificate signatures);
 `src/py/hashing.py`: `sha256` (the transcript hash).
+
+## Cards
+
+```card id=crypto-12-pki-problem
+What gap do certificates close, and what is a certificate?
+---
+Signatures authenticate relative to a key, not whose key it is. A certificate is a trusted third party's signature binding identity to key: $\mathsf{Sign}_{sk_{\mathrm{CA}}}(\text{name}\|pk_A\|\text{validity}\|\dots)$.
+```
+
+```card id=crypto-12-root-ca
+How does Bob get $pk_{\mathrm{CA}}$, and is the trust problem solved?
+---
+Few fixed root keys ship with the browser or OS; roots sign intermediates, which sign end-entity certs. Not solved but concentrated: a few hundred keys, authenticated once out of band.
+```
+
+```card id=crypto-12-pki-problems
+Practical problems of CA-based PKI.
+---
+Hundreds of roots, any can issue for any name: security is that of the weakest CA. Revocation is hard: CRLs large and stale, OCSP leaks visited sites and fails open.
+```
+
+```card id=crypto-12-ct
+Certificate Transparency: what it gives and what it rests on.
+---
+Not prevention but public after-the-fact detection: issued certificates go into an append-only log. Rests on Merkle trees: published root, inclusion proofs of $O(\log n)$ sibling hashes.
+```
+
+```card id=crypto-12-web-of-trust
+PGP web of trust.
+---
+No authorities: users sign each other's keys; accept a key via a short enough chain of trusted people. Removes single points of failure, adds an unsolved usability problem.
+```
+
+```card id=crypto-12-rsa-transport
+Two reasons TLS 1.3 removed RSA key transport.
+---
+No forward secrecy: a later-obtained server key decrypts recorded traffic. PKCS #1 v1.5 decryption is a chosen-ciphertext oracle (Bleichenbacher). Ephemeral DH has neither problem.
+```
+
+```card id=crypto-12-forward-secrecy
+What is forward secrecy and where does it come from in TLS 1.3?
+---
+Compromising the server's long-term $sk$ later does not decrypt recorded sessions. It is a property of the key exchange: ephemeral DH, $x,y$ discarded.
+```
+
+```card id=crypto-12-sign-transcript
+Why does the TLS 1.3 server sign the transcript, not just $g^y$?
+---
+A signature on $g^y$ alone can be replayed into another session with attacker-chosen ciphersuites and nonce. Signing the transcript binds identity to exactly this exchange.
+```
+
+```card id=crypto-12-finished
+Server signature and client Finished MAC both cover the transcript. Why both?
+---
+Signature: authenticates the server's identity and binds it to this exchange. Finished MAC under a key from $K$: key confirmation and agreement on the negotiation (downgrade protection).
+```
+
+```card id=crypto-12-record
+TLS 1.3 record layer: protection, nonces, keys per direction.
+---
+AEAD (AES-GCM or ChaCha20-Poly1305). Nonce = per-connection IV XOR 64-bit sequence number: prevents replay and ensures uniqueness. Separate $k_C,k_S$ prevent reflection.
+```

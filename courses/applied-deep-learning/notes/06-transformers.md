@@ -241,3 +241,88 @@ Configuration: pre-LN decoder, $d = 256$, $h = 8$, $L = 6$, FFN $4d$, learned or
 - Dosovitskiy, A. et al. (2021). An image is worth 16x16 words. ViT.
 - Touvron, H. et al. (2021). Training data-efficient image transformers and distillation through attention. DeiT.
 - Karpathy, A. (2022). nanoGPT / minGPT. Reference for the written-out multi-head attention in `transformer_char.py`.
+
+## Cards
+
+```card id=adl-06-attention
+Write scaled dot-product attention.
+---
+$\mathrm{softmax}(QK^\top/\sqrt{d_k})\,V$, softmax row-wise.
+Batched with heads the score tensor is `[B, h, T, T]`.
+```
+
+```card id=adl-06-sqrt-dk
+Why divide by $\sqrt{d_k}$?
+---
+For i.i.d. unit-variance components, $q \cdot k$ has variance $d_k$.
+Unscaled logits saturate the softmax and its gradient vanishes; scaling restores unit variance.
+```
+
+```card id=adl-06-mha-params
+How many parameters does multi-head attention have, and does it depend on $h$?
+---
+$4d^2$ (plus $4d$ biases): $W_Q, W_K, W_V, W_O$.
+Independent of $h$; heads partition the same columns.
+```
+
+```card id=adl-06-block-params
+Approximate parameter count of one transformer block with width $d$ and FFN $4d$?
+---
+Attention $4d^2$ + FFN $8d^2$ = $12d^2$, plus $13d$ for biases and two LayerNorms.
+```
+
+```card id=adl-06-mask
+Why must the causal mask add $-\infty$ to logits rather than $0$, and when?
+---
+$\exp(0) > 0$ still gives future tokens weight; $\exp(-\infty) = 0$ removes them from the normaliser too.
+Apply before softmax; use $-10^4$ under fp16 to avoid NaN.
+```
+
+```card id=adl-06-sinusoidal
+What property makes sinusoidal encodings useful for relative positions?
+---
+$PE(p + k) = R_k\,PE(p)$ with $R_k$ a block of 2x2 rotations depending only on $k$.
+A linear layer can express "attend to position $p+k$".
+```
+
+```card id=adl-06-preln
+Pre-LN vs post-LN: which is stable without warmup tricks, and why?
+---
+Pre-LN $X' = X + \mathrm{MHA}(\mathrm{LN}(X))$ keeps a clean residual path, so gradients are similar across depth.
+Post-LN needs warmup and is unstable when deep.
+```
+
+```card id=adl-06-flops
+When does attention dominate the FFN in FLOPs per block?
+---
+Ratio attention/FFN $= 2T^2 d / 8Td^2 = T/4d$.
+Attention dominates for $T > 4d$ (e.g. $T = 3072$ at $d = 768$).
+```
+
+```card id=adl-06-kv-cache
+What does the KV cache store and how large is it?
+---
+Per-layer $K, V$ of all previous tokens; each step computes only the new query row, $O(T)$.
+Size $2LdT$ values per sequence: about 2.1 GB for a 7B model at $T = 4096$ in fp16.
+```
+
+```card id=adl-06-hungarian
+How does DETR assign predictions to ground truth, and why is there no NMS?
+---
+Exact one-to-one matching by the Hungarian algorithm, $O(N^3)$; greedy is not equivalent.
+One-to-one matching means two predictions cannot claim one object.
+```
+
+```card id=adl-06-giou
+Why use GIoU instead of IoU as a box loss?
+---
+IoU is 0 for every disjoint pair, so no gradient.
+GIoU subtracts $|C \setminus (A \cup B)|/|C|$, decreasing toward $-1$ as boxes separate.
+```
+
+```card id=adl-06-vit
+Why does a ViT from scratch underperform CNNs on small datasets?
+---
+No convolutional inductive bias (locality, translation equivariance).
+Overtakes CNNs with 10M+ images or strong augmentation/distillation; for small data fine-tune a pretrained ViT.
+```

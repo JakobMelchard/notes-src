@@ -95,3 +95,77 @@ Rule of thumb: explore in a notebook, then promote every reused function to a mo
 5. `uv.lock` (or a pinned requirements file) is needed in addition to `pyproject.toml` because
    (a) pyproject cannot list dependencies (b) pyproject states version *ranges*; the lock file records the exact resolved versions so the environment can be rebuilt identically (c) uv ignores pyproject (d) the lock file contains the source code
    **b.**
+
+## Cards
+
+```card id=spp-06-kernel-state
+Where do a notebook's variables live?
+---
+In the kernel process, until it is restarted. The `.ipynb` file stores only source and outputs.
+```
+
+```card id=spp-06-ipynb
+What is an `.ipynb` file?
+---
+A JSON file (nbformat 4) with a list of cells; code cells carry `source`, `execution_count` and `outputs`, stored in the file.
+```
+
+```card id=spp-06-magic-syntax
+What is the difference between `%x` and `%%x` magics, and do they work in a `.py` script?
+---
+`%x` acts on one line, `%%x` on a whole cell. Both are IPython syntax, so a plain `.py` script fails on them.
+```
+
+```card id=spp-06-timeit
+How does `%timeit` differ from `%time`?
+---
+`%time` measures one run (wall and CPU). `%timeit` autoranges the loop count and repeats many runs: the tool for micro-benchmarks.
+```
+
+```card id=spp-06-autoreload
+How do you make IPython re-import edited modules automatically?
+---
+`%load_ext autoreload` then `%autoreload 2`.
+```
+
+```card id=spp-06-seed-bits
+A seeded simulation differs in the 15th digit on two machines. Most likely cause?
+---
+Different BLAS/SIMD summation order: floating-point addition is not associative. The seed fixes inputs, not reduction order.
+```
+
+```card id=spp-06-bitwise
+What helps bitwise repeatability of reductions, and what is the correctly rounded reference sum?
+---
+Set `OMP_NUM_THREADS=1` (multithreaded BLAS reductions can differ run to run). `math.fsum` is the reference.
+```
+
+```card id=spp-06-lock
+Why is a lock file like `uv.lock` needed besides `pyproject.toml`?
+---
+`pyproject.toml` states intent (version ranges); the lock file records the exact resolved versions so the environment rebuilds identically.
+```
+
+```card id=spp-06-pulp-drift
+Why did re-creating this repo's venv pull PuLP 4.0.0 instead of 3.3.2?
+---
+`pyproject.toml` lists `pulp` with no bound and `uv.lock` is git-ignored. Intent without a committed lock file is not a pin.
+```
+
+```card id=spp-06-run-all
+What guarantees a notebook's outputs match a top-to-bottom run of its current code?
+---
+Restart kernel and run all, or `nbconvert --execute`, which fails on the first error and so works as a CI test.
+```
+
+```card id=spp-06-spawn-notebook
+Why do `multiprocessing` workers defined in notebook cells fail on macOS/Windows?
+---
+The `spawn` start method must import worker functions from a file, so cell-defined functions fail to pickle. Put them in a module.
+```
+
+```card id=spp-06-clear-outputs
+What should you do with notebook outputs before committing?
+---
+Clear them (`jupyter nbconvert --clear-output --inplace` or `nbstripout`), unless the outputs are the deliverable.
+```

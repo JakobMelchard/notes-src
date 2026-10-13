@@ -105,3 +105,87 @@ Discretisation error (5.4e-5) is the same for every solver: the solver only has 
 5. **Sparse direct or CG for a 3D Poisson problem with $n = 10^7$?** Sparse Cholesky needs $O(n^2) = 10^{14}$ flops and $O(n^{4/3}) \approx 10^{9.3}$ fill entries (tens of GB); CG needs $\sim N = n^{1/3} \approx 215$ iterations times $O(n)$: $\sim 10^{10}$ flops and 5 vectors. CG (better: multigrid-preconditioned CG, ~10 iterations).
 
 Code: `src/cpp/csr.cpp` (`CSR::spmv`, `poisson2d`, `jacobi`, `sor`, `cg` with optional Jacobi preconditioner, `precond_demo`), `src/py/csr.py` (same in numpy, tests against `scipy.sparse` in `test_csr.py`). Sources: [S15] [S22] [S23].
+
+## Cards
+
+```card id=nssc-05-csr
+Describe the three CSR arrays.
+---
+`val[nnz]` and `col[nnz]` list nonzeros row by row.
+`row_ptr[n+1]` gives each row start, `row_ptr[n] = nnz`.
+```
+
+```card id=nssc-05-csr-example
+Write the CSR arrays of $\begin{pmatrix} 4 & -1 & 0 \\ -1 & 4 & -1 \\ 0 & -1 & 4 \end{pmatrix}$.
+---
+`val = [4,-1,-1,4,-1,-1,4]`, `col = [0,1,0,1,2,1,2]`, `row_ptr = [0,2,5,7]`.
+```
+
+```card id=nssc-05-spmv-ai
+Why is CSR SpMV memory bound?
+---
+2 flops and 12 bytes (8 value + 4 index) per nonzero, plus the gather `x[col[k]]`.
+AI $\approx 0.17$ flop/byte.
+```
+
+```card id=nssc-05-thomas
+What is the Thomas algorithm, its cost and when is it stable?
+---
+LU without pivoting for tridiagonal systems, $O(n)$.
+Stable for diagonally dominant or SPD matrices.
+```
+
+```card id=nssc-05-sparse-direct
+Why do 3D problems go iterative rather than sparse direct?
+---
+2D Poisson: $O(n^{3/2})$ flops, $O(n \log n)$ memory.
+3D: $O(n^2)$ flops, $O(n^{4/3})$ memory.
+```
+
+```card id=nssc-05-stationary
+When does the splitting iteration $x^{k+1} = x^k + M^{-1}(b - Ax^k)$ converge for every start?
+---
+Iff $\rho(M^{-1}K) < 1$ with $A = M - K$.
+Error contracts by $\rho$ per step asymptotically.
+```
+
+```card id=nssc-05-splittings
+Give $M$ for Jacobi, Gauss-Seidel and SOR with $A = D + L + U$.
+---
+Jacobi $D$, Gauss-Seidel $D + L$, SOR $\frac{1}{\omega}D + L$ with $0 < \omega < 2$.
+```
+
+```card id=nssc-05-rates
+Give the spectral radii for 2D Poisson for Jacobi, GS and optimal SOR.
+---
+$\rho_J = \cos\pi h \approx 1 - \pi^2 h^2/2$, $\rho_{GS} = \rho_J^2$.
+$\rho_{SOR} = \omega_{\text{opt}} - 1 \approx 1 - 2\pi h$, $\omega_{\text{opt}} = 2/(1 + \sin\pi h)$.
+```
+
+```card id=nssc-05-redblack
+Why is Gauss-Seidel hard to parallelise and what fixes it?
+---
+It uses updated values within the sweep, a sequential dependency.
+Red-black ordering: neighbours have opposite colour, so each colour updates in parallel.
+```
+
+```card id=nssc-05-cg-bound
+State the CG error bound and iteration count for 2D Poisson.
+---
+$\|e_k\|_A \le 2\left(\frac{\sqrt\kappa - 1}{\sqrt\kappa + 1}\right)^k \|e_0\|_A$, $k \approx \frac12\sqrt\kappa\ln\frac{2}{\text{tol}}$.
+$\kappa \sim N^2$ so $k \propto N$.
+```
+
+```card id=nssc-05-termination
+True or false: CG may be stopped after $n$ iterations since it then gives the exact solution.
+---
+False. Finite termination holds only in exact arithmetic.
+Stop on the residual, never on the step count.
+```
+
+```card id=nssc-05-jacobi-pc
+Why does Jacobi preconditioning not help the Poisson matrix?
+---
+Its diagonal is constant ($4/h^2$), so $M^{-1}A$ is a scalar multiple of $A$.
+Same eigenvalue spread; $M$ must be SPD with cheap $M^{-1}r$.
+```

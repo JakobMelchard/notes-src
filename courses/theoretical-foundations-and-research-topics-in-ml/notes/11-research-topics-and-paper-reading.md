@@ -206,3 +206,60 @@ No dedicated module. For a paper on double descent or benign overfitting, `src/p
 - Keshav (2007), "How to read a paper", ACM SIGCOMM CCR 37(3).
 - Shalev-Shwartz & Ben-David, *Understanding Machine Learning*; Mohri, Rostamizadeh & Talwalkar, *Foundations of Machine Learning*: the two references whose notation the summaries should use.
 - The papers listed above.
+
+## Cards
+
+```card id=tfml-11-four-ingredients
+Which four ingredients must you extract from a theory paper's claim?
+---
+Assumptions $A$, quantifiers (for all vs exists, expectation vs probability $1-\delta$), the object bounded (risk, excess risk, gap, mistakes), and the inequality with its dependence on $n,d,\delta$ and constants.
+```
+
+```card id=tfml-11-vacuous
+When is a bound vacuous, and how do you check it?
+---
+Right-hand side exceeds the trivial value (1 for $0$-$1$ risk, $\mathrm{Var}(y)$ for regression) at the paper's own sample and model sizes. Plug in $n$, $\delta$, norms with explicit constants.
+```
+
+```card id=tfml-11-tight
+What does "tight bound" mean, and how do you decide it?
+---
+A matching lower bound exists: same dependence on relevant quantities up to constants or logs. Look to NFL/minimax, the lower half of the fundamental theorem, or the paper itself.
+```
+
+```card id=tfml-11-distribution-free
+Distribution-free vs distribution-dependent guarantee: give examples.
+---
+Distribution-free: holds for all $\mathcal D$ (PAC, VC).
+Dependent: margin/noise conditions, sub-Gaussian design, source conditions in kernel regression.
+```
+
+```card id=tfml-11-three-pass
+Describe Keshav's three-pass reading.
+---
+Pass 1 (5 min): title, abstract, intro, headings, main theorem, conclusions. Pass 2 (1 h): all but proofs, note assumptions. Pass 3 (hours): re-derive the main result, find the step carrying the new idea.
+```
+
+```card id=tfml-11-algorithm-vs-run
+A paper proves a bound for infinite-width gradient flow and runs SGD at width 512. What do you say?
+---
+The algorithm analysed is not the algorithm run: finite width, discrete stochastic steps, standard parametrisation. Ask whether NTK regime assumptions hold and whether the experiment measures the theorem's quantity.
+```
+
+```card id=tfml-11-uniform-vs-algorithmic
+Why do only algorithm-dependent bounds have a chance for deep nets?
+---
+Uniform bounds depend only on $\mathcal H$; deep nets fit random labels, so they are vacuous over the architecture. Stability, implicit bias, PAC-Bayes around trained weights depend on the actual output.
+```
+
+```card id=tfml-11-few-parameters
+How do you attack "our model generalises because it has few parameters"?
+---
+VC dimension is not parameter count: $\mathbb 1[\sin(\omega x)\ge0]$ has one parameter and infinite VC dimension. Norm-based/Rademacher bounds show capacity can be a norm, not a count.
+```
+
+```card id=tfml-11-belkin-limitations
+Main limitations of Belkin et al. (2019) double descent?
+---
+No quantitative theorem; neural-net experiments use a non-standard min-norm training scheme; label noise level (which decides whether the second descent wins) not studied; "capacity" axis conflates notions.
+```

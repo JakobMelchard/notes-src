@@ -215,3 +215,89 @@ Split $E$ into train/val/test edges (e.g. 85/5/10). Encoder $Z = \mathrm{GNN}(A_
 - Bruna et al., ICLR 2014 and Defferrard et al., NeurIPS 2016 (spectral graph convolutions, Chebyshev filters).
 - Hamilton, *Graph Representation Learning*, 2020 [S68] -- free book, **Lecture 11's reference 2**.
 - **Lecture 11** [S4], *Graph Neural Networks*, is the lecture this note covers: graphs as inputs, what GNNs are, node/graph/link classification, **how to get the input graph** and how to get a better one (12 of 47 minutes -- the lecture spends more time on graph construction than on any single architecture, which is the part a project gets wrong), convolutional GNNs, the CORA dataset, GNNs in code, GAT, neural message passing, frameworks, applications (AlphaFold, antibiotic discovery).
+
+## Cards
+
+```card id=adl-07-perm
+What symmetry must a node-level GNN satisfy, and a graph-level one?
+---
+Node-level: permutation-equivariant, $f(PAP^\top, PX) = P f(A, X)$.
+Graph-level: permutation-invariant.
+```
+
+```card id=adl-07-mp
+Name the three components of a message-passing layer and the constraint on the aggregator.
+---
+Message $\psi$, aggregator $\bigoplus$ over $N(v)$, update $\phi$.
+The aggregator must be permutation-invariant (sum, mean, max, attention).
+```
+
+```card id=adl-07-gcn
+Write the GCN layer.
+---
+$H^{(l+1)} = \sigma(\hat D^{-1/2}(A+I)\hat D^{-1/2} H^{(l)} W^{(l)})$, $\hat D = \mathrm{diag}((A+I)\mathbf 1)$.
+Per node: sum over $N(v) \cup \{v\}$ weighted by $1/\sqrt{\hat d_v \hat d_u}$.
+```
+
+```card id=adl-07-gcn-norm
+Why does GCN add self-loops and use symmetric normalisation?
+---
+Self-loops keep the node's own state. Raw $A$ scales features by degree, so deep stacks explode or vanish.
+$\hat D^{-1/2}\tilde A\hat D^{-1/2}$ has eigenvalues in $(-1, 1]$, symmetric with real spectrum.
+```
+
+```card id=adl-07-path-graph
+For the path graph $1 - 2 - 3$, what are $\hat D$ and the entry $\hat A_{12}$?
+---
+$\hat D = \mathrm{diag}(2, 3, 2)$.
+$\hat A_{12} = 1/\sqrt{6} \approx 0.408$; diagonal $(1/2, 1/3, 1/2)$.
+```
+
+```card id=adl-07-sage
+What makes GraphSAGE scalable and inductive?
+---
+Samples a fixed $k$ neighbours per layer, bounding cost to $O(\prod_l k_l)$ per target regardless of degree.
+Learned weights apply to unseen nodes or new graphs.
+```
+
+```card id=adl-07-gat
+Compute GAT coefficients for scores $e_{u_1 v} = 2$, $e_{u_2 v} = 0$, $e_{vv} = 1$.
+---
+$\mathrm{softmax}(2, 0, 1) \approx (0.665, 0.090, 0.245)$.
+$h_v' = \sigma(0.665\,Wh_{u_1} + 0.090\,Wh_{u_2} + 0.245\,Wh_v)$.
+```
+
+```card id=adl-07-wl
+Why are mean/max GNNs weaker than 1-WL, and how does GIN reach the bound?
+---
+Mean and max cannot distinguish multisets differing only in multiplicity ($\{a, a\}$ vs $\{a\}$).
+GIN: sum aggregator plus MLP, $\mathrm{MLP}((1+\epsilon)h_v + \sum_u h_u)$.
+```
+
+```card id=adl-07-triangles
+True or false: some message-passing GNN can distinguish two disjoint triangles from a 6-cycle with identical features.
+---
+False. Both are 2-regular; 1-WL gives identical colourings.
+Need structural features or higher-order models.
+```
+
+```card id=adl-07-oversmooth
+What is over-smoothing and where does GCN accuracy peak on citation graphs?
+---
+$\hat A^L$ converges to a rank-1 projection onto $\propto \hat D^{1/2}\mathbf 1$, so node states lose specific information.
+Accuracy peaks at 2-3 layers.
+```
+
+```card id=adl-07-transductive
+In transductive node classification, what is visible during training?
+---
+All nodes' features and edges, including test nodes; only test labels are hidden.
+Splits are node masks over the same graph.
+```
+
+```card id=adl-07-link-leak
+What leakage must link prediction avoid?
+---
+Test (and validation) edges must be removed from the message-passing adjacency.
+Otherwise the encoder sees the answer.
+```

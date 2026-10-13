@@ -176,3 +176,85 @@ Four points in $\mathbb R^2$: $x_1=(1,1),x_2=(2,2)$ with $y=+1$; $x_3=(-1,-1),x_
 - Mohri, Rostamizadeh & Talwalkar, *Foundations of Machine Learning*, Ch. 5 (SVM, margin theory, Thm 5.8), Ch. 6 (kernels).
 - Schölkopf & Smola, *Learning with Kernels*, Ch. 7.
 - Boser, Guyon & Vapnik (1992), "A training algorithm for optimal margin classifiers"; Cortes & Vapnik (1995), "Support-vector networks"; Platt (1998), "Sequential minimal optimization"; Shalev-Shwartz, Singer, Srebro & Cotter (2011), "Pegasos"; Bartlett & Mendelson (2002), "Rademacher and Gaussian complexities"; Novikoff (1962), "On convergence proofs for perceptrons".
+
+## Cards
+
+```card id=tfml-09-hard-margin-primal
+State the hard-margin SVM primal and why it maximises the margin.
+---
+$\min_{w,b}\tfrac12\|w\|^2$ s.t. $y_i(\langle w,x_i\rangle+b)\ge1$.
+In canonical form $\min_iy_i(\langle w,x_i\rangle+b)=1$, the geometric margin is $1/\|w\|$.
+```
+
+```card id=tfml-09-hard-margin-dual
+State the hard-margin dual and the primal recovery.
+---
+$\max_{\alpha\ge0}\sum_i\alpha_i-\tfrac12\sum_{ij}\alpha_i\alpha_jy_iy_j\langle x_i,x_j\rangle$ s.t. $\sum_i\alpha_iy_i=0$.
+$w^*=\sum_i\alpha_i^*y_ix_i$. Strong duality by Slater (separability).
+```
+
+```card id=tfml-09-support-vectors
+What does complementary slackness say about support vectors in the hard-margin SVM?
+---
+$\alpha_i^*>0\Rightarrow y_i(\langle w^*,x_i\rangle+b^*)=1$: on the margin. Points strictly outside have $\alpha_i^*=0$.
+Also $1/\gamma^2=\|w^*\|^2=\sum_i\alpha_i^*$.
+```
+
+```card id=tfml-09-soft-margin-rlm
+Show the soft-margin SVM is hinge-loss RLM. What is $\lambda$?
+---
+Optimal slack is $\xi_i=\max\{0,1-y_if(x_i)\}$. Dividing by $Cn$: $\lambda\|w\|^2+\frac1n\sum\ell_{\mathrm{hinge}}$ with $\lambda=\frac1{2Cn}$.
+```
+
+```card id=tfml-09-box-constraint
+Where does the box constraint $0\le\alpha_i\le C$ in the soft-margin dual come from?
+---
+$\partial_{\xi_i}\mathcal L=C-\alpha_i-\mu_i=0$ with $\mu_i\ge0$ (multiplier of $\xi_i\ge0$) gives $\alpha_i\le C$; the $\xi$ terms cancel.
+```
+
+```card id=tfml-09-three-regimes
+Soft margin: the three KKT regimes of $\alpha_i$?
+---
+$\alpha_i=0$: $y_if(x_i)\ge1$, not a SV. $0<\alpha_i<C$: exactly on margin (free SV, use for $b$).
+$\alpha_i=C$: $y_if(x_i)=1-\xi_i\le1$, inside margin or misclassified (bounded SV).
+```
+
+```card id=tfml-09-loo-bound
+State the leave-one-out bound for the hard-margin SVM and its key step.
+---
+$\mathbb E_{S\sim\mathcal D^n}L_{\mathcal D}(h_S)\le\mathbb E_{S\sim\mathcal D^{n+1}}[N_{SV}]/(n+1)$.
+Removing a non-SV leaves KKT satisfied, so the solution is unchanged; each LOO error is an SV. Expectation only.
+```
+
+```card id=tfml-09-margin-bound
+State the SVM margin bound for $\mathcal H_B=\{\|w\|\le B\}$, $\|x\|\le R$, fixed $\rho$.
+---
+$$L^{0\text{-}1}_{\mathcal D}(h)\le\hat L_{S,\rho}(h)+\frac2\rho\frac{BR}{\sqrt n}+3\sqrt{\frac{\log(2/\delta)}{2n}}$$
+Proof: $\ell_{0\text{-}1}\le\ell_\rho$, Rademacher bound, contraction ($1/\rho$-Lipschitz), $\mathfrak R_S(\mathcal H_B)\le BR/\sqrt n$.
+```
+
+```card id=tfml-09-margin-dimension-free
+Why does the margin bound justify kernel SVMs, and when is it vacuous anyway?
+---
+Depends only on $B=\|f\|_{\mathcal H_k}$, $R^2=\sup k(x,x)$, $\rho$, not on dimension.
+Vacuous e.g. with tiny-bandwidth RBF: separable with large margin but $RB$ huge. Choosing $\rho$ after data costs a $\log\log$ term.
+```
+
+```card id=tfml-09-perceptron
+State and prove the perceptron mistake bound.
+---
+$\|x_i\|\le R$, $\|w^*\|=1$, $y_i\langle w^*,x_i\rangle\ge\gamma$: at most $(R/\gamma)^2$ mistakes.
+$\langle w_k,w^*\rangle\ge k\gamma$, $\|w_k\|^2\le kR^2$; Cauchy–Schwarz gives $k\gamma\le\sqrt kR$.
+```
+
+```card id=tfml-09-smo
+Why does SMO optimise two dual variables at a time?
+---
+$\sum_i\alpha_iy_i=0$ fixes any single $\alpha_i$ once the others are fixed. Two variables give a one-dimensional feasible segment, clipped to the box $[0,C]^2$.
+```
+
+```card id=tfml-09-c-trap
+True or false: $C$ is the margin width of the soft-margin SVM.
+---
+False. $C\to\infty$ recovers hard margin on separable data; $C\to0$ makes $w\to0$. Small $C$ widens the margin at the price of slack.
+```

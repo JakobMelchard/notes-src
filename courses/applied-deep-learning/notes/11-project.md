@@ -245,3 +245,87 @@ Columns: method, params, train time (min, M3 Pro), val macro-F1 (mean $\pm$ std,
 - Pineau, J. et al. (2021). Improving Reproducibility in Machine Learning Research (the ML reproducibility checklist). JMLR 22.
 - Karpathy, A. (2019). *A Recipe for Training Neural Networks*.
 - **Course-authoritative:** [S1] TISS 194.077 2026W; [S5] Pacha, *Applied Deep Learning 2025 — Lecture 0 — Preliminary Information*; [S12] *Assignment 1 — Initiate*; [S13] *Assignment 2 — Hacking*; [S14] *Assignment 3 — Deliver*; [S11] VoWi course page. ILEA/TUWEL for the announced 2026W deadlines. See [`../refs/SOURCES.md`](../refs/SOURCES.md).
+
+## Cards
+
+```card id=adl-11-deliverables
+How is 194.077 graded?
+---
+Five deliverables, 10 points each: assignments 1 and 2, demo application, report ($\le 5$ pages), presentation ($\le 4$ min).
+No written exam.
+```
+
+```card id=adl-11-types
+Name the four official project types.
+---
+Bring your own data, Bring your own method, Beat the classics, Beat the stars.
+Safest for 3 ECTS: Bring your own method.
+```
+
+```card id=adl-11-classics
+What is required for a "Beat the classics" project?
+---
+Solve a problem with an established traditional algorithm using deep learning.
+Both must be evaluated with the same metric.
+```
+
+```card id=adl-11-flops
+How do you estimate training FLOPs for feasibility?
+---
+$\approx 6PNE$ (forward $2P$, backward $4P$ per sample).
+$P = 10^7$, $N = 5\cdot10^4$, $E = 30$: $9\cdot10^{13}$ FLOP.
+```
+
+```card id=adl-11-split
+How should the dataset be split per the note?
+---
+Once, by a hash of the sample id; about 70/15/15; groups (patient, user) in one split.
+Test evaluated once at the end; selection and early stopping on val.
+```
+
+```card id=adl-11-baselines
+Which three baselines go in the results table?
+---
+Trivial (majority, mean); classical ML on hand features; small pretrained model with linear head.
+Deep model must beat them by more than the seed std.
+```
+
+```card id=adl-11-sota
+Which three numbers should a SOTA comparison report?
+---
+Paper's published value, your reproduction of its method in your setup, your method.
+The first two differ by the "setup gap", which must be discussed.
+```
+
+```card id=adl-11-diff
+When is a difference between two methods not a difference, per the note?
+---
+When it is smaller than $2s/\sqrt n$ over $n \ge 3$ seeds.
+```
+
+```card id=adl-11-learning-curve
+Errors $0.30, 0.26, 0.235$ at $n = 1000, 2000, 4000$. Can $4\times$ data reach 0.18?
+---
+Ratio $r = 0.625$, tail $0.025 \cdot r/(1-r) = 0.042$, asymptote $\approx 0.193$.
+No; at $n = 16000$ about $0.210$. Change the model, not the data.
+```
+
+```card id=adl-11-imbalance
+Which metric for an imbalanced classification problem?
+---
+Per-class recall, macro-F1 or balanced accuracy, not accuracy.
+Majority class at 95% gives 95% accuracy for free.
+```
+
+```card id=adl-11-test-relabel
+True or false: after finding mislabelled examples, relabel the test set.
+---
+False. That is test tuning; relabelling val is allowed if documented.
+Estimate the noise rate on a random val sample and report it.
+```
+
+```card id=adl-11-hours
+Do the hours logged in the work-breakdown structure affect the grade?
+---
+No. The estimating discipline is the point; A3 discusses estimate vs actual.
+```

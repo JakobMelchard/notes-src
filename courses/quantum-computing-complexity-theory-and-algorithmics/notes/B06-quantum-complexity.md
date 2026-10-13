@@ -96,3 +96,89 @@ With the phase oracle the same holds with $z_i = (-1)^{x_i} = 1 - 2x_i$ as varia
 ## Code
 
 `src/py/complexity/query_complexity.py`: `decision_tree_depth(f, n)` (exhaustive minimax, $D(\mathrm{OR}_n) = D(\mathrm{PARITY}_n) = n$ for $n \le 4$), `phase_oracle`, `deutsch_pair_parity`, `parity_via_pairs` ($\lceil n/2 \rceil$ queries, always correct), `deutsch_jozsa`, `grover_iterations`, `grover_or` (iteration count and success probability), `multilinear_coefficients` (subset Möbius transform), `acceptance_polynomial_degree`, `random_query_algorithm` (Haar-random $U_0, \dots, U_t$ with a dummy index; degree $\le 2t$ verified for $t = 1, 2$ on $n = 5$, and $= 5$ for $t = 3$). The BPP-style amplification used for BQP and QMA is `bpp_amplify.py` (B05); Grover and Simon themselves are in `src/py/quantum/`.
+
+## Cards
+
+```card id=qc-cx6-bqp
+Define BQP. Is it the quantum analogue of P or BPP?
+---
+Uniform polynomial-size quantum circuit families with $\Pr[C_n(x)=[x\in L]]\ge2/3$.
+Analogue of BPP.
+```
+
+```card id=qc-cx6-robust
+Why do the constant $2/3$ and the gate set not matter for BQP?
+---
+Majority of independent runs with Chernoff amplification.
+Solovay-Kitaev: $O(\log^c(1/\varepsilon))$ gates per gate; errors add up.
+```
+
+```card id=qc-cx6-bpp-bqp
+Prove BPP $\subseteq$ BQP.
+---
+Reversible circuit: Toffoli for NAND, CNOT for fan-out; copy output, run $R^{-1}$ to uncompute garbage.
+Coins from $H|0\rangle$.
+```
+
+```card id=qc-cx6-feynman
+How does the Feynman path sum show BQP $\subseteq$ PSPACE?
+---
+Insert identities between gates; enumerate paths of $m\ell$ bits one at a time, accumulating the amplitude.
+Space polynomial, time $2^{O(m\ell)}$.
+```
+
+```card id=qc-cx6-upper-bound
+Best classical upper bound for BQP, and is BQP $\subseteq$ PH known?
+---
+$\mathrm{BQP}\subseteq\mathrm{PP}\subseteq\mathrm{PSPACE}$.
+BQP vs PH unknown; Raz-Tal give an oracle with $\mathrm{BQP}\not\subseteq\mathrm{PH}$.
+```
+
+```card id=qc-cx6-ect
+What does the extended Church-Turing thesis say, and how does Shor challenge it?
+---
+Every physically realisable model is simulable by a probabilistic TM with polynomial overhead.
+FACTORING $\in$ BQP with no known polynomial classical algorithm.
+```
+
+```card id=qc-cx6-qma
+Define QMA and state the known inclusions with NP and BQP.
+---
+Quantum verifier, quantum witness on $p(n)$ qubits; completeness $2/3$, soundness $1/3$.
+$\mathrm{NP}\subseteq\mathrm{MA}\subseteq\mathrm{QCMA}\subseteq\mathrm{QMA}$, $\mathrm{BQP}\subseteq\mathrm{QMA}\subseteq\mathrm{PP}$.
+```
+
+```card id=qc-cx6-klh
+Why is $k$-LOCAL HAMILTONIAN in QMA?
+---
+Witness: ground state. Pick random term $j$, measure $\{H_j,I-H_j\}$, accept on $I-H_j$.
+$\Pr[\text{accept}]=1-\frac1r\langle\psi|H|\psi\rangle$; gap $(b-a)/r$.
+```
+
+```card id=qc-cx6-query-table
+Give $Q$, $R$, $D$ for OR$_n$ and PARITY$_n$.
+---
+OR: $\Theta(\sqrt n)$, $\Theta(n)$, $\Theta(n)$.
+PARITY: $\lceil n/2\rceil$, $n$, $n$.
+```
+
+```card id=qc-cx6-poly-method
+State the polynomial method. Trap: degree $t$ or $2t$?
+---
+After $t$ queries amplitudes have degree $\le t$, acceptance probability degree $\le2t$.
+So $Q(f)\ge\widetilde{\deg}(f)/2$, $Q_E(f)\ge\deg(f)/2$.
+```
+
+```card id=qc-cx6-total-functions
+True or false: Deutsch-Jozsa gives an exponential quantum vs randomised separation.
+---
+False: it separates $Q_E=1$ from $D=n/2+1$, but $R=O(1)$.
+Exponential $Q$ vs $R$ needs promise problems; for total $f$, $D=O(Q^4)$.
+```
+
+```card id=qc-cx6-symmetric
+Quantum query complexity of a symmetric $f$, and the value for MAJORITY?
+---
+$Q(f)=\Theta(\sqrt{n(n-\Gamma(f))})$.
+MAJORITY: $\Gamma=0$, so $Q=\Theta(n)$.
+```

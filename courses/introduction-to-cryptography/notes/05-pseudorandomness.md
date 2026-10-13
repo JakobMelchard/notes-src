@@ -182,3 +182,73 @@ the counter, RFC 8439 sec. 2.3 [S36]).
 `src/py/private_key.py`: `FeistelPRP`, `AESBlock`. `src/py/aes.py`: `PureAES`.
 Tests: `test_prg.py::test_chacha20_block_rfc8439_2_3_2`,
 `test_private_key.py::test_feistel_is_a_permutation`.
+
+## Cards
+
+```card id=crypto-05-prg
+Definition of a PRG.
+---
+Deterministic poly-time $G:\{0,1\}^n\to\{0,1\}^{\ell(n)}$ with expansion $\ell(n)>n$ such that $\{G(s)\}\approx_c$ uniform $\ell(n)$-bit strings, $s$ uniform.
+```
+
+```card id=crypto-05-lcg
+Why is the LCG $x_{i+1}=ax_i+c \bmod m$ not a PRG?
+---
+The output is the state: a few outputs determine the parameters and predict the next value, advantage $\approx 1$. Statistical randomness is not cryptographic pseudorandomness; passing statistical tests is necessary, not sufficient.
+```
+
+```card id=crypto-05-perfect
+Can a PRG be indistinguishable from uniform against unbounded distinguishers?
+---
+No. Its image has $\le 2^n$ of $2^\ell$ points; an unbounded $D$ outputs 1 iff the input is in the image. Advantage $\ge 1-2^{n-\ell}$. PRGs only fool efficient tests.
+```
+
+```card id=crypto-05-prf
+Definition of a PRF.
+---
+Keyed $F$ such that for every PPT $D$: $|\Pr[D^{F_k(\cdot)}(1^n)=1]-\Pr[D^{f(\cdot)}(1^n)=1]|\le\mathsf{negl}(n)$, $k$ uniform, $f$ a uniformly random function. $D$ queries adaptively.
+```
+
+```card id=crypto-05-prf-to-prg
+How does a PRF give a PRG, and is $G(s)=F_s(0)\|F_s(0)$ one?
+---
+$G(s)=F_s(0)\|F_s(1)\|\cdots\|F_s(t-1)$ on distinct inputs. $F_s(0)\|F_s(0)$ is not: the halves are equal, which uniform strings satisfy only with prob $2^{-\ell_{out}}$.
+```
+
+```card id=crypto-05-prp
+PRP vs strong PRP, and which models a block cipher?
+---
+PRP: a PRF that is a bijection per key with efficient inverse, indistinguishable from a random permutation. Strong: also with oracle access to $F_k^{-1}$. Block ciphers are modelled as strong PRPs (heuristic assumption, not a theorem).
+```
+
+```card id=crypto-05-switching
+PRP/PRF switching lemma and its consequence for block size.
+---
+A $q$-query distinguisher between random permutation and random function on $n$ bits has advantage $\le q^2/2^{n+1}$.
+Usable until $q\approx 2^{n/2}$: for $n=64$ only $\approx 2^{32}$ blocks, hence 3DES deprecated and AES has $n=128$.
+```
+
+```card id=crypto-05-feistel
+One Feistel round and its inverse.
+---
+$L'=R$, $R'=L\oplus f_i(R)$. Inverse: $R=L'$, $L=R'\oplus f_i(L')$. Invertible for any round function $f_i$.
+```
+
+```card id=crypto-05-luby-rackoff
+Luby-Rackoff: how many Feistel rounds for a PRP and a strong PRP, and why the extra round?
+---
+Independent PRF round functions: 3 rounds give a PRP, 4 a strong PRP. With 3 rounds an inverse (chosen-ciphertext) query distinguishes; the fourth closes this.
+```
+
+```card id=crypto-05-stretch
+How is a 1-bit-expansion PRG stretched, and how is it proved?
+---
+$s_0=s$, $G_1(s_{i-1})=(s_i,b_i)$, output $b_1\cdots b_\ell$. Hybrid: $H_j$ has the first $j$ bits truly random; each step is one use of $G_1$, total advantage $\le\ell\cdot\varepsilon$.
+```
+
+```card id=crypto-05-ggm
+GGM (background): construction and why evaluation is efficient.
+---
+From length-doubling $G=(G_0,G_1)$: $F_k(x_1\cdots x_\ell)=G_{x_\ell}(\cdots G_{x_1}(k)\cdots)$, a path down a binary tree.
+Only the $\ell$ path nodes are computed: $O(\ell)$ PRG calls despite $2^\ell$ leaves.
+```

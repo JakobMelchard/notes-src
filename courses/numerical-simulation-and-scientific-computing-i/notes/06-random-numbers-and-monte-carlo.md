@@ -93,3 +93,84 @@ $\int_0^1 e^x dx = e - 1$ with $N = 10^5$, RMS error over 20 runs: plain 1.5e-3,
 5. **What is a control variate and how do you choose the coefficient?** A function $g$ correlated with $f$ whose mean is known. Estimate $\mathbb{E}[f - c(g - \mathbb{E}g)]$; the variance is $\sigma_f^2 - 2c\,\text{Cov}(f,g) + c^2 \sigma_g^2$, minimised at $c^* = \text{Cov}(f,g)/\sigma_g^2$, leaving $\sigma_f^2 (1 - \rho^2)$. Estimate $c^*$ from a pilot sample (or the same sample, at the cost of a small bias).
 
 Code: `src/cpp/rng_mc.cpp` (`LCG`, `exponential`, `box_muller`, `mc_pi`, `mc_exp_integral`), `src/py/montecarlo.py` (`LCG`, `box_muller`, `mc_integral`, `mc_antithetic`, `mc_control_variate`, `error_scaling`), `src/py/lattice.py` (`hull_dobell`, `period`, `marsaglia_plane_bound`, `randu_triple_residual`, `randu_plane_count`); tests `src/py/test_montecarlo.py`, `src/py/test_lattice.py`. Sources: [S14] [S26] [S27] [S28] [S29] [S30].
+
+## Cards
+
+```card id=nssc-06-hull-dobell
+State the Hull-Dobell full-period conditions for an LCG.
+---
+$\gcd(c, m) = 1$; $a - 1$ divisible by every prime factor of $m$;
+$a - 1$ divisible by 4 if $4 \mid m$. An iff statement.
+```
+
+```card id=nssc-06-minstd
+What are the minstd parameters, and the standard's required 10000th value?
+---
+$a = 16807$, $c = 0$, $m = 2^{31} - 1$ (`std::minstd_rand0`).
+10000th value from the default seed: 1043618065.
+```
+
+```card id=nssc-06-lattice
+What is the lattice weakness of LCGs?
+---
+Overlapping $k$-tuples lie on at most $(k!\,m)^{1/k}$ parallel hyperplanes (Marsaglia).
+RANDU triples fall on only 15 planes.
+```
+
+```card id=nssc-06-randu
+Which recurrence makes RANDU so bad?
+---
+$a = 2^{16}+3$ gives $x_{k+2} - 6x_{k+1} + 9x_k \equiv 0 \pmod{2^{31}}$ identically.
+```
+
+```card id=nssc-06-low-bits
+Why is `x % 2` from an LCG with $m = 2^{32}$ poor?
+---
+Bit $j$ cycles with period $2^{j+1}$; the lowest bit alternates 0,1,0,1.
+```
+
+```card id=nssc-06-mt
+Give the key properties of MT19937.
+---
+624 x 32-bit state, period $2^{19937} - 1$, 623-dimensionally equidistributed.
+Not cryptographic: 624 outputs reveal the state.
+```
+
+```card id=nssc-06-parallel-seed
+How should random streams be set up for parallel threads?
+---
+One generator per thread, seeded differently (`std::seed_seq`, jump/streams, `SeedSequence.spawn`).
+Sharing one generator is a data race and serialises.
+```
+
+```card id=nssc-06-inverse
+Sample an exponential distribution by inverse transform.
+---
+$X = -\ln(1 - U)/\lambda$, using `log1p(-u)` and $1 - U$ to avoid $\ln 0$.
+```
+
+```card id=nssc-06-box-muller
+State the Box-Muller transform.
+---
+$Z_0 = \sqrt{-2\ln U_1}\cos 2\pi U_2$, $Z_1 = \sqrt{-2\ln U_1}\sin 2\pi U_2$.
+From polar coordinates: $R^2 \sim$ exponential, $\Theta$ uniform.
+```
+
+```card id=nssc-06-mc-error
+What is the MC standard error, and when does MC beat order-$p$ quadrature?
+---
+$|\Omega|\sigma_f/\sqrt N$, independent of $d$.
+Quadrature error is $N^{-p/d}$, so MC wins for $d > 2p$ and non-smooth integrands.
+```
+
+```card id=nssc-06-pi-samples
+Compute: samples needed to estimate $\pi$ to $\pm 10^{-4}$ (one standard error).
+---
+$1.64/\sqrt N = 10^{-4} \Rightarrow N \approx 2.7 \cdot 10^8$.
+```
+
+```card id=nssc-06-control
+What is the optimal control-variate coefficient and resulting variance reduction?
+---
+$c^* = \text{Cov}(f,g)/\text{Var}(g)$, reducing variance by factor $1 - \rho_{fg}^2$.
+```

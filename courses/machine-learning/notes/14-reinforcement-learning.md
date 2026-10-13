@@ -221,3 +221,79 @@ Split along the chapter boundary of [S21]:
 `td0_prediction` for the MC-vs-TD contrast.
 
 `src/exercises/2022-06-30/` works E22b's bandit and gradient-descent questions.
+
+## Cards
+
+```card id=ml-14-incremental
+Write the incremental sample-average update for a bandit action value.
+---
+$Q_{n+1} = Q_n + \frac{1}{n}[R_n - Q_n]$: old + step size × (target − old).
+```
+
+```card id=ml-14-nonstationary
+What changes for non-stationary rewards, and why?
+---
+Use a constant $\alpha$: $Q_{n+1} = Q_n + \alpha[R_n - Q_n]$, an exponentially weighted average that keeps tracking change.
+```
+
+```card id=ml-14-convergence
+What step-size condition guarantees convergence, and which step sizes satisfy it?
+---
+$\sum\alpha_n = \infty$ and $\sum\alpha_n^2 < \infty$. $1/n$ satisfies it; a constant $\alpha$ does not.
+```
+
+```card id=ml-14-egreedy
+Explain $\varepsilon$-greedy and why pure greedy fails.
+---
+With probability $1-\varepsilon$ take $\arg\max_a Q_t(a)$, otherwise a uniformly random action.
+Pure greedy locks onto an early best arm and never finds a better arm whose first sample was unlucky.
+```
+
+```card id=ml-14-ucb
+Give the UCB action-selection rule.
+---
+$A_t = \arg\max_a [Q_t(a) + c\sqrt{\ln t / N_t(a)}]$: prefers good or under-tried actions; $c$ sets exploration strength.
+```
+
+```card id=ml-14-definite
+In the bandit trace question, when was an action definitely random and when only possibly?
+---
+Definitely: the chosen action is not a maximiser of $Q$ before the step.
+Possibly: it is the unique maximiser or ties for the maximum.
+```
+
+```card id=ml-14-step1
+With all-zero initial estimates, can step 1 be definitely random?
+---
+No. All actions tie for the maximum, so step 1 is only possibly random.
+```
+
+```card id=ml-14-trace
+Bandit, $Q = (1, -1, 0, 0)$, $N(2) = 1$; action 2 chosen, reward $+3$. Verdict and new $Q(2)$?
+---
+Greedy set is $\{1\}$, so definitely random. $N(2) = 2$, $Q(2) = -1 + \frac12(3 - (-1)) = 1$.
+```
+
+```card id=ml-14-markov
+What is the Markov property in an MDP?
+---
+The next state and reward depend only on the present state and action, $p(s', r \mid s, a)$, not on the history.
+```
+
+```card id=ml-14-bellman
+State the Bellman equation for $v_\pi$.
+---
+$v_\pi(s) = \sum_a \pi(a\mid s)\sum_{s',r} p(s',r\mid s,a)[r + \gamma v_\pi(s')]$.
+```
+
+```card id=ml-14-mc
+True or false: for Monte Carlo RL, value estimates and policies are changed only on the completion of an episode.
+---
+True. The target is the return of the whole episode. TD methods update every step by bootstrapping.
+```
+
+```card id=ml-14-bandit-expected
+True or false: $k$-armed bandits choose the next action based on the expected future reward.
+---
+True. The greedy part maximises the estimate $Q_t(a)$ of expected reward.
+```

@@ -209,3 +209,89 @@ Concrete full loop with AdamW and a one-cycle schedule (`OneCycleLR`: warmup the
 - Srivastava et al. 2014 [S31], dropout. Gal & Ghahramani 2016, dropout in RNNs. Szegedy et al. 2016, label smoothing (Inception-v3). Pascanu et al. 2013 [S47], gradient clipping.
 - **Lecture 2** [S4] (neural networks, optimisation, backpropagation) and **Lecture 9** [S4] (preprocessing, augmentation, regularisation, visualisation) are the two lectures this note covers; their own reading lists supplied [S25] Ruder's optimiser overview, [S28]/[S29] batch norm, [S31] dropout, [S32] SWA, [S33] cutout, [S34]/[S35] adversarial examples, [S36] SpecAugment and [S37] EDA.
 - Izmailov et al. 2018 [S32], stochastic weight averaging. DeVries & Taylor 2017 [S33], cutout. Goodfellow, Shlens & Szegedy 2015 [S34], adversarial examples and FGSM. Su et al. 2017 [S35], one-pixel attack. Park et al. 2019 [S36], SpecAugment. Wei & Zou 2019 [S37], EDA.
+
+## Cards
+
+```card id=adl-01-softmax-grad
+What is the gradient of softmax cross-entropy with respect to the logits $z_k$?
+---
+$\partial \ell / \partial z_k = p_k - y_k$.
+Bounded in $[-1, 1]$ per logit and does not saturate like MSE on a softmax.
+```
+
+```card id=adl-01-ce-logits
+True or false: you should put a softmax layer before `nn.CrossEntropyLoss`.
+---
+False. It takes raw logits and fuses `log_softmax` + `nll_loss` stably.
+Likewise use `BCEWithLogitsLoss`, not `Sigmoid` + `BCELoss`.
+```
+
+```card id=adl-01-ce-compute
+Compute the cross-entropy for logits $z = (2, 0, -1)$ with true class 0.
+---
+$p = (0.844, 0.114, 0.042)$, so $\ell = -\ln 0.844 = 0.170$.
+Gradient $p - y = (-0.156, 0.114, 0.042)$, which sums to 0.
+```
+
+```card id=adl-01-reverse-ad
+Why does reverse-mode AD give all parameter gradients in about one pass, and what does it cost?
+---
+One adjoint per node is propagated back from the scalar loss via VJPs, about $2$-$3\times$ forward FLOPs.
+Price is memory: all activations kept until backward, $O(\text{depth} \times \text{activation size})$.
+```
+
+```card id=adl-01-adam-bias
+Without Adam's bias correction, how large is the first step (with $\beta_1 = 0.9$, $\beta_2 = 0.999$) and for how long is it inflated?
+---
+About $\eta/\sqrt{0.1} \approx 3.16\,\eta$ instead of $\eta$.
+Stays inflated for about $1/(1-\beta_2) = 1000$ steps.
+```
+
+```card id=adl-01-adamw
+Why does `Adam(weight_decay=...)` decay weights poorly, and what does AdamW change?
+---
+Coupled L2 gradient $\lambda\theta$ gets divided by $\sqrt{\hat v_t}$, so high-gradient coordinates barely decay.
+AdamW applies $\lambda\theta_t$ outside the adaptive step (decoupled).
+```
+
+```card id=adl-01-warmup
+Why does linear warmup help Adam?
+---
+Early $\hat v_t$ averages few samples; coordinates with small gradients get a huge $1/\sqrt{\hat v_t}$ and take destructive steps.
+Keep $\eta$ small until $\hat v$ has seen about 1000 samples.
+```
+
+```card id=adl-01-init
+State the Xavier and He initialisation variances and when each applies.
+---
+Xavier: $\sigma^2 = 2/(n_{in}+n_{out})$, for linear/tanh.
+He: $\sigma^2 = 2/n_{in}$, for ReLU (ReLU halves the second moment). For a conv $n_{in} = k^2 C_{in}$.
+```
+
+```card id=adl-01-zero-init
+Why does zero (or constant) weight initialisation fail?
+---
+Symmetry: all units of a layer compute the same output and get the same gradient forever, effective width 1.
+With ReLU and $W = 0$ the gradient is exactly zero. Biases may be zero.
+```
+
+```card id=adl-01-bn-modes
+How does batch norm differ between train and eval mode, and what goes wrong with $B = 1$?
+---
+Train uses batch statistics $\mu_B, \sigma_B$; eval uses EMA running buffers ($m = 0.1$).
+$B = 1$ is degenerate ($\sigma_B = 0$); use GroupNorm or LayerNorm.
+```
+
+```card id=adl-01-dropout
+What does inverted dropout do at train and test time?
+---
+Train: $\tilde h = m \odot h / (1-p)$ with $m_i \sim \mathrm{Bernoulli}(1-p)$, so $\mathbb E[\tilde h] = h$.
+Test: identity, no rescaling. Active only in `model.train()`.
+```
+
+```card id=adl-01-loss-lnk
+Training loss sits at exactly $\ln K$ from step 0. What should you check?
+---
+Gradient is zero or not reaching the parameters: `requires_grad`, optimizer built from `model.parameters()` after moving to device.
+Also that `zero_grad`, `backward` and `step` all run.
+```

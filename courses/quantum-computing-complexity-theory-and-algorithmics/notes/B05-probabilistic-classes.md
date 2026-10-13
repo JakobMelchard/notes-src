@@ -87,3 +87,84 @@ Chernoff is loose by a constant in the exponent (the exact rate is the relative 
 ## Code
 
 `src/py/complexity/bpp_amplify.py`: `chernoff_bound(k, p)`, `exact_majority_error(k, p)` (binomial tail via `scipy.stats.binom`), `majority_vote(base, k, rng)`, `empirical_error(p, k, trials, rng)`, `repetitions_needed(p, target_error)`, `rp_amplify`, `rp_error`. Tests: exact tail $\le$ Chernoff for all odd $k < 200$, empirical error within sampling slack of the exact tail, monotonicity in $k$ and $p$, minimality of `repetitions_needed`, RP simulation.
+
+## Cards
+
+```card id=qc-cx5-classes
+Define RP, ZPP, BPP and PP by their error conditions.
+---
+RP: yes $\ge1/2$, no $=0$. ZPP: never errs, expected polynomial time.
+BPP: correct w.p. $\ge2/3$. PP: $x\in L\iff\Pr[\text{accept}]>1/2$.
+```
+
+```card id=qc-cx5-zpp
+Prove $\mathrm{ZPP}\subseteq\mathrm{RP}$.
+---
+Run the Las Vegas machine for $2t(n)$ steps; by Markov it has not halted w.p. $\le1/2$.
+If not halted, answer no. Overall $\mathrm{ZPP}=\mathrm{RP}\cap\mathrm{coRP}$.
+```
+
+```card id=qc-cx5-chernoff
+State the Chernoff-Hoeffding bound used for BPP amplification.
+---
+$\Pr[X\le(p-\varepsilon)k]\le e^{-2\varepsilon^2k}$ for $k$ independent Bernoulli($p$) trials.
+```
+
+```card id=qc-cx5-amplify-compute
+Compute: how many repetitions bring a BPP algorithm from $2/3$ to error $2^{-30}$ (Chernoff)?
+---
+$\varepsilon=1/6$: $k\ge18\cdot30\ln2\approx374$, so $k=375$.
+```
+
+```card id=qc-cx5-pp-amplify
+Why can PP not be amplified like BPP?
+---
+The gap $\eta$ can be $2^{-\mathrm{poly}}$, so Chernoff needs $k=\Omega(\eta^{-2})$: exponentially many runs.
+```
+
+```card id=qc-cx5-rp-amplify
+How is RP amplified, and why is no Chernoff needed?
+---
+$k$ runs, accept if any accepts. No-instances are never accepted; miss probability $\le2^{-k}$.
+```
+
+```card id=qc-cx5-adleman
+Prove $\mathrm{BPP}\subseteq\mathrm{P/poly}$ (Adleman).
+---
+Amplify to error $<2^{-(n+1)}$; union bound over $2^n$ inputs gives bad probability $\le1/2$.
+Some random string is good for all $x$; use it as advice.
+```
+
+```card id=qc-cx5-lautemann
+Where does BPP sit relative to the polynomial hierarchy?
+---
+$\mathrm{BPP}\subseteq\Sigma_2^p\cap\Pi_2^p$ (Sipser-Gács, Lautemann), via $\exists$ shifts $\forall r$.
+Even $\mathrm{BPP}\subseteq\mathrm{NP}$ is open.
+```
+
+```card id=qc-cx5-np-pp
+Show NP $\subseteq$ PP.
+---
+Accept outright w.p. just under $1/2$, otherwise test a random assignment.
+Acceptance exceeds $1/2$ iff a satisfying assignment exists.
+```
+
+```card id=qc-cx5-toda
+State Toda's theorem.
+---
+$\mathrm{PH}\subseteq\mathrm P^{\#\mathrm P}=\mathrm P^{\mathrm{PP}}$.
+```
+
+```card id=qc-cx5-miller-rabin
+Miller-Rabin: which class does it place COMPOSITES in, and with what error?
+---
+COMPOSITES $\in$ RP, PRIMES $\in$ coRP: at least $3/4$ of bases witness a composite.
+Error $4^{-k}$ after $k$ bases. PRIMES $\in$ P by AKS.
+```
+
+```card id=qc-cx5-pit
+Why is polynomial identity testing in coRP?
+---
+Schwartz-Zippel: nonzero $p$ of degree $d$ vanishes at a random point from $S$ w.p. $\le d/|S|$.
+Derandomising PIT implies circuit lower bounds (Kabanets-Impagliazzo).
+```

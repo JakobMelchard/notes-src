@@ -142,3 +142,87 @@ qr response, rd/ra recursion, **ad** = the resolver validated DNSSEC, no aa = an
 ## Code
 
 `src/py/dns.py`: `encode_name` (RFC 1035 §2.3.4 limits; with a table, §4.1.4 suffix compression), `build_query` (with EDNS0 DO), `build_response` (every owner name compressed, so the query name becomes `c0 0c`), `parse_message`, `decode_name` (pointer following with loop guard); `test_dns.py` rebuilds §4.1.4's F.ISI.ARPA figure byte for byte and compares a full response with a hand-written packet; `python dns.py --live name` sends a real query (tests never do). `src/py/dnssec.py`: `key_tag` (RFC 4034 Appendix B), `ds_digest`/`ds_record` (§5.1.4), `canonical_name` (§6.2), with the §5.4 vector in `RFC4034_EXAMPLE` and asserted in `test_rfc_vectors.py`. `src/py/telnet_client_sketch.py`: `parse_stream` (IAC escapes, SB…SE), `QOption` (RFC 1143 §7, tested row by row against the section's tables), `Negotiator` and `negotiate` (refuse-by-default client on top), `describe`.
+
+## Cards
+
+```card id=net-08-name-limits
+What are the DNS length limits for a label and a name?
+---
+Labels at most 63 bytes, names at most 255.
+Case-insensitive ASCII.
+```
+
+```card id=net-08-referral
+What does a DNS referral from a root server look like?
+---
+No answer section; Authority holds the NS records of the delegated zone.
+Additional holds their addresses (glue).
+```
+
+```card id=net-08-aa-ra
+Which of AA and RA are set in an answer from a recursive resolver serving from its cache?
+---
+RA set, AA clear.
+AA is set only by an authoritative server for its zone.
+```
+
+```card id=net-08-tcp-fallback
+When does DNS use TCP, and how does EDNS(0) change the UDP limit?
+---
+For messages over 512 bytes (TC bit set, retry over TCP) and zone transfers.
+EDNS(0) puts a larger UDP payload size in an OPT pseudo-RR in Additional.
+```
+
+```card id=net-08-header-decode
+Decode the DNS header flags 0x8183.
+---
+QR=1, opcode 0, AA=0, TC=0, RD=1, RA=1, RCODE=3 NXDOMAIN.
+```
+
+```card id=net-08-compression
+What does c0 0c mean in a DNS message?
+---
+Top two bits 11 introduce a 14-bit pointer to an earlier offset.
+Offset 12 is the question name.
+```
+
+```card id=net-08-dnssec-scope
+True or false: DNSSEC encrypts DNS and authenticates the server.
+---
+False. It signs records so a validating resolver can detect forgery.
+No encryption, no server authentication.
+```
+
+```card id=net-08-zsk-ksk
+What do the ZSK and KSK sign, and which DNSKEY flags mark them?
+---
+ZSK signs the records (flags 256); KSK signs the DNSKEY RRset (flags 257, SEP bit set).
+```
+
+```card id=net-08-ds
+What is the DS record's digest, where does it live, and why a hash?
+---
+In the parent zone: $H(\text{canonical owner name} \mathbin\Vert \text{DNSKEY RDATA})$.
+Short, and only a KSK rollover needs a new DS; the owner name stops key transplanting.
+```
+
+```card id=net-08-validation
+What does a validating resolver return on DNSSEC failure and on success?
+---
+Failure (bogus): SERVFAIL. Success: AD bit to the stub (CD suppresses validation).
+States: secure, insecure, bogus, indeterminate.
+```
+
+```card id=net-08-key-tag
+How does the DNSSEC key tag relate to the Internet checksum, and is it unique?
+---
+It is the sum without the final complement; it must not be computed as the ones complement checksum.
+It does not identify a key uniquely, only narrows the candidates.
+```
+
+```card id=net-08-telnet-echo
+A Telnet trace shows ff fb 01. What is it and what may a client answer?
+---
+IAC WILL ECHO: the server offers to echo.
+Accept with ff fd 01 (IAC DO ECHO) and stop local echo, or refuse with ff fe 01 (DONT).
+```

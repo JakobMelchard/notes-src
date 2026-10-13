@@ -223,3 +223,73 @@ from it. The nearest implementations elsewhere in `src/` are
 `ensemble.permutation_importance` (a model-agnostic global explanation) and
 `mlp.MLP` with dropout / $L_2$ / early stopping, which is the same overfitting
 control that shrinks the membership-inference signal.
+
+## Cards
+
+```card id=ml-16-white-image
+True or false: a CNN given a pure white image outputs equal probabilities for all classes.
+---
+False. The network is deterministic; learned biases and features favour some classes.
+```
+
+```card id=ml-16-taxonomy
+Which security property does each attack break: adversarial examples, membership inference, accuracy-destroying poisoning?
+---
+Integrity, confidentiality, availability respectively.
+```
+
+```card id=ml-16-fgsm
+Write the fast gradient sign method.
+---
+$x' = x + \varepsilon\,\operatorname{sign}(\nabla_x J(\theta, x, y))$: gradient of the training loss w.r.t. the input, sign, fixed step $\varepsilon$.
+```
+
+```card id=ml-16-linearity
+According to the note, what makes adversarial examples work in high dimensions?
+---
+Excessive linearity: a per-coordinate perturbation $\varepsilon$ changes a linear score by $\varepsilon\|w\|_1$, growing with input dimension.
+```
+
+```card id=ml-16-transfer
+Does an adversarial attack require white-box access?
+---
+No. Black-box attacks exploit transferability: examples built against a surrogate often fool the target.
+```
+
+```card id=ml-16-backdoor
+What is a backdoor attack, and which models suffer most?
+---
+Poisoned training data make inputs with a trigger map to an attacker-chosen class while clean accuracy is unchanged.
+Over-parameterised models that overfit, which can memorise the trigger.
+```
+
+```card id=ml-16-membership
+What is membership inference, and what is its root cause?
+---
+Determining whether a record was in the training set by exploiting higher confidence on training points. Root cause: overfitting.
+```
+
+```card id=ml-16-kanon-dp
+Distinguish $k$-anonymity from differential privacy.
+---
+$k$-anonymity: property of a released table; each record matches $k-1$ others on quasi-identifiers; does not bound attribute disclosure.
+DP: property of the mechanism, $\Pr[M(D) \in S] \le e^{\varepsilon}\Pr[M(D') \in S]$; composes across queries.
+```
+
+```card id=ml-16-federated
+True or false: federated learning is private on its own.
+---
+False. Shared model updates still leak; combine with DP and secure aggregation.
+```
+
+```card id=ml-16-xai
+Name the three axes of the lecture's XAI taxonomy.
+---
+When (ex-ante, intrinsic, post-hoc); scope (local vs global); applicability (model-specific vs model-agnostic).
+```
+
+```card id=ml-16-skew
+What is training/serving skew and what prevents it?
+---
+Features computed at inference differ from those used in training. A shared feature store serves the same features to both.
+```

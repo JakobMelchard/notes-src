@@ -217,3 +217,89 @@ Both stop graph construction. `inference_mode` also disables version counters an
 - Bergstra & Bengio (2012) [S94], *Random search for hyper-parameter optimization*, JMLR; Feurer & Hutter (2019) [S94], *Hyperparameter optimization*, AutoML book ch. 1 -- **Lecture 5's references 4 and 5** [S4].
 - Tan & Le (2020) [S44], *EfficientNet* -- Lecture 5's *efficiently scaling up a model*.
 - **Lecture 5** [S4], *Libraries and Practical Aspects*, is the lecture this note covers: coverage, capacity, under/overfitting, effective capacity, scaling up, hyperparameters, train/val/test, the learning rate, selecting hyperparameters, automatic hyperparameter optimization, the Bayes error, design principles, performance metrics, obtaining a baseline, dataset size, debugging, and 14 minutes of library tour. **Lecture 12** [S4] continues it into serving and optimisation; that is [`12-serving-and-deployment.md`](12-serving-and-deployment.md).
+
+## Cards
+
+```card id=adl-10-eval-mode
+True or false: `model.eval()` disables gradient computation.
+---
+False. It only toggles Dropout and BatchNorm behaviour.
+Use `torch.no_grad()` or `torch.inference_mode()` to stop graph building.
+```
+
+```card id=adl-10-inference-mode
+When is `torch.inference_mode()` a mistake compared to `no_grad()`?
+---
+When its outputs later enter autograd, e.g. frozen-backbone features fed to a trainable head.
+Inference tensors cannot be saved for backward.
+```
+
+```card id=adl-10-broadcast
+What silent bug does `pred [B,1] - target [B]` cause?
+---
+Broadcasts to `[B,B]`, a wrong loss that may still decrease.
+Fix: `target.view_as(pred)` or `squeeze(-1)`; assert shapes match.
+```
+
+```card id=adl-10-bf16
+Why does fp16 need a `GradScaler` but bf16 does not?
+---
+fp16 has a 5-bit exponent, so small gradients underflow.
+bf16 keeps fp32's 8-bit exponent range (7 mantissa bits).
+```
+
+```card id=adl-10-adam-memory
+Compute the static memory of a 10M-parameter model under Adam with fp32 master weights.
+---
+16 B per parameter (weight 4, gradient 4, $m$ 4, $v$ 4): 160 MB.
+Activations usually dominate and scale with batch size.
+```
+
+```card id=adl-10-ckpt
+What must a resumable checkpoint contain besides model weights?
+---
+Optimizer and scheduler state, step, RNG states, config, best metric.
+Otherwise LR schedule and Adam moments restart and the trajectory changes.
+```
+
+```card id=adl-10-seeds
+How should results be reported given seed variance?
+---
+$\bar m \pm s$ over $n \ge 3$ seeds, $s$ the sample std.
+Overlapping intervals mean the experiment does not distinguish the methods.
+```
+
+```card id=adl-10-overfit-batch
+What does failing to overfit one small batch tell you?
+---
+The model, loss or optimizer is broken, not the data.
+Called the single most informative debugging test.
+```
+
+```card id=adl-10-init-loss
+What should the initial cross-entropy be for 10 classes, and what does 5.2 indicate?
+---
+$\ln 10 = 2.303$ for uniform predictions.
+5.2 means logits too large at init: wrong init/bias, unnormalised inputs, or double softmax.
+```
+
+```card id=adl-10-capacity
+Representational vs effective capacity?
+---
+Representational: functions the architecture can express.
+Effective: the subset the optimiser actually reaches; always smaller, and what regularisers move.
+```
+
+```card id=adl-10-bayes
+What is the Bayes error and how can you estimate it cheaply?
+---
+Loss of the best possible predictor, from labels not being a function of inputs.
+Relabel 100 random validation items and measure disagreement with stored labels.
+```
+
+```card id=adl-10-random-search
+Why does random search beat grid search?
+---
+With few important hyperparameters, a grid of $n^k$ trials tries only $n$ values of each.
+Random search tries a distinct value of every parameter in every trial.
+```

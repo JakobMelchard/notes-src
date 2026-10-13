@@ -125,3 +125,85 @@ Write the field $u = \sin\pi x \sin\pi y$ on a $41 \times 41$ grid and its gradi
 5. **How would you store the mesh so that "elements around node $i$" and "neighbour across edge $e$" are both $O(1)$?** Node-element adjacency as CSR (`offset`, `elems`); element neighbours as an $m \times 3$ array `neighbor[e][k]` (element across the edge opposite node $k$, or $-1$ on the boundary), built once by sorting or hashing edges.
 
 Code: `src/cpp/vtk_writer.cpp` (`write_structured_points`, `write_unstructured_grid`, `square_triangles`), `src/py/vtk_check.py` (`parse`, `structured_index`, `cell_type_names`, `write_structured_points` - a validating reader for the format above), `src/py/delaunay.py` (`triangulate`, `is_delaunay`, `min_angle_degrees`), `src/py/plot_helper.py` (`plot_convergence`, `plot_field`); tests `src/py/test_vtk_check.py`, `src/py/test_delaunay.py`. Sources: [S12] [S13] [S32] [S33].
+
+## Cards
+
+```card id=nssc-09-structured
+Name the advantages and the limitation of structured grids.
+---
+No connectivity memory, perfect cache behaviour, simple parallel decomposition.
+Limitation: geometry.
+```
+
+```card id=nssc-09-delaunay
+State the Delaunay property and why it suits FE meshes.
+---
+No node lies inside any triangle's circumcircle.
+It maximises the minimum angle among all triangulations of the point set.
+```
+
+```card id=nssc-09-bowyer-watson
+Give the steps of Bowyer-Watson insertion.
+---
+Insert a point; delete every triangle whose circumcircle contains it;
+join the point to each boundary edge of the star-shaped cavity. $O(n\log n)$ expected.
+```
+
+```card id=nssc-09-euler-count
+Compute: how many triangles in a triangulation of $n$ points with $h$ on the convex hull?
+---
+Exactly $2n - 2 - h$.
+```
+
+```card id=nssc-09-refinement
+What does Delaunay refinement do and what angle does Shewchuk's variant guarantee?
+---
+Inserts circumcentres of poor-quality triangles until a minimum-angle bound holds.
+Guarantees 20.7 degrees and terminates; about 33 in practice.
+```
+
+```card id=nssc-09-cocircular
+True or false: Delaunay triangulation of a structured square grid is unique.
+---
+False. Four cocircular points make it non-unique; choose the diagonal explicitly.
+```
+
+```card id=nssc-09-vtk-sections
+List the five sections of a legacy VTK file in order.
+---
+Version line, title (max 256 chars), `ASCII` or `BINARY`,
+dataset structure (`DATASET`), attributes (`POINT_DATA` or `CELL_DATA`).
+```
+
+```card id=nssc-09-dimensions
+What does `DIMENSIONS` count and in which order are point values written?
+---
+Points per axis, not cells (40 x 40 cells is 41 x 41 points).
+Values with $x$ increasing fastest, then $y$, then $z$.
+```
+
+```card id=nssc-09-cells-size
+Compute the `CELLS` line for 200 triangles.
+---
+`CELLS 200 800`: size is the total integer count including each cell's leading count, $200 \cdot (1 + 3)$.
+```
+
+```card id=nssc-09-cell-types
+Give the VTK cell type ids for triangle, quad, tetra and hexahedron.
+---
+Triangle 5, quad 9, tetra 10, hexahedron 12.
+Pixel 8 and voxel 11 are axis-aligned variants with different node ordering.
+```
+
+```card id=nssc-09-point-cell
+Distinguish point data and cell data.
+---
+Point data: one value per node (FE, FD), interpolated inside cells.
+Cell data: one value per element (FV averages, material id), piecewise constant.
+```
+
+```card id=nssc-09-orientation
+Which test checks counter-clockwise triangle orientation?
+---
+Signed area $\frac12[(x_1 - x_0)(y_2 - y_0) - (y_1 - y_0)(x_2 - x_0)] > 0$.
+```

@@ -90,3 +90,79 @@ created, and you implicitly simplify your task" [S10]. Sources: (1) fitting prep
 
 - `src/py/model_selection.py`: `train_test_split(stratify=True)`, `stratified_kfold`, `learning_curve`.
 - `src/py/exercise_template.py`: the leak-free pipeline skeleton (`make_preprocessor`, `compare_models`).
+
+## Cards
+
+```card id=ml-01-paradigms
+Name the three learning paradigms and what supervision signal each gets.
+---
+Supervised: labelled data (classification, regression).
+Unsupervised: no labels (clustering, dimensionality reduction, anomaly detection).
+Reinforcement learning: no labels, only a reward signal for actions in an environment.
+```
+
+```card id=ml-01-ordinal
+True or false: ordinal data does not allow distances to be computed between data points.
+---
+True. An ordinal scale fixes the order but not the spacing, so differences such as small vs medium are not meaningful.
+```
+
+```card id=ml-01-scales
+What does each measurement scale add: nominal, ordinal, interval, ratio?
+---
+Nominal: unique names only. Ordinal: an order. Interval: meaningful differences, arbitrary zero (°C). Ratio: an absolute zero (length, income).
+Nominal and ordinal are qualitative; interval and ratio quantitative.
+```
+
+```card id=ml-01-classif-target
+True or false: classification is a machine learning task where the target attribute is nominal.
+---
+True. Regression is the supervised task with a continuous target $y \in \mathbb R$.
+```
+
+```card id=ml-01-risk
+Define empirical risk and true risk, and overfitting in their terms.
+---
+$\hat R(h) = \frac1n \sum_i L(y_i, h(x_i))$; $R(h) = \mathbb E_{(x,y)\sim p} L(y, h(x))$.
+Overfitting: $\hat R$ small but generalisation gap $R - \hat R$ large. Underfitting: $\hat R$ large.
+```
+
+```card id=ml-01-leakage
+Give three sources of data leakage and the general remedy.
+---
+Preprocessing fitted on all data before splitting; target-proxy features unavailable at prediction time; duplicates across splits (also tuning on the test set).
+Remedy: split first, fit every transformation in a pipeline inside each CV fold.
+```
+
+```card id=ml-01-val-test
+Why do we need both a validation set and a test set?
+---
+Model and hyperparameter choice are fitted to the validation data, so its score is optimistically biased (a maximum over trials).
+The test set is touched once and gives an unbiased estimate.
+```
+
+```card id=ml-01-gen-disc
+Generative vs discriminative models: what does each model? Give an example of each.
+---
+Generative models $p(x, y)$ (naive Bayes). Discriminative models $p(y \mid x)$ or the decision boundary directly (logistic regression, SVM).
+```
+
+```card id=ml-01-param-lazy
+What is kNN in terms of parametric vs non-parametric and eager vs lazy?
+---
+Non-parametric (parameters grow with data) and lazy (model built at query time).
+```
+
+```card id=ml-01-inductive-bias
+What is the inductive bias of a linear classifier and of 1-NN?
+---
+Linear: classes separated by a hyperplane (strong bias, low variance).
+1-NN: label is locally constant (weak bias, high variance).
+```
+
+```card id=ml-01-iid
+State the i.i.d. assumption and three ways it is violated.
+---
+Train and future data drawn independently from the same distribution $p$.
+Violated by time drift, duplicated rows, grouped samples (several rows per patient).
+```

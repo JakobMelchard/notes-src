@@ -136,3 +136,83 @@ With SIMD the compute roof rises to ~64 GFLOP/s and the ridge moves right to 0.6
 5. **Give two reasons a compiler refuses to vectorise `for i: s += a[i]*b[i]`.** (a) The reduction on `s` is a loop-carried dependency and reordering the additions changes IEEE results, so it needs `-ffast-math` or an explicit reduction pragma; (b) if `a`, `b` are pointers it must also assume they may alias (irrelevant for a pure reduction but decisive for `c[i] = a[i] + b[i]`).
 
 Code: `src/cpp/cache_bench.cpp` (`chase_ns`, `strided_sum`, `triad_gbs`, `compute_gflops`), `src/sh/build_and_bench.sh` summary table. Sources: [S8] [S16] [S17] [S18] [S34] [S35] [S37].
+
+## Cards
+
+```card id=nssc-01-cache-line
+What is a cache line, and what are its sizes on the M3 Pro and on x86?
+---
+The unit of transfer between memory levels.
+128 B on the M3 Pro (`hw.cachelinesize`), 64 B on x86.
+```
+
+```card id=nssc-01-locality
+Distinguish spatial and temporal locality.
+---
+Spatial: after `a[i]` you touch `a[i+1]`.
+Temporal: you touch `a[i]` again soon.
+Caches only help if the access pattern has one of the two.
+```
+
+```card id=nssc-01-latency-bandwidth
+Why does pointer chasing measure latency while the triad measures bandwidth?
+---
+Each chase load depends on the previous one, so only one request is outstanding.
+Triad loads are independent: many in flight plus prefetching, so time = bytes / bandwidth.
+```
+
+```card id=nssc-01-vectorise
+Name the three conditions for the compiler to auto-vectorise a loop.
+---
+Iterations independent (no loop-carried dependency).
+Pointers provably not aliasing.
+FP reductions allowed to reassociate (`-ffast-math` or `omp simd reduction`).
+```
+
+```card id=nssc-01-fma-chain
+An FMA has latency 4 cycles and reciprocal throughput 0.5. What fraction of peak does a single-accumulator dot product reach, and what fixes it?
+---
+$t_{rtp}/t_{lat} = 1/8$ of peak.
+Unroll into 8 independent accumulators.
+```
+
+```card id=nssc-01-peak
+State the formula for peak performance.
+---
+$P_{\text{peak}} = \text{cores} \times f_{\text{clock}} \times \text{FMA units} \times \text{vector width} \times 2$ flop/FMA.
+```
+
+```card id=nssc-01-roofline
+State the roofline model and define its ridge point.
+---
+$P = \min(P_{\text{peak}}, \text{AI} \cdot B)$, AI = flops per byte of DRAM traffic.
+Ridge $\text{AI}^* = P_{\text{peak}}/B$: left memory bound, right compute bound.
+```
+
+```card id=nssc-01-daxpy
+Compute: is daxpy `y[i] = a*x[i] + y[i]` memory or compute bound at 50 GFLOP/s and 50 GB/s?
+---
+AI = 2 flop / 24 B = 0.083, ridge = 1 flop/byte.
+Memory bound at $50 \cdot 0.083 \approx 4.2$ GFLOP/s, 8 % of peak.
+```
+
+```card id=nssc-01-stride
+Compute: a loop touches 1 double every 128 B of a 1 GB array at 100 GB/s. Roughly how long?
+---
+Every load brings a full 128 B line, so all 1 GB moves: about 10 ms.
+Same time as touching every element.
+```
+
+```card id=nssc-01-timing
+Which statistic should you report from repeated timing runs, and which never?
+---
+Report the minimum (least disturbed) or the median.
+Never the mean of noisy runs. Use a monotonic wall clock and warm up first.
+```
+
+```card id=nssc-01-pow2
+True or false: a 1024 x 1024 array is the safest choice for column access.
+---
+False. Power-of-two dimensions cause cache-set conflict misses (associativity).
+Pad to 1025.
+```

@@ -120,3 +120,82 @@ table a 1R question asks for), `Prism` (the covering algorithm),
 `discretize_1r`.
 
 `src/py/tree.py`: `entropy`, `gini`, `information_gain`, `DecisionTree(criterion=gini|entropy|mse, max_depth, min_samples_leaf, max_features, ccp_alpha)` with `fit(X, y, sample_weight)`, `predict`, `predict_proba`, `apply`, `feature_importances_`, `to_text`, `_prune` (weakest-link). Test checks that the pruned leaf count equals sklearn's for the same `ccp_alpha`.
+
+## Cards
+
+```card id=ml-06-impurity
+Write entropy, Gini and misclassification impurity for class proportions $p_c$.
+---
+$H = -\sum_c p_c \log_2 p_c$, $G = 1 - \sum_c p_c^2$, $E = 1 - \max_c p_c$.
+```
+
+```card id=ml-06-compute
+Compute entropy and Gini for a node with 6 positives and 2 negatives.
+---
+$H = 0.811$ bits; $G = 1 - 0.5625 - 0.0625 = 0.375$.
+```
+
+```card id=ml-06-ig
+Define information gain and gain ratio.
+---
+$IG = H(\text{parent}) - \sum_k \frac{n_k}{n} H(\text{child}_k)$.
+Gain ratio $= IG / \text{SplitInfo}$, $\text{SplitInfo} = -\sum_k \frac{n_k}{n}\log_2\frac{n_k}{n}$.
+```
+
+```card id=ml-06-many-values
+Why does ID3 prefer attributes with many values, and what does C4.5 do about it?
+---
+Many small groups are purer by chance (an ID column gives $IG = H(\text{parent})$).
+C4.5 divides by split information (gain ratio); CART uses binary splits.
+```
+
+```card id=ml-06-error-crit
+Why is classification error not used as a splitting criterion for growing trees?
+---
+It is not strictly concave: a split from $(4+,4-)$ to $(4+,2-)$ and $(0+,2-)$ keeps error at $2/8$ though children are purer. Entropy and Gini reward it.
+```
+
+```card id=ml-06-zeror
+True or false: the first model in gradient boosting is a zero rule model.
+---
+True. "Gradient boosting always starts with the one-rule model" is false.
+```
+
+```card id=ml-06-oner
+Describe the 1R algorithm and its relation to a decision tree.
+---
+For each attribute, one rule per value predicting the majority class; count training errors; pick the attribute with the fewest.
+1R is a decision tree with only a root node (a decision stump).
+```
+
+```card id=ml-06-covering
+How does the covering algorithm (PRISM) build a rule?
+---
+Fix a class; start with empty rule; greedily add the test with highest accuracy $p/t$ (ties by larger $t$) until pure; remove covered rows and repeat.
+Separate-and-conquer, vs a tree's divide-and-conquer.
+```
+
+```card id=ml-06-error-vs-entropy
+True or false: decision trees using error rate vs entropy lead to different results.
+---
+True.
+```
+
+```card id=ml-06-ccp
+State minimal cost-complexity pruning and how $\alpha$ is chosen.
+---
+Minimise $R_\alpha(T) = R(T) + \alpha|\text{leaves}(T)|$; repeatedly prune the weakest link with smallest $g(t) = \frac{R(t) - R(T_t)}{|\text{leaves}(T_t)| - 1}$.
+$\alpha$ chosen by cross-validation.
+```
+
+```card id=ml-06-maxdepth
+1000 observations, min 200 to split, min 300 per leaf: why is the maximum depth (excluding root) 2?
+---
+1000 into 300 and 700; 700 into 300 and 400. The 400 node may split by the 200 rule, but any split leaves a child below 300.
+```
+
+```card id=ml-06-rules
+True or false: a decision tree can be converted into a rule set.
+---
+True. One rule per root-to-leaf path, at the cost of a large, redundant rule set.
+```

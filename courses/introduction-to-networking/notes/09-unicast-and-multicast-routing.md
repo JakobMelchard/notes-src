@@ -79,3 +79,85 @@ Forwarding state at R1 at the end: (S, G) incoming = link to S (RPF), outgoing =
 ## Code
 
 No dedicated module: RPF reduces to the unicast table (`src/py/linkstate.py::routing_table` gives the RPF interface for every source). `test_linkstate.py` style trees can be derived with `path()` from each receiver toward the source. Group → MAC mapping: `src/py/subnet.py::multicast_mac` (RFC 1112 §6.4 for IPv4, RFC 2464 §7 for IPv6); `test_subnet.py::test_solicited_node_and_multicast_mac` constructs the 32 groups that share `01:00:5e:00:00:05`.
+
+## Cards
+
+```card id=net-09-mac-v4
+Which Ethernet MAC does 224.1.2.3 map to, and how many groups share it?
+---
+01:00:5e:01:02:03 (01:00:5E plus the low 23 bits, RFC 1112).
+28 group bits onto 23: 32 groups collide, so the host must still filter in IP.
+```
+
+```card id=net-09-mac-v6
+How is an IPv6 multicast group mapped to an Ethernet MAC?
+---
+33:33 plus the low 32 bits of the group (RFC 2464 §7).
+```
+
+```card id=net-09-uplink
+Compute: a source sends 4 Mbit/s to 100 receivers. Uplink load for unicast vs multicast?
+---
+Unicast 400 Mbit/s; multicast 4 Mbit/s (one copy, routers replicate at branch points).
+```
+
+```card id=net-09-igmp-query
+Who sends IGMPv2 Membership Queries, and how often by default?
+---
+The querier router, every Query Interval, default 125 s (RFC 2236).
+```
+
+```card id=net-09-igmpv3
+What does IGMPv3 add, and what does it enable?
+---
+Source filtering: INCLUDE ("only from S") or EXCLUDE ("from anyone except").
+Enables SSM (232/8), where the channel is (S, G) and no rendezvous is needed.
+```
+
+```card id=net-09-rpf
+What is the RPF check and why does it prevent loops?
+---
+Accept a packet from S only on the interface the unicast table uses to reach S.
+One accepting interface per source, so accepted packets form a reverse shortest-path tree.
+```
+
+```card id=net-09-protocol-independent
+Why is PIM called "protocol independent"?
+---
+It has no topology database of its own; it reuses whichever unicast table exists for RPF.
+```
+
+```card id=net-09-trees
+Compare router state for a shared tree and source trees with 50 sources sending to one group.
+---
+Shared tree: one (*, G) entry; source trees: 50 (S, G) entries.
+Shared tree price: detour via the RP, which concentrates traffic.
+```
+
+```card id=net-09-pim-register
+How does a PIM-SM source reach receivers before a source tree exists?
+---
+Its first-hop router unicast-encapsulates packets in Register messages to the RP.
+RP forwards down the shared tree, joins the source tree toward S, then sends Register-Stop.
+```
+
+```card id=net-09-igmp-vs-pim
+True or false: IGMP is a multicast routing protocol.
+---
+False. IGMP is membership between hosts and their first-hop router.
+PIM is routing, not a membership protocol.
+```
+
+```card id=net-09-udp-only
+Why is multicast UDP only?
+---
+Per-receiver ACKs and windows make no sense for TCP multicast.
+Reliability, if any, is application level (NACK-based, FEC).
+```
+
+```card id=net-09-ssm
+Why is SSM easier to deploy than ASM?
+---
+No RP, no Register/MSDP, no source discovery in the network (receivers name the source).
+(S, G) state only where there are receivers; the source is implicitly authorised.
+```

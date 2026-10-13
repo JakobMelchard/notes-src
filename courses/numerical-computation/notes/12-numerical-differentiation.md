@@ -180,3 +180,76 @@ Tests: `test_diff.py` (measured orders, known stencils,
 `scipy.differentiate.derivative`, Richardson column orders) and
 `test_neville.py` (the $h^{m+1}$ column rate of [S4 Thm 1.17] on $f=e^x$, and
 the stalled $\sqrt h$ columns of [S4 Ex. 1.18] on $u=|x|^{3/2}$).
+
+## Cards
+
+```card id=numc-12-neville-extrap
+How does [S4] get an accurate derivative without a small $h$?
+---
+Evaluate $D(h_j)=(f(h_j)-f(0))/h_j$ at moderate $h_j=q^j$, interpolate, evaluate at $h=0$ with Neville.
+Column $m$ converges like $h^{m+1}$ [S4 Thm 1.17].
+```
+
+```card id=numc-12-stall
+What happens when extrapolating $D(h)$ for $u(x)=|x|^{3/2}$?
+---
+$D(h)=\sqrt h$ is not differentiable at 0, so every column stalls at $O(\sqrt h)$ [S4 Ex. 1.18].
+```
+
+```card id=numc-12-central
+Give the central difference formula and its error term.
+---
+$\dfrac{f(x+h)-f(x-h)}{2h}$, error $\frac{h^2}6f'''(\xi)$: order 2.
+Odd Taylor terms cancel.
+```
+
+```card id=numc-12-forward
+Error term and order of the forward difference $\frac{f(x+h)-f(x)}{h}$?
+---
+$\frac h2f''(\xi)$, order 1.
+```
+
+```card id=numc-12-second-diff
+Find $w_{-1},w_0,w_1$ with $\sum w_jf(x+jh)=h^2f''(x)+O(h^4)$, and the error term.
+---
+$(1,-2,1)$: $\frac{f(x+h)-2f(x)+f(x-h)}{h^2}$, error $\frac{h^2}{12}f^{(4)}(\xi)$.
+```
+
+```card id=numc-12-hopt
+Why does the finite-difference error grow for very small $h$, and what is $h_{\mathrm{opt}}$ for forward and central differences in double?
+---
+Rounding $\sim u|f|$ is divided by $h$; total error is V-shaped.
+Forward $h_{\mathrm{opt}}\sim\sqrt u\approx10^{-8}$, central $u^{1/3}\approx6\cdot10^{-6}$.
+```
+
+```card id=numc-12-general-opt
+For an order-$p$ formula, how do $h_{\mathrm{opt}}$ and $E_{\min}$ scale with $u$?
+---
+$E(h)\approx Ch^p+su|f|/h$, so $h_{\mathrm{opt}}\sim u^{1/(p+1)}$, $E_{\min}\sim u^{p/(p+1)}$.
+```
+
+```card id=numc-12-richardson
+Give the Richardson extrapolation step for $D(h)=L+c_1h^p+\cdots$ with ratio $r$.
+---
+$D_1(h)=D(h/r)+\dfrac{D(h/r)-D(h)}{r^p-1}=L+O(h^{2p})$ (for even-power expansions).
+With the trapezoid rule and $p=2$ this is Romberg.
+```
+
+```card id=numc-12-richardson-compute
+$D(h)=L+ch^2+O(h^4)$, $D(0.2)=1.0400$, $D(0.1)=1.0100$. Extrapolate $L$.
+---
+$L\approx1.0100+\frac{1.0100-1.0400}{3}=1.0000$.
+```
+
+```card id=numc-12-wrong-p
+What goes wrong when Richardson uses the wrong $p$?
+---
+$p=1$ for a central difference wastes a column;
+$p=2$ for a forward difference (odd powers present) combines the wrong terms.
+```
+
+```card id=numc-12-dominant
+Which error dominates for the 3-point second-derivative formula at $h=10^{-6}$ in double?
+---
+Round-off: $4u/h^2\approx4\cdot10^{-4}$, against truncation $\sim10^{-13}$.
+```

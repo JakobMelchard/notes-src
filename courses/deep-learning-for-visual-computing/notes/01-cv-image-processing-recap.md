@@ -47,7 +47,7 @@ noise, preserves edges; not a convolution.
 
 **Edges.** Large $\|\nabla I\|$. Central difference $[-1, 0, 1]$ combined with
 smoothing $[1, 2, 1]^\top$ in the other direction gives Sobel:
-$$ S_x = \begin{psmallmatrix}-1&0&1\\-2&0&2\\-1&0&1\end{psmallmatrix}, \quad
+$$ S_x = \begin{pmatrix}-1&0&1\\-2&0&2\\-1&0&1\end{pmatrix}, \quad
    S_y = S_x^\top, \quad \|\nabla I\| \approx \sqrt{g_x^2+g_y^2}, \quad
    \theta = \operatorname{atan2}(g_y, g_x). $$
 Laplacian $\nabla^2 I$ (zero crossings at edges) is noise-sensitive, hence

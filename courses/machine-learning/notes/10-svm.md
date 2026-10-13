@@ -75,3 +75,81 @@ Points $x_1 = (1, 1), y = +1$; $x_2 = (2, 2), y = +1$; $x_3 = (0, 0), y = -1$. B
 ## Code
 
 `src/py/svm.py`: `kernel(linear|poly|rbf)`, `LinearSVM` (Pegasos on the hinge loss, `hinge_loss`), `SVM(C, kernel, gamma)` (SMO with Platt's second-choice heuristic, stops when a full sweep moves no pair; `support_`, `alpha_`, `decision_function`, `coef_` for the linear kernel). Tests: primal objective within 2 % of `SVC(kernel="linear")`, RBF predictions ≥ 95 % agreement with `SVC`.
+
+## Cards
+
+```card id=ml-10-hard-margin
+State the hard-margin SVM optimisation problem.
+---
+$\min_{w,b} \tfrac12\|w\|^2$ s.t. $y_i(w^\top x_i + b) \ge 1$ for all $i$. A convex QP with a unique solution.
+```
+
+```card id=ml-10-margin
+Why is the margin $2/\|w\|$, and why minimise $\tfrac12\|w\|^2$?
+---
+With canonical scaling the hyperplanes $w^\top x + b = \pm 1$ are $2/\|w\|$ apart.
+$\tfrac12\|w\|^2$ is the differentiable convex form with the same minimiser.
+```
+
+```card id=ml-10-soft
+Write the soft-margin SVM as a hinge-loss problem. What does $C$ do?
+---
+$\min \tfrac12\|w\|^2 + C\sum_i \max(0, 1 - y_i(w^\top x_i + b))$.
+Large $C$: few violations, narrow margin, overfits. Small $C$: wide margin, smoother.
+```
+
+```card id=ml-10-slack
+What do slack values $0 < \xi_i < 1$ and $\xi_i > 1$ mean?
+---
+$0 < \xi_i < 1$: inside the margin but correctly classified. $\xi_i > 1$: misclassified.
+```
+
+```card id=ml-10-dual-w
+What does the stationarity condition $w = \sum_i \alpha_i y_i x_i$ imply for prediction?
+---
+$f(x) = \sum_{i \in SV} \alpha_i y_i x_i^\top x + b$ needs only inner products with support vectors, enabling the kernel trick.
+```
+
+```card id=ml-10-kkt
+Interpret $\alpha_i = 0$, $0 < \alpha_i < C$, $\alpha_i = C$.
+---
+$\alpha_i = 0$: beyond the margin. $0 < \alpha_i < C$: exactly on the margin. $\alpha_i = C$: inside the margin or misclassified.
+```
+
+```card id=ml-10-gamma
+Effect of large vs small $\gamma$ in the RBF kernel $\exp(-\gamma\|x - z\|^2)$?
+---
+Large $\gamma$: narrow bumps, wiggly boundary, overfits (many SVs). Small $\gamma$: nearly linear boundary, underfits.
+Tune $C$ and $\gamma$ jointly on a log grid, after scaling.
+```
+
+```card id=ml-10-poly-map
+Give the explicit feature map for $K(x, z) = (x^\top z)^2$ in $\mathbb R^2$.
+---
+$\phi(x) = (x_1^2, \sqrt2\,x_1x_2, x_2^2)$.
+```
+
+```card id=ml-10-kernel-perceptron
+True or false: kernel projections can only be used in conjunction with SVMs.
+---
+False. The perceptron's weights are a combination of mistakes, so it depends only on inner products: the kernel perceptron.
+```
+
+```card id=ml-10-perc-svm
+Main difference between perceptron and SVM in the hyperplane they find and how they learn?
+---
+Perceptron stops at any separating hyperplane and is an online learner. SVM maximises the margin by solving one global convex QP.
+```
+
+```card id=ml-10-proscons
+Name two advantages and two disadvantages of SVMs.
+---
+Pro: non-linear problems via kernels, convex problem with no local minima, good generalisation from the margin.
+Con: scales roughly $O(n^2)$, $C$ and $\gamma$ hard to tune, hard to interpret, no calibrated probabilities.
+```
+
+```card id=ml-10-many-sv
+What does a number of support vectors close to $n$ indicate?
+---
+Overfitting, or a $\gamma$ that is too large.
+```

@@ -111,3 +111,77 @@ the lecturer's field [S10], this is the note to over-prepare.
 5. Running an 8-process pool where each worker computes large `np.linalg.solve` calls is slower than expected because
    (a) numpy cannot run in subprocesses (b) each process starts its own multithreaded BLAS and the cores are oversubscribed (c) `solve` holds the GIL (d) pickling of the solution is impossible
    **b.** Limit BLAS threads per worker (`OMP_NUM_THREADS=1`) or use fewer processes.
+
+## Cards
+
+```card id=spp-08-gil-why
+What is the GIL and why does CPython have it?
+---
+Only one thread executes Python bytecode at a time. Reference-counting memory management is not thread-safe without it.
+```
+
+```card id=spp-08-threads-cpu
+Pure-Python Monte Carlo in 4 threads via `ThreadPoolExecutor`: expected speedup?
+---
+About 1. The GIL serialises bytecode; switching overhead can even make it slower. Use processes.
+```
+
+```card id=spp-08-threads-help
+When do threads still help in CPython?
+---
+For I/O-bound work (a thread waiting on I/O releases the GIL) and for C code that releases the GIL, like most numpy ufuncs, BLAS and `np.random`.
+```
+
+```card id=spp-08-spawn
+What does the `spawn` start method require of your code?
+---
+The child imports the main module, so workers must be importable top-level functions and the script needs `if __name__ == "__main__":`. No lambdas, closures or notebook-cell functions.
+```
+
+```card id=spp-08-pickling
+What is the hidden cost of process pools, and how do you minimise it?
+---
+Every argument and result is pickled through a pipe. Pass small descriptions of work (seeds, index ranges, file names) and let workers generate or load data.
+```
+
+```card id=spp-08-chunking
+What goes wrong with too many tiny chunks versus too few chunks?
+---
+Too many: per-task overhead dominates. Too few: load imbalance, the last worker determines wall time. Use several chunks per worker when durations vary.
+```
+
+```card id=spp-08-seeds
+What goes wrong with the same seed in every worker, and the fix?
+---
+Identical "random" samples; variance estimates wrong by a factor of the worker count. Use `SeedSequence.spawn` for independent streams.
+```
+
+```card id=spp-08-shm
+With `multiprocessing.shared_memory.SharedMemory`, who calls `close()` and who `unlink()`?
+---
+The creator must `close()` and `unlink()`; workers only `close()`. Forgetting `unlink()` leaks `/dev/shm` segments on Linux.
+```
+
+```card id=spp-08-oversub
+Why is an 8-process pool of large `np.linalg.solve` calls slower than expected?
+---
+Each process runs its own multithreaded BLAS: 8 x 8 = 64 threads oversubscribe the cores. Set `OMP_NUM_THREADS=1` per worker or use fewer processes.
+```
+
+```card id=spp-08-amdahl
+State Amdahl's law and $S(\infty)$ for parallel fraction $p = 0.9$.
+---
+$S(n) = 1 / ((1 - p) + p/n)$, $S(\infty) = 1/(1-p) = 10$ (and $S(8) = 4.71$).
+```
+
+```card id=spp-08-amdahl-serial
+20 % of a program's time is serial setup. Maximum speedup on unlimited cores?
+---
+5: $1 / (1 - 0.8)$.
+```
+
+```card id=spp-08-gustafson
+What does Gustafson's law say and how does it relate to Amdahl?
+---
+Scaled speedup $S = (1 - p) + p n$ for a problem growing with $n$ at fixed wall time (weak scaling). Amdahl fixes problem size (strong scaling); no conflict.
+```

@@ -84,3 +84,81 @@ One backprop step by hand: 1 input $x = 1$, one hidden sigmoid unit $w_1 = 0.5, 
 ## Code
 
 `src/py/mlp.py`: `Perceptron`, `MLP(hidden, activation, task, optimizer=sgd|adam, l2, dropout, early_stopping)` with `_forward`, `_backward`, `_step`, `loss`, `history_`; `numerical_gradient` for gradient checking. Tests: gradient check to $10^{-6}$ for three activations, accuracy vs `MLPClassifier`, regression vs `MLPRegressor`.
+
+## Cards
+
+```card id=ml-11-perceptron
+Give the perceptron update rule and its convergence condition.
+---
+On a mistake: $w \leftarrow w + \eta y_i x_i$, $b \leftarrow b + \eta y_i$.
+Converges in at most $(R/\gamma)^2$ updates if data are separable with margin $\gamma$; never converges on non-separable data.
+```
+
+```card id=ml-11-xor
+Why can a single perceptron not learn XOR, and how does a hidden layer fix it?
+---
+Its boundary is a hyperplane and XOR is not linearly separable.
+A hidden layer maps inputs to a space (e.g. OR, AND) where they become separable.
+```
+
+```card id=ml-11-linear-act
+A ReLU network approximates XOR. Replace ReLUs by linear activations: can it still?
+---
+No. A composition of linear maps is one linear map, a single hyperplane.
+```
+
+```card id=ml-11-uat
+State the universal approximation result.
+---
+One hidden layer with enough units approximates any continuous function on a compact set.
+```
+
+```card id=ml-11-sigmoid
+What is the derivative of the sigmoid and why does it cause vanishing gradients?
+---
+$\sigma'(z) = \sigma(1 - \sigma) \le 1/4$; products of such factors across layers shrink exponentially with depth.
+```
+
+```card id=ml-11-vanishing
+Name three remedies for vanishing gradients.
+---
+ReLU-type activations, He/Xavier initialisation, batch normalisation, residual connections, LSTM gating.
+```
+
+```card id=ml-11-backprop
+Give the backprop recursion for $\delta^{(l)}$ and the weight gradient.
+---
+$\delta^{(l)} = (W^{(l+1)\top}\delta^{(l+1)}) \odot g'(z^{(l)})$; $\frac{\partial J}{\partial W^{(l)}} = \delta^{(l)} a^{(l-1)\top}$.
+```
+
+```card id=ml-11-steps
+Order the steps of training a neural network with gradient descent.
+---
+Initialise weights; forward-propagate; compute the error with the loss; back-propagate and adjust weights; repeat until no improvement.
+```
+
+```card id=ml-11-dropout
+Explain dropout and what happens at test time.
+---
+Hidden units are dropped with probability $p$ during training, preventing co-adaptation; an implicit ensemble of thinned networks.
+At test time the full network is used; inverted dropout already scaled activations by $1/(1-p)$.
+```
+
+```card id=ml-11-adam
+How does Adam differ from SGD with momentum?
+---
+Both keep a running average of the gradient; Adam also normalises by a running RMS of the gradient per parameter, giving adaptive step sizes.
+```
+
+```card id=ml-11-overfit
+Which methods combat overfitting in neural networks? Is cross-validation one?
+---
+Dropout, $L_2$ weight decay, data augmentation, early stopping, batch normalisation, smaller architecture.
+Not cross-validation: it measures overfitting.
+```
+
+```card id=ml-11-init
+Give Xavier and He initialisation variances and when each is used.
+---
+Xavier/Glorot $\operatorname{Var}(W) = 1/n_{\text{in}}$ for tanh/sigmoid; He $2/n_{\text{in}}$ for ReLU.
+```

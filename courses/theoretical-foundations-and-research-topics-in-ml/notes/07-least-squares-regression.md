@@ -255,3 +255,86 @@ Divide by $n$.
 - C. Saunders, A. Gammerman, V. Vovk, "Ridge regression learning algorithm in dual variables", ICML 1998.
 - P. L. Bartlett, O. Bousquet, S. Mendelson, "Local Rademacher complexities", *Ann. Statist.* 33 (2005) — fast rates.
 - T. Hsu, S. Kakade, T. Zhang, "Random design analysis of ridge regression", *FoCM* 14 (2014) — random-design version of Theorem 7.9(c).
+
+## Cards
+
+```card id=tfml-07-normal-equations
+When does $w$ minimise $\|Xw-y\|^2$, and which minimiser is chosen if $X$ is rank-deficient?
+---
+Iff $X^\top Xw=X^\top y$. If $\mathrm{rank}X=d$: $\hat w=(X^\top X)^{-1}X^\top y$.
+Otherwise minimisers are $X^+y+\ker X$; $X^+y$ is the unique min-norm one.
+```
+
+```card id=tfml-07-hat-matrix
+What are the properties of the hat matrix $H=X(X^\top X)^{-1}X^\top$?
+---
+$H^2=H$, $H^\top=H$: orthogonal projector onto $\mathrm{col}(X)$; $\mathrm{tr}H=d$.
+Residual satisfies $X^\top r=0$, and $\|y\|^2=\|\hat y\|^2+\|r\|^2$.
+```
+
+```card id=tfml-07-ols-statistics
+Well-specified fixed design, $\mathrm{Cov}\,\epsilon=\sigma^2I$: give $\mathbb E\hat w$, $\mathrm{Cov}\,\hat w$, in-sample excess risk.
+---
+$\mathbb E\hat w=w^*$, $\mathrm{Cov}\,\hat w=\sigma^2(X^\top X)^{-1}$.
+$\frac1n\mathbb E\|X\hat w-Xw^*\|^2=\sigma^2d/n$ since $X\hat w-Xw^*=H\epsilon$ and $\mathrm{tr}H=d$.
+```
+
+```card id=tfml-07-sigma-hat
+Why divide the RSS by $n-d$ to estimate $\sigma^2$?
+---
+$r=(I-H)\epsilon$ and $I-H$ is a projector of rank $n-d$, so $\mathbb E\|r\|^2=\sigma^2(n-d)$.
+```
+
+```card id=tfml-07-gauss-markov
+State Gauss–Markov and its proof idea. What does it not cover?
+---
+Among linear unbiased $Cy$ ($CX=I$), OLS has minimal covariance in PSD order. $C=(X^\top X)^{-1}X^\top+D$, $DX=0$, $\mathrm{Cov}=\sigma^2(X^\top X)^{-1}+\sigma^2DD^\top$.
+Not biased estimators: ridge can have smaller MSE.
+```
+
+```card id=tfml-07-ridge-svd
+How does ridge act in the SVD basis, and what is $\mathrm{df}(\lambda)$?
+---
+$\hat w_\lambda=(X^\top X+\lambda I)^{-1}X^\top y$; component along $u_j$ shrunk by $\sigma_j^2/(\sigma_j^2+\lambda)$, most for small $\sigma_j$.
+$\mathrm{df}(\lambda)=\mathrm{tr}H_\lambda=\sum_j\sigma_j^2/(\sigma_j^2+\lambda)$, from $\mathrm{rank}X$ down to $0$.
+```
+
+```card id=tfml-07-ridge-bayes
+Bayesian reading of ridge?
+---
+Prior $w\sim N(0,\tau^2I)$, noise $N(0,\sigma^2I)$: posterior mode (and mean) is $\hat w_\lambda$ with $\lambda=\sigma^2/\tau^2$.
+```
+
+```card id=tfml-07-bias-variance
+State the bias–variance decomposition at a fixed $x$ and why cross terms vanish.
+---
+$\mathbb E(\hat f_S(x)-y)^2=\sigma^2+\mathrm{Bias}^2+\mathrm{Var}_S\hat f_S(x)$.
+$\mathbb E_S(\hat f-\bar f)=0$, and $\epsilon$ is independent of $S$ with mean $0$. Only for squared loss, not $0$-$1$.
+```
+
+```card id=tfml-07-push-through
+State the push-through identity and what it gives.
+---
+$(X^\top X+\lambda I_d)^{-1}X^\top=X^\top(XX^\top+\lambda I_n)^{-1}$.
+Gives KRR: $\hat\alpha=(K+\lambda I)^{-1}y$, $\hat f(x)=\sum_i\hat\alpha_ik(x_i,x)$, an $O(n^3)$ solve usable for $d=\infty$.
+```
+
+```card id=tfml-07-ridge-risk-bound
+State the ridge fixed-design risk bound.
+---
+$$\tfrac1n\mathbb E\|X\hat w_\lambda-Xw^*\|^2\le\frac{\lambda\|w^*\|^2}{4n}+\frac{\sigma^2\mathrm{df}(\lambda)}{n}$$
+Bias via $ab/(a+b)^2\le\tfrac14$; variance via $\mathrm{tr}H_\lambda^2\le\mathrm{df}(\lambda)$.
+```
+
+```card id=tfml-07-rademacher-squared
+Rademacher bound for squared loss on $\|w\|\le B$, $\|x\|\le R$, $|y|\le Y$?
+---
+$L_{\mathcal D}\le L_S+\frac{4(BR+Y)BR}{\sqrt n}+(BR+Y)^2\sqrt{\frac{\log(1/\delta)}{2n}}$.
+$2(BR+Y)$ is the Lipschitz constant on the bounded range (contraction); $(BR+Y)^2$ the loss range.
+```
+
+```card id=tfml-07-fast-rates
+True or false: for well-specified squared loss the best rate is $O(\sqrt{d/n})$.
+---
+False. Fast rate $O((d+\log(1/\delta))/n)$: excess loss variance is controlled by its mean (Bernstein condition), so localised Rademacher analysis gives $1/n$.
+```

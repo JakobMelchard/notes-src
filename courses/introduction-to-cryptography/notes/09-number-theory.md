@@ -277,3 +277,79 @@ checks it.
 `test_numtheory.py::test_order_mod_matches_sympy_and_the_exam_items` (F24 1k,
 F23 4a), `test_numtheory.py::test_miller_rabin_vs_sympy`,
 `test_standard_vectors.py::test_rfc3526_group14_is_a_safe_prime_with_generator_2`.
+
+## Cards
+
+```card id=crypto-09-zn-star
+What is $\mathbb Z_N^*$, its order, and when is $a$ invertible mod $N$?
+---
+Integers in $[1,N)$ coprime to $N$ under multiplication mod $N$; order $\varphi(N)$, with $\varphi(pq)=(p-1)(q-1)$.
+$a$ invertible iff $\gcd(a,N)=1$; inverse by extended Euclid: $ax+Ny=1$.
+```
+
+```card id=crypto-09-euler
+Euler's theorem and its consequence for exponents.
+---
+$\gcd(a,N)=1\Rightarrow a^{\varphi(N)}\equiv 1 \pmod N$ (Fermat: $a^{p-1}\equiv1$). Exponents live mod $\varphi(N)$, hence RSA's $d=e^{-1}\bmod\varphi(N)$.
+```
+
+```card id=crypto-09-2-63
+Compute $[2^{63}\bmod 11]$.
+---
+$\varphi(11)=10$, $63=6\cdot10+3$, so $2^{63}\equiv 2^3=8$.
+```
+
+```card id=crypto-09-3-mod-22
+True or false: $[3^{1000000}\bmod 22]=3$.
+---
+False. $\varphi(22)=10$ and $10\mid 10^6$, so the result is $3^0=1$ (also $\mathrm{ord}(3)=5$).
+```
+
+```card id=crypto-09-generator
+Test for $g$ generating $\mathbb Z_p^*$; is 2 a generator of $\mathbb Z_{23}^*$?
+---
+$g$ generates iff $g^{(p-1)/q}\ne1$ for every prime $q\mid p-1$.
+$22=2\cdot11$, $2^{11}\equiv1$, so $\mathrm{ord}(2)=11$: no. 5 is a generator.
+```
+
+```card id=crypto-09-groups
+Is $(\mathbb Z,\cdot)$ a group? Is $\mathbb Z_7^*$ cyclic? Is $(\{0,1\}^2,\oplus)$ a cyclic group?
+---
+No: only $\pm1$ invertible. Yes, e.g. generator 3. A group but not cyclic: order 4, every non-identity element has order 2 (Klein four-group).
+```
+
+```card id=crypto-09-dlp-additive
+Is DLP hard in $(\mathbb Z_p,+)$?
+---
+No. "$g^x$" is $x\cdot g\bmod p$, so $x=h\cdot g^{-1}\bmod p$, one extended-Euclid call. Hardness is a property of the group.
+```
+
+```card id=crypto-09-assumptions
+Order DLP, CDH, DDH as assumptions. Does CDH hard imply DLog hard?
+---
+DDH hard $\Rightarrow$ CDH hard $\Rightarrow$ DLP hard; DDH is the strongest. Yes: a DLog solver gives a CDH solver (recover $x$, output $(g^y)^x$).
+```
+
+```card id=crypto-09-ddh-zp
+Why does DDH fail in $\mathbb Z_p^*$, and the fix?
+---
+The Legendre symbol is computable and leaks whether $g^{xy}$ is a square. Work in the prime-order subgroup (safe prime $p=2q+1$), where DDH is believed to hold.
+```
+
+```card id=crypto-09-prime-order
+Why insist on a prime-order group for DH?
+---
+Pohlig-Hellman makes smooth orders cheap; prime order forces full $O(\sqrt q)$. DDH holds only in the prime-order subgroup. Every non-identity element generates: no small subgroups.
+```
+
+```card id=crypto-09-rsa-factoring
+RSA assumption vs factoring: which implies which?
+---
+RSA hard $\Rightarrow$ factoring hard (factoring gives $\varphi(N)$, hence $d$). Converse unknown, so RSA is the stronger assumption.
+```
+
+```card id=crypto-09-nist
+NIST: parameters for 128-bit security, and do public-key or symmetric keys need to be longer?
+---
+AES-128; RSA 3072; DH/DSA $p$ 3072 with 256-bit subgroup; ECC 256-383. Public-key, by an order of magnitude: sub-exponential attacks (NFS) on factoring and $\mathbb Z_p^*$-DLog; curves only generic $2^{n/2}$.
+```

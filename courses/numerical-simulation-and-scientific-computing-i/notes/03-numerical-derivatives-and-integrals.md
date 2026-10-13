@@ -96,3 +96,84 @@ Derivative of $\sin$ at $x = 0.7$ with $h = 10^{-1}, \dots, 1.25 \cdot 10^{-2}$:
 5. **Why is a 5-point 4th-order stencil not automatically better than the 3-point 2nd-order one in a PDE code?** It needs two boundary layers (special one-sided formulas at the edges), produces a wider matrix band (more memory, less sparse), is harder to make stable for advection, and only pays if the solution is smooth enough that the asymptotic regime is reached on affordable grids.
 
 Code: `src/py/fdstencil.py` (`weights_vandermonde`, `weights_fornberg`, `leading_error_term`, `table` - regenerates the stencil table above), `src/py/fd_poisson.py` (`fd_derivative`, `fd_second_derivative`, `quad_composite`, `convergence_order`); tests `src/py/test_fdstencil.py`, `src/py/test_fd_poisson.py`. Sources: [S25] [S23] [S35].
+
+## Cards
+
+```card id=nssc-03-central
+Give the central difference and its leading error.
+---
+$D_0 f = \dfrac{f(x+h) - f(x-h)}{2h}$, error $\frac{h^2}{6} f'''$, order 2.
+```
+
+```card id=nssc-03-second-deriv
+Give the 3-point second-derivative stencil and its leading error.
+---
+$\dfrac{f(x+h) - 2f(x) + f(x-h)}{h^2}$, error $\frac{h^2}{12} f''''$, order 2.
+```
+
+```card id=nssc-03-one-sided
+Give the second-order one-sided boundary formula for $f'$.
+---
+$\dfrac{-3 f_0 + 4 f_1 - f_2}{2h}$, error $-\frac{h^2}{3} f'''$.
+```
+
+```card id=nssc-03-order-cond
+How are FD weights for the $d$-th derivative found from stencil points $s_j$?
+---
+Solve the Vandermonde order conditions $\sum_j w_j s_j^k/k! = \delta_{kd}/h^d$.
+First failing condition $C \ne 0$ at order $m$ gives error $C h^{m-d} f^{(m)}$.
+```
+
+```card id=nssc-03-fornberg
+What does Fornberg's algorithm offer over the Vandermonde solve?
+---
+A recurrence in $O(n^2 d)$, for arbitrarily spaced nodes,
+and all derivative orders up to $d$ at once.
+```
+
+```card id=nssc-03-hopt
+Why does FD error grow again as $h \to 0$, and what is $h_{\text{opt}}$?
+---
+Round-off $\epsilon |f|/h$ from cancellation grows; $E \approx C h^p + \epsilon |f|/h$.
+$h_{\text{opt}} \sim \epsilon^{1/(p+1)}$: forward $10^{-8}$, central $\approx 10^{-5.3}$.
+```
+
+```card id=nssc-03-eps
+True or false: `numpy.finfo(float).eps` is the IEEE double unit round-off.
+---
+False. It is machine epsilon $2^{-52}$; unit round-off is $2^{-53} \approx 1.1 \cdot 10^{-16}$, half of it.
+```
+
+```card id=nssc-03-richardson
+State Richardson extrapolation for $D(h) = f' + c h^p + O(h^{p+2})$.
+---
+$\dfrac{2^p D(h/2) - D(h)}{2^p - 1} = f' + O(h^{p+2})$.
+On the trapezoid rule this is Romberg integration.
+```
+
+```card id=nssc-03-observed-order
+How do you measure the observed order with and without an exact solution?
+---
+Known: $p = \log_2(e_h / e_{h/2})$.
+Unknown: $p = \log_2 \frac{D(h) - D(h/2)}{D(h/2) - D(h/4)}$.
+```
+
+```card id=nssc-03-quad
+Give the composite error and polynomial exactness of midpoint, trapezoid and Simpson.
+---
+Midpoint $\frac{(b-a)h^2}{24} f''$, trapezoid $-\frac{(b-a)h^2}{12} f''$, both exact to degree 1.
+Simpson $-\frac{(b-a)h^4}{180} f''''$, exact to degree 3, needs $n$ even.
+```
+
+```card id=nssc-03-gauss
+How exact is Gauss-Legendre with $m$ nodes per panel?
+---
+Nodes are roots of $P_m$; exact for degree $2m-1$, error $O(h^{2m})$.
+```
+
+```card id=nssc-03-periodic
+Why does the trapezoid rule converge exponentially for a smooth periodic integrand over a full period?
+---
+Every Euler-Maclaurin correction contains $f^{(2k-1)}(b) - f^{(2k-1)}(a) = 0$,
+so the error decays faster than any power of $h$.
+```

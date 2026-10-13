@@ -205,3 +205,88 @@ Nothing here writes an ONNX file: `onnx` and `onnxruntime` are not in the repo v
 - ONNX and ONNX Runtime [S88]. TensorFlow.js, Gradio, Streamlit, Hugging Face Spaces, Docker — all named in assignment 3 [S14].
 - Wilkinson et al. (2016), *The FAIR guiding principles* [S89]; <https://www.go-fair.org/fair-principles/>.
 - Goodfellow, Bengio, Courville [S15], ch. 12.1 (large-scale deep learning: quantisation, model compression, dynamic structure).
+
+## Cards
+
+```card id=adl-12-batching
+What is the single biggest throughput lever when serving a model?
+---
+Separate model server batching requests over a short window (e.g. 10 ms).
+A batch of 16 costs barely more than a batch of 1 on a GPU.
+```
+
+```card id=adl-12-weights
+Where should demo weights come from?
+---
+Fetched at runtime from a GitHub release, never committed.
+Fail loudly if the checksum does not match.
+```
+
+```card id=adl-12-onnx
+What is the main ONNX export failure mode and how do you guard against it?
+---
+Tracing bakes in one control-flow path and shapes.
+Use `dynamic_axes` and assert outputs match PyTorch to about `1e-5` on several batch sizes.
+```
+
+```card id=adl-12-bf16
+bf16 vs fp16: which is more precise and which is harder to break?
+---
+fp16 is more precise (10 vs 7 mantissa bits) but overflows at 65504.
+bf16 has fp32's 8-bit exponent: same range, no loss scaling.
+```
+
+```card id=adl-12-affine
+Give the affine int8 scale and zero point.
+---
+$s = (x_{\max} - x_{\min})/(q_{\max} - q_{\min})$, $z = q_{\min} - \mathrm{round}(x_{\min}/s)$.
+$q = \mathrm{round}(x/s) + z$, $\hat x = (q - z)s$.
+```
+
+```card id=adl-12-zero
+Why is the zero point rounded to an integer?
+---
+So real zero is exactly representable.
+Otherwise padded convolutions acquire a systematic bias.
+```
+
+```card id=adl-12-quant-error
+What are the max and RMS rounding errors of quantisation with step $s$?
+---
+Max $s/2$; RMS $s/\sqrt{12}$ for a near-uniform error distribution.
+```
+
+```card id=adl-12-outlier
+Why does one outlier hurt per-tensor int8, and what are fixes?
+---
+$s = \max|x|/127$ is set by the largest value, coarsening every other weight (SNR 40.5 to 21.0 dB).
+Fixes: per-channel scales, clipped calibration range, outlier channels in fp16.
+```
+
+```card id=adl-12-quant-compute
+Symmetric int8 with $\max|x| = 0.41$: quantise the weight $0.05$.
+---
+$s = 0.41/127 = 3.23\cdot10^{-3}$; $\mathrm{round}(15.48) = 15$, dequantised $0.04845$.
+Error $1.55\cdot10^{-3}$, inside $s/2$.
+```
+
+```card id=adl-12-pruning
+True or false: 90% unstructured pruning speeds up inference.
+---
+False. Dense kernels still multiply the zeros; it buys download size.
+Structured pruning (channels, heads) changes shapes and speeds up.
+```
+
+```card id=adl-12-lottery
+State the lottery ticket hypothesis. Did the note's experiment reproduce it?
+---
+A sparse subnetwork trained from the original init matches the dense net; rewinding to init matters.
+No: one-shot pruning of a small MLP, rewind minus reinit $= -0.007 \pm 0.008$.
+```
+
+```card id=adl-12-fair
+What does FAIR stand for?
+---
+Findable, Accessible, Interoperable, Reusable.
+Reusable needs a clear licence; publishing the dataset earns a bonus point.
+```

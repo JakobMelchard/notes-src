@@ -151,12 +151,12 @@ input is used exactly. With $S = 1$ the output would be $5\times5$; with
 $P = 1, S = 1$ it would be $7\times7$.
 
 Take the input $I_{ij} = i + j$ ($i, j = 0..6$) and the kernel
-$K = \begin{psmallmatrix}1&0&-1\\1&0&-1\\1&0&-1\end{psmallmatrix}$ (a vertical
+$K = \begin{pmatrix}1&0&-1\\1&0&-1\\1&0&-1\end{pmatrix}$ (a vertical
 edge detector). Every $3\times3$ patch of $I$ has column sums differing by 3
 per column step, so each output is $3\cdot(\text{left col}) - 3\cdot(\text{right
 col}) = -6$ everywhere: a linear ramp has a constant gradient.
 Max pooling the same input with $3\times3$/stride 2 gives the bottom-right
-corner of each window, i.e. $\begin{psmallmatrix}4&6&8\\6&8&10\\8&10&12\end{psmallmatrix}$.
+corner of each window, i.e. $\begin{pmatrix}4&6&8\\6&8&10\\8&10&12\end{pmatrix}$.
 `../src/py/conv.py` prints both.
 
 **Parameter count.** A conv layer with 32 input channels, 64 output channels and
@@ -221,3 +221,80 @@ whole argument for weight sharing.
   the gradient check (note 11).
 - `src/exercises/2020-09-09/`: the convolution and max-pooling questions of
   E20c, worked.
+
+## Cards
+
+```card id=ml-13-deep-vs-trad
+How does deep learning differ from traditional ML in feature handling?
+---
+Traditional ML uses hand-crafted features. Deep learning operates on raw data and learns its own feature extraction together with the parameters.
+```
+
+```card id=ml-13-outsize
+Give the convolution output-size formula.
+---
+$O = \left\lfloor\frac{I - K + 2P}{S}\right\rfloor + 1$ per spatial dimension. Same formula for pooling.
+```
+
+```card id=ml-13-outsize-compute
+$28\times28$ input, $5\times5$ kernel: output size with stride 1, padding 2, and with stride 2, no padding?
+---
+$\lfloor(28-5+4)/1\rfloor + 1 = 28$; $\lfloor(28-5)/2\rfloor + 1 = 12$.
+```
+
+```card id=ml-13-larger
+The output of a convolutional layer is larger when padding increases, padding decreases, stride increases, or stride decreases?
+---
+Padding increases and stride decreases. $P$ is in the numerator, $S$ in the denominator.
+```
+
+```card id=ml-13-params
+How many parameters does a conv layer with 32 input channels, 64 output channels and a $3\times3$ kernel have?
+---
+$k^2DD' = 3^2\cdot32\cdot64 = 18\,432$ weights plus 64 biases, independent of image size.
+```
+
+```card id=ml-13-archs
+Which of LeNet, LSTM, ResNet, Reception, TeNet are CNN architectures?
+---
+LeNet and ResNet. LSTM is recurrent; Reception and TeNet are invented distractors (Inception is real).
+```
+
+```card id=ml-13-rnn
+True or false: an RNN suits sequential input whose length is not fixed.
+---
+True. The same weights are used at every time step, so any length $T$ works.
+```
+
+```card id=ml-13-rnn-conv
+True or false: convolution and pooling are components of RNNs.
+---
+False. They belong to CNNs.
+```
+
+```card id=ml-13-vanishing
+Name four fixes for vanishing gradients and why each works.
+---
+ReLU (no saturation on active half); He/Xavier init (unit variance across layers); batch norm (removes scale coupling); residual connections (derivative-1 path).
+Plus gradient clipping (exploding) and LSTM/GRU gating (recurrent).
+```
+
+```card id=ml-13-cv-reg
+True or false: cross-validation is a regularisation method for deep nets.
+---
+False. It measures performance and does not change the model.
+```
+
+```card id=ml-13-augment
+What is data augmentation, and to which data is it applied?
+---
+Extending the training set with label-preserving transformations (flips, rotations, crops, colour changes, noise).
+Training set only.
+```
+
+```card id=ml-13-transfer
+What does freezing a layer mean, and what is off-the-shelf transfer learning?
+---
+Freezing: its weights are not updated during fine-tuning.
+Off-the-shelf: discard the pretrained head and train a shallow model on the remaining layers' activations.
+```

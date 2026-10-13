@@ -259,3 +259,81 @@ hypothesis that rules the second branch out.
 `test_signatures.py::test_schnorr_nonce_reuse_recovers_the_key` (Q2),
 `test_signatures.py::test_special_soundness_extracts_the_witness`,
 `test_dsa.py::test_rfc6979_appendix_a2` (all twenty RFC 6979 DSA vectors [S32]).
+
+## Cards
+
+```card id=crypto-11-euf-cma
+EUF-CMA for signatures: how does it differ from the MAC game?
+---
+$\mathcal A^{\mathsf{Sign}_{sk}(\cdot)}(pk)$ outputs $(m^*,\sigma^*)$; wins iff $\mathsf{Vrfy}_{pk}(m^*,\sigma^*)=1$ and $m^*\notin Q$. Same shape, but $\mathcal A$ gets $pk$ and verification is public.
+```
+
+```card id=crypto-11-textbook-forgery
+No-query forgery on textbook RSA signatures $\sigma=m^d$.
+---
+Pick any $\sigma$, set $m=\sigma^e\bmod N$; $\sigma^e=m$ verifies. $m$ is junk but EUF-CMA counts any new message.
+```
+
+```card id=crypto-11-homomorphic
+Homomorphic forgery on textbook RSA signatures.
+---
+From $\sigma_1=m_1^d$, $\sigma_2=m_2^d$: $\sigma_1\sigma_2=(m_1m_2)^d$ is valid on $m_1m_2$. Targeted, two queries.
+```
+
+```card id=crypto-11-hash-and-sign
+Hash-and-sign theorem and its reduction.
+---
+$H$ collision resistant and the scheme EUF-CMA on fixed-length digests $\Rightarrow$ EUF-CMA on arbitrary messages.
+A forgery is either a forgery on a new digest $H(m^*)$, or $H(m^*)=H(m)$ for a queried $m$: a collision.
+```
+
+```card id=crypto-11-fdh
+RSA-FDH: scheme, security claim, and how the ROM reduction signs without $d$.
+---
+$\mathsf{Sign}(m)=H(m)^d\bmod N$. EUF-CMA in the ROM under RSA (background).
+Program $H(m_i)=r_i^e$, sign as $r_i$; for the guessed target set $H(m^*)=y r^e$, so a forgery gives $y^d=\sigma^*/r$.
+```
+
+```card id=crypto-11-schnorr-id
+Schnorr identification protocol for $y=g^x$.
+---
+Commit $t=g^r$; challenge random $c$; response $s=r+cx\bmod q$; check $g^s=t\cdot y^c$.
+```
+
+```card id=crypto-11-sigma-properties
+Special soundness and HVZK for Schnorr identification.
+---
+Special soundness: $(t,c,s)$, $(t,c',s')$ with $c\ne c'$ give $x=(s-s')/(c-c')$.
+HVZK: simulate without $x$ by picking $c,s$ first and setting $t=g^s y^{-c}$.
+```
+
+```card id=crypto-11-fiat-shamir
+Fiat-Shamir: how does Schnorr identification become a signature, and the pitfall?
+---
+Replace the challenge by $c=H(t\|m)$; $\sigma=(c,s)$, verify $t'=g^s y^{-c}$ and $c=H(t'\|m)$. Must bind $m$ into the hash; hashing only $t$ lets a transcript be reused for another message.
+```
+
+```card id=crypto-11-schnorr-vrfy
+Schnorr: $I=g^k$, $r=H(I,m)$, $s=rx+k \bmod q$, $\sigma=(r,s)$. Define $\mathsf{Vrfy}$ and show correctness.
+---
+$I'=g^s\cdot pk^{-r}$; accept iff $H(I',m)=r$. Honest: $g^{rx+k}g^{-xr}=g^k=I$.
+```
+
+```card id=crypto-11-nonce-reuse
+Two Schnorr signatures on $m_1\ne m_2$ reuse $k$. Recover $sk$.
+---
+$s_1-s_2=(r_1-r_2)x$, and $r_1\ne r_2$ w.h.p., so $x=(s_1-s_2)(r_1-r_2)^{-1}\bmod q$. Same for (EC)DSA. Fix: fresh unpredictable or deterministic nonce (RFC 6979).
+```
+
+```card id=crypto-11-sig-vs-mac
+Advantages of signatures over MACs.
+---
+Public verifiability (anyone with $pk$; works for broadcast). Non-repudiation (verifier could have made a MAC tag itself). Key management: $n$ public keys, not $\binom n2$ secrets. Cost: much slower.
+```
+
+```card id=crypto-11-dsa
+DSA signing equation, and current FIPS 186-5 status.
+---
+$r=(g^k\bmod p)\bmod q$, $s=k^{-1}(H(m)+xr)\bmod q$; ECDSA is the same over a curve.
+DSA withdrawn for generation; ECDSA and EdDSA approved; deterministic per-message secrets permitted.
+```

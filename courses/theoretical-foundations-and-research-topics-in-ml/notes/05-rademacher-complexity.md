@@ -273,3 +273,86 @@ Summing over scales turns $\sum_j\varepsilon_j\sqrt{\log\mathcal N(\varepsilon_j
 - M. Ledoux, M. Talagrand, *Probability in Banach Spaces* (1991), Thm 4.12 (contraction).
 - R. M. Dudley, "The sizes of compact subsets of Hilbert space and continuity of Gaussian processes", *J. Funct. Anal.* 1 (1967).
 - D. Haussler, "Sphere packing numbers for subsets of the Boolean $n$-cube with bounded VC dimension", *J. Comb. Theory A* 69 (1995).
+
+## Cards
+
+```card id=tfml-05-empirical-rademacher
+Define the empirical Rademacher complexity and say what it measures.
+---
+$\mathfrak R_S(\mathcal F)=\mathbb E_\sigma\sup_{f\in\mathcal F}\frac1n\sum_i\sigma_if(z_i)$, $\sigma_i$ uniform $\pm1$.
+How well $\mathcal F$ correlates with (fits) random labels on $S$. Shattered $S$ gives $1$.
+```
+
+```card id=tfml-05-symmetrisation
+State the symmetrisation lemma and the key proof step.
+---
+$\mathbb E_S\sup_f(\mathbb Ef-\hat{\mathbb E}_Sf)\le2\mathfrak R_n(\mathcal F)$.
+Ghost sample plus Jensen; swapping $z_i\leftrightarrow z_i'$ preserves the joint law, so insert signs; split the sup, use $-\sigma\overset d=\sigma$.
+```
+
+```card id=tfml-05-generalisation-bound
+State the Rademacher generalisation bound for $\mathcal F\subseteq[0,1]^{\mathcal Z}$, both forms.
+---
+W.p. $\ge1-\delta$, $\forall f$: $\mathbb Ef\le\hat{\mathbb E}_Sf+2\mathfrak R_n(\mathcal F)+\sqrt{\log(1/\delta)/(2n)}$,
+and $\mathbb Ef\le\hat{\mathbb E}_Sf+2\mathfrak R_S(\mathcal F)+3\sqrt{\log(2/\delta)/(2n)}$.
+```
+
+```card id=tfml-05-why-three
+Why does the $\mathfrak R_S$ form have a factor $3$ and $\log(2/\delta)$?
+---
+McDiarmid on $S\mapsto\mathfrak R_S$ ($c_i=1/n$) replaces $2\mathfrak R_n$ by $2\mathfrak R_S+2\sqrt{\cdot}$; plus the original deviation term; union bound with $\delta/2$ each. Benefit: $\mathfrak R_S$ is computable from data.
+```
+
+```card id=tfml-05-mcdiarmid-check
+Why does $g(S)=\sup_f(\mathbb Ef-\hat{\mathbb E}_Sf)$ have bounded differences $c_i=1/n$?
+---
+Changing $z_i$ moves each $\hat{\mathbb E}_Sf$ by at most $1/n$ for $f\in[0,1]$, and $\sup a-\sup b\le\sup(a-b)$. For $[a,b]$-valued $f$ it is $(b-a)/n$.
+```
+
+```card id=tfml-05-massart
+State Massart's finite-class lemma.
+---
+$\mathfrak R_S(\mathcal F)\le r\sqrt{2\log|\mathcal F|}/n$, $r=\max_f\|f|_S\|_2$.
+If $|f|\le1$: $\le\sqrt{2\log|\mathcal F|/n}$. Proof: Jensen on $\exp$, $\cosh(x)\le e^{x^2/2}$, optimise $s$.
+```
+
+```card id=tfml-05-linear-l2
+Rademacher complexity of $\{x\mapsto\langle w,x\rangle:\|w\|_2\le B\}$ with $\|x_i\|_2\le R$?
+---
+Exactly $\frac Bn\mathbb E_\sigma\|\sum_i\sigma_ix_i\|_2\le\frac Bn\sqrt{\sum_i\|x_i\|^2}\le BR/\sqrt n$.
+Dimension-free; in an RKHS $\frac Bn\sqrt{\mathrm{tr}K}$. Trap: $BR/\sqrt n$, not $BR/n$.
+```
+
+```card id=tfml-05-linear-l1
+Rademacher bound for $\ell_1$-constrained linear classes, and why?
+---
+$\|w\|_1\le B_1$, $\|x_i\|_\infty\le R_\infty$: $\mathfrak R_S\le B_1R_\infty\sqrt{2\log(2d)/n}$.
+$\ell_1$ ball is the convex hull of $2d$ vertices; convex-hull invariance plus Massart.
+```
+
+```card id=tfml-05-contraction
+State Talagrand's contraction lemma and its main use.
+---
+$\phi$ $L$-Lipschitz: $\mathfrak R_S(\phi\circ\mathcal F)\le L\,\mathfrak R_S(\mathcal F)$.
+Margin losses $\phi(yh(x))$: $\mathfrak R_S(\ell\circ\mathcal H)\le L_\ell\mathfrak R_S(\mathcal H)$; hinge $L=1$, $\gamma$-ramp $L=1/\gamma$.
+```
+
+```card id=tfml-05-structural
+Which structural properties does $\mathfrak R_S$ have (scaling, translation, convex hull)?
+---
+$\mathfrak R_S(c\mathcal F)=|c|\mathfrak R_S(\mathcal F)$; $\mathfrak R_S(\mathcal F+g)=\mathfrak R_S(\mathcal F)$ for fixed $g$; sums subadditive; $\mathfrak R_S(\mathrm{conv}\mathcal F)=\mathfrak R_S(\mathcal F)$.
+```
+
+```card id=tfml-05-vs-vc
+How does Rademacher complexity relate to VC dimension?
+---
+$\mathfrak R_S(\mathcal H)\le\sqrt{2\log\tau_{\mathcal H}(n)/n}\le\sqrt{2d\log(en/d)/n}$ (Massart plus Sauer); Dudley plus Haussler give $O(\sqrt{d/n})$.
+No matching lower bound for every sample: data-dependent, can be far smaller.
+```
+
+```card id=tfml-05-dudley
+State Dudley's entropy integral bound. When is $\alpha>0$ needed?
+---
+$\mathfrak R_S(\mathcal F)\le\inf_{\alpha>0}\bigl(4\alpha+\frac{12}{\sqrt n}\int_\alpha^\infty\sqrt{\log\mathcal N(\varepsilon,\mathcal F,L_2(S))}\,d\varepsilon\bigr)$.
+If $\log\mathcal N\gtrsim\varepsilon^{-2}$ the integral diverges at $0$.
+```

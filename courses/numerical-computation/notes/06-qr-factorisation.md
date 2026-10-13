@@ -17,7 +17,7 @@ orthogonal matrices are reflections in a plane, rotations, and permutations
 [S4 Ex. 4.39].
 
 **Theorem** [S4 Thm 4.40]. (i) Products and inverses of orthogonal matrices are
-orthogonal. (ii) $\begin{psmallmatrix}I_k&0\\0&Q\end{psmallmatrix}\in\mathcal O_n$
+orthogonal. (ii) $\begin{pmatrix}I_k&0\\0&Q\end{pmatrix}\in\mathcal O_n$
 for $Q\in\mathcal O_{n-k}$: this is what lets a Householder step act on a
 trailing block. (iii) $\|Qx\|_2=\|x\|_2$, hence $\kappa_2(Q)=1$. (iv)
 $x^\top y=(Qx)^\top(Qy)$: angles are preserved too.
@@ -30,7 +30,7 @@ an amplification factor of exactly $1$.
 ## 2. The factorisation [S4 §4.7.2]
 
 For $m\ge n$, $R\in\mathbb R^{m\times n}$ is **generalised upper triangular** if
-$R_{ij}=0$ for $i>j$, i.e. $R=\begin{psmallmatrix}\tilde R\\0\end{psmallmatrix}$
+$R_{ij}=0$ for $i>j$, i.e. $R=\begin{pmatrix}\tilde R\\0\end{pmatrix}$
 with $\tilde R$ upper triangular; $A=QR$ with $Q\in\mathcal O_m$ is a
 **QR factorisation** [S4 Def. 4.42].
 
@@ -92,16 +92,16 @@ parallel to $e^1$ ($|x_1|\approx\|x\|_2$): $x+\lambda e^1$ then cancels. Choose
 the sign that makes the first entry a sum of like-signed terms.
 
 **The algorithm** [S4 Alg. 4.51]: apply $Q_1$ to the whole matrix, then
-$Q_2=\begin{psmallmatrix}1&0\\0&\widetilde Q_1\end{psmallmatrix}$ to the trailing
+$Q_2=\begin{pmatrix}1&0\\0&\widetilde Q_1\end{pmatrix}$ to the trailing
 $(m-1)\times(n-1)$ block, and so on. $Q$ is stored **implicitly** as the
 reflectors $v_1,\ldots,v_{n-1}$, never formed; $Q^\top b$ is $n$ applications of
 $H_i$, each $O(m)$.
 
 Worked example (`qr.cpp`):
-$A=\begin{psmallmatrix}12&-51&4\\6&167&-68\\-4&24&-41\end{psmallmatrix}$.
+$A=\begin{pmatrix}12&-51&4\\6&167&-68\\-4&24&-41\end{pmatrix}$.
 Column 1: $\|x\|_2=14$, $x_1=12>0$ so $\lambda=14$, $x+\lambda e^1=(26,6,-4)$,
 and $H_1x=-14e^1$. Continuing gives
-$R=\begin{psmallmatrix}-14&-21&14\\&-175&70\\&&35\end{psmallmatrix}$; with the
+$R=\begin{pmatrix}-14&-21&14\\&-175&70\\&&35\end{pmatrix}$; with the
 opposite sign convention all the signs flip, so quote $|r_{ii}|=14,175,35$.
 
 ## 4. QR with column pivoting [S4 §4.7.4] (CSE)
@@ -233,3 +233,80 @@ the rank of a deliberately rank-deficient matrix, cross-checked against
 least squares; $|r_{ii}|=14,175,35$ on the classic $3\times3$, an exact quadratic
 fit, the line through $(0,1),(1,2),(2,4)$ with residual $\sqrt{1/6}$, a
 degree-12 Vandermonde.
+
+## Cards
+
+```card id=numc-06-orthogonal
+Why do orthogonal matrices not amplify errors?
+---
+$\|Qx\|_2=\|x\|_2$, so the relative error amplification is exactly 1 and $\kappa_2(Q)=1$ [S4 Rem. 4.41].
+```
+
+```card id=numc-06-existence
+True or false: every invertible $A\in\mathbb R^{n\times n}$ has a QR factorisation. Is it unique?
+---
+True [S4 Thm 4.43], unlike LU which may need pivoting.
+Unique only once the signs of the $R_{ii}$ are fixed.
+```
+
+```card id=numc-06-cost
+What is the cost of QR, and how is $Ax=b$ solved with it?
+---
+$O(m^2n)$, for $m=n$ $O(n^3)$, about twice LU.
+Set $y=Q^\top b$, back-substitute $Rx=y$. Preferred when $\kappa(A)$ is large.
+```
+
+```card id=numc-06-gram-schmidt
+How do CGS, MGS and Householder compare in loss of orthogonality $\|Q^\top Q-I\|$?
+---
+CGS $O(\kappa^2u)$, MGS $O(\kappa u)$, Householder $O(u)$.
+$\|A-QR\|=O(u)$ for all three: the factorisation is fine, orthogonality is not.
+```
+
+```card id=numc-06-householder-props
+State the properties of $H=I-2vv^\top$, $\|v\|_2=1$, and derive orthogonality.
+---
+Symmetric and involution ($H^2=I$), hence orthogonal: $H^\top H=H^2=I$.
+Geometrically a reflection in the hyperplane $v^\top x=0$.
+```
+
+```card id=numc-06-householder-sign
+Which sign of $\lambda$ does [S4] use in the Householder vector $v\propto x+\lambda e^1$, and why?
+---
+$\lambda=\mathrm{sign}(x_1)\|x\|_2$, giving $Hx=-\lambda e^1$.
+The opposite sign cancels when $x$ is nearly parallel to $e^1$.
+```
+
+```card id=numc-06-householder-compute
+Householder for $x=(3,4)^\top$ with [S4]'s sign: give $\lambda$, $v$ and $Hx$.
+---
+$\lambda=5$, $x+\lambda e^1=(8,4)$, $v=(8,4)/\sqrt{80}$, $Hx=(-5,0)^\top$.
+```
+
+```card id=numc-06-givens
+When are Givens rotations preferred over Householder?
+---
+For matrices already mostly zero: Hessenberg, tridiagonal, banded.
+For dense QR Givens is more expensive than Householder.
+```
+
+```card id=numc-06-hessenberg
+What does QR of an upper Hessenberg matrix cost with Givens, and why does it matter?
+---
+Only $n-1$ subdiagonal entries to zero: $O(n^2)$ ($O(n)$ if tridiagonal).
+$RQ$ is Hessenberg again, so each QR algorithm step is $O(n^2)$.
+```
+
+```card id=numc-06-pivoting
+What does QR with column pivoting produce and what is it used for?
+---
+$AP=QR$ with $|r_{11}|\ge|r_{22}|\ge\cdots$.
+Rank revealing: collapsing trailing $r_{ii}$ show the numerical rank, cheaper than SVD.
+```
+
+```card id=numc-06-implicit-q
+How is $Q$ stored in Householder QR, and how is $Q^\top b$ computed?
+---
+Implicitly as the reflectors $v_1,\ldots,v_{n-1}$, never formed.
+$Q^\top b$ is applying each $H_i$ in turn, $O(m)$ each.
+```

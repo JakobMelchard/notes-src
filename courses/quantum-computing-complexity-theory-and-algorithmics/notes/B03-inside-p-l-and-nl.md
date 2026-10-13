@@ -70,3 +70,79 @@ Consequence: the nondeterministic space hierarchy is strict (B02), and the "poly
 ## Code
 
 `src/py/complexity/reachability.py`: `nl_reachable` (guess-the-next-vertex machine, state = current vertex + counter, all branches explored), `savitch_reach` / `reachable_savitch` (B02), `implication_graph`, `kosaraju_scc`, `two_sat` (SCC criterion, returns an assignment), `two_sat_brute`, `inductive_count` (returns $c_{n-1}$, optionally the whole sequence $c_0, \dots, c_{n-1}$), `certify_unreachable`. Tests compare with `networkx.has_path`, `networkx.strongly_connected_components` and brute-force 2SAT.
+
+## Cards
+
+```card id=qc-cx3-logspace-tm
+Define a log-space TM. Which tape counts toward space?
+---
+Read-only input tape plus read-write work tape; only work-tape cells count.
+$\mathrm L=\mathrm{SPACE}(\log n)$, $\mathrm{NL}=\mathrm{NSPACE}(\log n)$.
+```
+
+```card id=qc-cx3-nl-in-p
+Why is NL $\subseteq$ P?
+---
+A log-space machine has polynomially many configurations.
+Write down the configuration graph and run BFS from start to accept.
+```
+
+```card id=qc-cx3-reduction-type
+Why must NL-completeness use log-space rather than polynomial-time reductions?
+---
+NL $\subseteq$ P, so under $\le_p$ every nontrivial problem in NL would be complete.
+```
+
+```card id=qc-cx3-compose
+How are log-space reductions composed when $f(x)$ cannot be stored?
+---
+Run $g$ on a virtual input: recompute $f(x)$ from scratch for each requested bit, counting output bits.
+Polynomial time, still $O(\log n)$ space.
+```
+
+```card id=qc-cx3-path-nl
+NL algorithm for PATH: what does it store, and why the counter?
+---
+Only the current vertex and a step counter ($2\log n$ bits), guessing a neighbour each step.
+The counter forces every branch to terminate (paths need at most $n-1$ steps).
+```
+
+```card id=qc-cx3-2sat
+When is a 2SAT formula unsatisfiable, in terms of the implication graph?
+---
+Iff some $x$ has $x\leadsto\neg x$ and $\neg x\leadsto x$ (same SCC).
+Clause $(a\vee b)$ gives edges $\neg a\to b$ and $\neg b\to a$.
+```
+
+```card id=qc-cx3-sat-variants
+Classify 2SAT, 3SAT and HORN-SAT.
+---
+2SAT: NL-complete. 3SAT: NP-complete. HORN-SAT: P-complete.
+```
+
+```card id=qc-cx3-immerman
+State Immerman-Szelepcsényi and its proof technique.
+---
+$\mathrm{NL}=\mathrm{coNL}$ (generally $\mathrm{NSPACE}(s)=\mathrm{coNSPACE}(s)$, $s\ge\log n$).
+Inductive counting: compute $c_d=|L_d|$ from $c_{d-1}$, then certify $t\notin L_{n-1}$.
+```
+
+```card id=qc-cx3-certify-not
+Given $c_{d-1}$, how does an NL machine certify $v\notin L_d$?
+---
+Enumerate all $u$, certify $c_{d-1}$ of them in $L_{d-1}$ by guessed paths, check none is $v$ or a predecessor of $v$.
+Reject if the count is not met.
+```
+
+```card id=qc-cx3-reingold
+True or false: Reingold's theorem puts directed reachability in L.
+---
+False. Reingold: UNDIRECTED PATH is in L (SL = L).
+Directed reachability in L would give L = NL, which is open.
+```
+
+```card id=qc-cx3-known
+Which are known: L = NL, NL = coNL, NL = P, NL $\ne$ PSPACE?
+---
+Only NL = coNL (Immerman-Szelepcsényi) and NL $\ne$ PSPACE (Savitch plus space hierarchy).
+```

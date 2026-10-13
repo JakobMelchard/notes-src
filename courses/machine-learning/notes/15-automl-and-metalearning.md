@@ -254,3 +254,80 @@ conceptual; the closest runnable thing is `src/py/rules.py`'s `ZeroR`/`OneR`,
 which are two of the standard landmarkers, and `src/py/exercise_template.py`,
 which compares eight learners with one CV protocol — a hand-rolled selection
 mapping over a small portfolio.
+
+## Cards
+
+```card id=ml-15-nfl
+State the no-free-lunch theorem and its main implication.
+---
+Averaged over all target functions, every learner has the same expected off-training-set error.
+No algorithm is best on every problem; claims hold only for a restricted problem class and need experiments.
+```
+
+```card id=ml-15-ccwa
+OCWA vs CCWA: which one does metalearning require, and why?
+---
+CCWA (closed classification world): models are comparable across problems. Metalearning generalises from past data sets, which is only valid under CCWA; under OCWA nothing transfers.
+```
+
+```card id=ml-15-rice
+Name the four spaces of Rice's framework and the mapping to be learned.
+---
+Problem space $P$, feature space $F$, algorithm space $A$, performance space $Y$.
+Learn the selection mapping $S(f(x)) = a$ maximising $\|y(a(x))\|$.
+```
+
+```card id=ml-15-rice-issues
+Name three issues to consider when applying Rice's framework.
+---
+Must assume CCWA; meta-feature extraction must cost less than trying the algorithms; portfolio small with good coverage and different biases; NFL limits generality.
+```
+
+```card id=ml-15-rice-hpo
+Can Rice's framework be used for hyperparameter optimisation?
+---
+Not directly: it selects an algorithm, not a configuration. Treating the algorithm as a hyperparameter (CASH) merges both into one search.
+```
+
+```card id=ml-15-metafeatures
+Name the four families of metalearning features.
+---
+Statistical/information-theoretic, model-based, landmarking, learning-curve.
+```
+
+```card id=ml-15-landmark
+What are landmarking features?
+---
+The performances of simple, fast learners (1R, 1-NN, naive Bayes, a stump) on the data set. Each excels on a characteristic task class, so its score characterises the task.
+```
+
+```card id=ml-15-model-based
+True or false: model-based metalearning features are extracted directly from the data set.
+---
+False. That is the statistical family. Model-based features are properties of an induced hypothesis (tree depth, node count).
+```
+
+```card id=ml-15-nattr
+True or false: "number of attributes of the data set" is not a model-based feature.
+---
+True. It is a statistical meta-feature.
+```
+
+```card id=ml-15-grid-automl
+True or false: state-of-the-art AutoML systems usually use grid search.
+---
+False. Grid search is exhaustive and budget-inefficient; systems use SMBO (SMAC in Auto-WEKA and auto-sklearn).
+```
+
+```card id=ml-15-grid-random
+Budget of 16 evaluations: how many distinct values of $k$ does a $4\times2\times2$ grid test vs random search?
+---
+Grid: 4 distinct values of $k$, each 4 times. Random: up to 16.
+```
+
+```card id=ml-15-systems
+Describe two AutoML systems.
+---
+Auto-WEKA: CASH over WEKA learners, optimised with SMAC.
+auto-sklearn: CASH over scikit-learn pipelines, metalearning warm-start, ensemble of evaluated models.
+```

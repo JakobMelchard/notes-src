@@ -88,3 +88,88 @@ Convergence-order check for the 1D Poisson solver (`./bin/fd_poisson1d`): errors
 5. **What is the order of accuracy of the ghost-point Neumann treatment, and why is the one-sided difference worse?** Ghost point: central difference for $u'(0)$, $O(h^2)$, keeps the second-order global error. One-sided $(u_1 - u_0)/h$: $O(h)$ truncation at that node, which pollutes the whole solution to first order.
 
 Code: `src/cpp/fd_poisson1d.cpp` (`thomas`, `apply_A`, `cg`, convergence table), `src/cpp/heat2d.cpp` (`laplacian`, `run_explicit`, `run_implicit`, `cg_implicit`), `src/py/fd_poisson.py` (`poisson1d`, `poisson2d_matrix`), `src/py/heat2d.py` (`explicit_euler`, `implicit_euler`, `cfl_limit`). Sources: [S23] [S24].
+
+## Cards
+
+```card id=nssc-04-poisson1d
+Give the 1D Poisson FD matrix and how Dirichlet values enter.
+---
+$A = \frac{1}{h^2}\,\text{tridiag}(-1, 2, -1)$ of size $N-1$.
+Boundary values move to $b$: $b_1 \mathrel{+}= \alpha/h^2$, $b_{N-1} \mathrel{+}= \beta/h^2$.
+```
+
+```card id=nssc-04-kappa
+What is the condition number of the 1D Poisson matrix and what does it imply for CG?
+---
+$\lambda_{\min} \approx \pi^2$, $\lambda_{\max} \approx 4/h^2$, $\kappa \approx 4/(\pi^2 h^2) \sim N^2$.
+CG needs $\sim \sqrt{\kappa} \sim N$ iterations.
+```
+
+```card id=nssc-04-convergence
+Which pattern gives order-2 convergence for 1D Poisson?
+---
+Consistency + stability = convergence.
+$\tau_i = \frac{h^2}{12} u''''$ and $\|A^{-1}\|_\infty \le 1/8$ give $\|u - u_h\|_\infty \le \frac{h^2}{96}\max|u''''|$.
+```
+
+```card id=nssc-04-neumann
+How is a second-order Neumann condition $u'(0) = g$ imposed, and why not the one-sided formula?
+---
+Ghost point $u_{-1} = u_1 - 2hg$, keep row 0.
+One-sided $(u_1 - u_0)/h = g$ is first order, breaks symmetry, pulls global order to 1.
+```
+
+```card id=nssc-04-pure-neumann
+True or false: the pure Neumann (or periodic) FD matrix is invertible.
+---
+False. It is singular with a constant null vector.
+Fix the mean or pin one value.
+```
+
+```card id=nssc-04-five-point
+Give the 2D five-point stencil and the matrix structure under lexicographic ordering.
+---
+$\frac{4u_{i,j} - u_{i\pm1,j} - u_{i,j\pm1}}{h^2} = f_{i,j}$.
+Block tridiagonal $A_2 = I \otimes A_1 + A_1 \otimes I$, 5 nnz per row, bandwidth $N-1$.
+```
+
+```card id=nssc-04-explicit-limit
+State the explicit Euler stability limit for the heat equation in $d$ dimensions.
+---
+$r = \alpha\Delta t/h^2 \le 1/(2d)$: $1/2$ in 1D, $1/4$ in 2D, $1/6$ in 3D.
+```
+
+```card id=nssc-04-von-neumann
+Derive the 1D explicit Euler heat limit by von Neumann analysis.
+---
+Insert $g^n e^{i\theta j}$: $g = 1 - 4r\sin^2(\theta/2)$.
+Worst case $\theta = \pi$: $|1 - 4r| \le 1 \Leftrightarrow r \le 1/2$.
+```
+
+```card id=nssc-04-schemes
+Compare explicit Euler, implicit Euler and Crank-Nicolson for the heat equation.
+---
+Explicit: order 1, $\Delta t \le 2/(\alpha\lambda_{\max})$. Implicit: order 1, always stable.
+CN: order 2, always stable, but $g \to -1$ for stiff modes (oscillations).
+```
+
+```card id=nssc-04-cfl
+State the CFL condition for upwind advection and its logical status.
+---
+$|a|\Delta t/h \le 1$: numerical domain of dependence must contain the analytic one.
+Necessary but not sufficient.
+```
+
+```card id=nssc-04-lax
+State the Lax equivalence theorem with its hypotheses.
+---
+For a consistent FD approximation to a well-posed linear initial-value problem,
+stability is necessary and sufficient for convergence.
+```
+
+```card id=nssc-04-eigen-trap
+Why is $u = \sin\pi x \sin\pi y$ a bad test for a 2D Poisson solver?
+---
+It is an eigenvector of $A_2$, so CG converges in one iteration.
+Use a manufactured solution that is not an eigenfunction.
+```

@@ -245,3 +245,84 @@ So $L_{\mathcal D}(h)\le L_S(h)+0.164$ for all $h$ simultaneously, with probabil
 - Mohri, Rostamizadeh & Talwalkar, *FoML* (2018): Ch. 3.2 (growth function), 3.3 (VC dimension, Radon's theorem, Thm 3.13, Sauer's lemma 3.17, Cor. 3.18–3.19 VC bounds), 3.4 (lower bounds).
 - Devroye, Györfi & Lugosi, *A Probabilistic Theory of Pattern Recognition* (1996): Ch. 12–13 (VC theory, the $4\tau(2n)e^{-n\varepsilon^2/8}$ bound).
 - Vapnik, *Statistical Learning Theory* (1998): Ch. 4 (bounds on the risk).
+
+## Cards
+
+```card id=tfml-04-vc-proof-obligation
+What must you show to prove $\mathrm{VCdim}(\mathcal H)=d$?
+---
+(i) One set of size $d$ is shattered. (ii) Every set of size $d+1$ has a labelling not realised.
+Showing one particular $(d+1)$-set fails (e.g. three collinear points) proves nothing.
+```
+
+```card id=tfml-04-standard-vc-values
+Give the VC dimension of thresholds, intervals, axis-aligned rectangles in $\mathbb R^2$, halfspaces in $\mathbb R^k$.
+---
+Thresholds $1$, intervals $2$, rectangles $4$.
+Homogeneous halfspaces $k$, non-homogeneous $k+1$.
+```
+
+```card id=tfml-04-halfspace-upper
+Why can no $k+2$ points in $\mathbb R^k$ be shattered by non-homogeneous halfspaces?
+---
+Radon: split into $I,J$ with $\mathrm{conv}(I)\cap\mathrm{conv}(J)\neq\emptyset$. Label $I$ positive, $J$ negative. Both the halfspace and its complement are convex, so both would contain the common point $z$. Contradiction.
+```
+
+```card id=tfml-04-radon
+State Radon's theorem and its proof idea.
+---
+Any $k+2$ points in $\mathbb R^k$ split into $I,J$ with intersecting convex hulls.
+$\sum\lambda_ix_i=0$, $\sum\lambda_i=0$ is $k+1$ equations in $k+2$ unknowns, so nonzero $\lambda$ exists; positive vs non-positive parts give the partition.
+```
+
+```card id=tfml-04-params-trap
+True or false: VC dimension equals the number of parameters.
+---
+False. $x\mapsto\mathbb 1[\sin(\omega x)\ge0]$ has one parameter and infinite VC dimension (shatters $\{2^{-1},\dots,2^{-n}\}$). Finite unions of intervals also have infinite VC dimension.
+```
+
+```card id=tfml-04-finite-vs-vc
+How does $\mathrm{VCdim}$ relate to $|\mathcal H|$ for a finite class? Can the gap be large?
+---
+$\mathrm{VCdim}(\mathcal H)\le\log_2|\mathcal H|$, since a shattered $C$ needs $2^{|C|}\le|\mathcal H|$.
+Gap arbitrary: $N$ grid thresholds have $|\mathcal H|=N$, VC dimension $1$.
+```
+
+```card id=tfml-04-sauer-shelah
+State the Sauer–Shelah lemma and its polynomial consequence.
+---
+$\mathrm{VCdim}=d<\infty\Rightarrow\tau_{\mathcal H}(n)\le\sum_{i=0}^d\binom ni$, and $\le(en/d)^d$ for $n\ge d$.
+Stronger form: $|\mathcal H_C|\le$ number of subsets of $C$ shattered by $\mathcal H$.
+```
+
+```card id=tfml-04-sauer-proof
+Sauer–Shelah proof: how does the induction step split $\mathcal H_C$?
+---
+By the label of $c_1$: $Y_0=\mathcal H_{C'}$ (patterns with at least one $c_1$-label), $Y_1$ (patterns with both), $|\mathcal H_C|=|Y_0|+|Y_1|$. $Y_0$ counts shattered sets without $c_1$; each $B$ shattered by $\mathcal H'$ gives shattered $B\cup\{c_1\}$.
+```
+
+```card id=tfml-04-growth-intervals
+What is the growth function of intervals, and is Sauer tight for it?
+---
+$\tau(n)=\binom n2+n+1$, exactly the Sauer bound with $d=2$: tight. Thresholds: $\tau(n)=n+1$, also tight.
+```
+
+```card id=tfml-04-fundamental-theorem
+State the fundamental theorem of statistical learning (which equivalences, under which conditions).
+---
+Binary classes, $0$-$1$ loss: uniform convergence, ERM agnostic PAC, agnostic PAC, ERM PAC, PAC, and $\mathrm{VCdim}<\infty$ are equivalent.
+Agnostic $n_{\mathcal H}=\Theta((d+\log(1/\delta))/\varepsilon^2)$.
+```
+
+```card id=tfml-04-uc-proof-steps
+Sketch why finite VC dimension implies uniform convergence.
+---
+Ghost sample $S'$ plus Jensen removes $L_{\mathcal D}$; Rademacher signs by exchangeability; on $2n$ points only $\tau(2n)$ behaviours; Hoeffding plus union bound gives $(4+\sqrt{\log\tau(2n)})/\sqrt{2n}$; Sauer and McDiarmid finish.
+```
+
+```card id=tfml-04-vc-bound-form
+State the Vapnik-style VC generalisation bound. What part is canonical?
+---
+W.p. $\ge1-\delta$, $\forall h$: $L_{\mathcal D}(h)\le L_S(h)+\sqrt{(8d\log(2en/d)+8\log(4/\delta))/n}$, $n\ge d$.
+Constants vary between books; only $\sqrt{(d\log(n/d)+\log(1/\delta))/n}$ is canonical.
+```

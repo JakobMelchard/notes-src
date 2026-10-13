@@ -114,3 +114,79 @@ Total $1 + 3 + 13 = 17$. Check by brute force: pairs $(5,4),(5,2),(5,3),(4,2),(4
 ## Code
 
 `src/py/algorithmics/divide_conquer.py`: `merge_sort(a)`, `count_inversions(a)` (returns count and sorted list), `closest_pair(points)` (with the strip scan; tests compare to brute force), `strassen(A, B)` (numpy blocks, padded to a power of two), `master_theorem(a, b, d)`.
+
+## Cards
+
+```card id=qc-alg4-merge-sort
+Merge sort: recurrence, solution, and the comparison-sort lower bound.
+---
+$T(n)=2T(n/2)+cn$, so $T(n)=O(n\log n)$.
+Any comparison sort needs $\lceil\log_2 n!\rceil=\Omega(n\log n)$ comparisons (decision tree with $n!$ leaves).
+```
+
+```card id=qc-alg4-split-inversions
+In merge-and-count, what is added to the count when $R[j]$ is emitted before $L[i]$, and why?
+---
+$|L|-i$: the remaining left elements are all larger than $R[j]$ and precede it in the input.
+Each split inversion is counted once, when its right element is emitted.
+```
+
+```card id=qc-alg4-inversions-sorted
+Why must the recursive calls of inversion counting return their halves sorted?
+---
+Counting split inversions on unsorted halves is $\Theta(n^2)$ again.
+Sorting does not change the split count, which depends only on which elements are in $L$ vs $R$.
+```
+
+```card id=qc-alg4-inversions-compute
+Compute the number of inversions of $[1,5,4,8,10,2,6,9,3,7]$ (left 1, right 3, split 13).
+---
+$1+3+13=17$.
+```
+
+```card id=qc-alg4-strip-lemma
+Closest pair: why does each strip point need comparing with only 7 successors in $y$-order?
+---
+Squares of side $\delta/2$ hold at most one point (two would be at distance $\le\delta/\sqrt2<\delta$).
+A closer point lies in a $2\times4$ block of 8 squares, so at most 7 candidates.
+```
+
+```card id=qc-alg4-closest-time
+True or false: re-sorting the strip by $y$ at every level keeps closest pair at $O(n\log n)$.
+---
+False: that gives $O(n\log^2 n)$.
+Carrying the pre-sorted list $P_y$ down by filtering keeps $T(n)=2T(n/2)+O(n)=O(n\log n)$.
+```
+
+```card id=qc-alg4-karatsuba
+Karatsuba: which three products, and the resulting running time?
+---
+$x_1y_1$, $x_0y_0$, $p=(x_1+x_0)(y_1+y_0)$; middle term $p-x_1y_1-x_0y_0$.
+$T(n)=3T(n/2)+O(n)=O(n^{\log_2 3})=O(n^{1.585})$.
+```
+
+```card id=qc-alg4-karatsuba-variants
+What if integer multiplication split into 3 parts using 5 products?
+---
+$T(n)=5T(n/3)+O(n)=O(n^{\log_3 5})=O(n^{1.465})$, better than Karatsuba. This is Toom-3.
+```
+
+```card id=qc-alg4-strassen
+Strassen's recurrence and solution. Why is it not $\Theta(n^2\log n)$?
+---
+$T(n)=7T(n/2)+O(n^2)=\Theta(n^{\log_2 7})=O(n^{2.81})$.
+$\log_2 7\approx2.807>2$, master case 1 (leaves dominate); the additions are lower order.
+```
+
+```card id=qc-alg4-omega
+What is the matrix multiplication exponent $\omega$, and what bounds does the note give?
+---
+Infimum of $c$ with $n\times n$ multiplication in $O(n^c)$. $2\le\omega<2.372$.
+$k\times k$ with $r$ scalar products gives $\omega\le\log_k r$ (Strassen: $\log_2 7$).
+```
+
+```card id=qc-alg4-fft
+How does the FFT multiply two degree-$n$ polynomials in $O(n\log n)$?
+---
+Evaluate at the $2n$ complex roots of unity (even/odd split, $2T(n/2)+O(n)$), multiply pointwise, interpolate by the inverse transform.
+```

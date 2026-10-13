@@ -117,3 +117,87 @@ Simplex from $(0,0)$ with slacks $s_1, s_2$: basis $\{s_1, s_2\}$, reduced costs
 ## Code
 
 `src/py/algorithmics/lp_ilp.py`: `vertex_cover_lp(adj)` and `vertex_cover_ilp(adj)` (scipy `linprog` for the relaxation with $\frac12$-rounding, `pulp` for the exact ILP; tests compare values on $K_n$ and odd cycles to the closed forms above), `simplex(c, A, b)` (dense tableau with Bland's rule, cross-checked against `linprog`), `branch_and_bound(c, A, b)` on top of `linprog`. Flow LP duality is exercised in `flow.py` tests (A06).
+
+## Cards
+
+```card id=qc-alg8-dual
+Write the dual of $\max c^\top x$, $Ax\le b$, $x\ge0$.
+---
+$\min b^\top y$, $A^\top y\ge c$, $y\ge0$.
+One dual variable per primal constraint; the dual of the dual is the primal.
+```
+
+```card id=qc-alg8-weak-duality
+Prove weak duality for $\max c^\top x$, $Ax\le b$, $x\ge0$.
+---
+$c^\top x\le(A^\top y)^\top x=y^\top Ax\le y^\top b$.
+Uses $A^\top y\ge c, x\ge0$, then $Ax\le b, y\ge0$.
+```
+
+```card id=qc-alg8-strong-duality
+Strong duality: what are the possible outcomes for a primal-dual pair?
+---
+Both optimal with equal values; one unbounded and the other infeasible; or both infeasible.
+```
+
+```card id=qc-alg8-comp-slack
+State complementary slackness.
+---
+Feasible $x,y$ are both optimal iff $y_i(b_i-a_i^\top x)=0$ for all $i$ and $x_j((A^\top y)_j-c_j)=0$ for all $j$.
+```
+
+```card id=qc-alg8-bfs
+What is a basic feasible solution and why does simplex only visit them?
+---
+A vertex: feasible point with $n$ linearly independent tight constraints.
+If an LP has an optimum, it has one at a vertex.
+```
+
+```card id=qc-alg8-simplex-complexity
+True or false: simplex shows LP is in P.
+---
+False. Klee-Minty cubes force exponentially many pivots.
+LP is in P via ellipsoid (Khachiyan) or interior point (Karmarkar).
+```
+
+```card id=qc-alg8-bland
+What problem does Bland's rule solve in simplex, and how?
+---
+Cycling under degeneracy.
+Enter the lowest-index eligible variable, leave the lowest-index tied one.
+```
+
+```card id=qc-alg8-ilp-hard
+How does 3-SAT reduce to 0/1-ILP?
+---
+Variables $x_i\in\{0,1\}$; clause $(x_1\vee\bar x_2\vee x_3)$ becomes $x_1+(1-x_2)+x_3\ge1$. Feasibility = satisfiability.
+```
+
+```card id=qc-alg8-gap-kn
+Compute the vertex cover LP and ILP values on $K_n$, and the resulting gap.
+---
+LP $n/2$ (all $\frac12$), ILP $n-1$.
+Gap $2(n-1)/n\to2$.
+```
+
+```card id=qc-alg8-tu
+Define total unimodularity and state Hoffman-Kruskal.
+---
+Every square submatrix has determinant in $\{-1,0,1\}$.
+If $A$ is TU and $b$ integral, every vertex of $\{Ax\le b,x\ge0\}$ is integral (Cramer's rule).
+```
+
+```card id=qc-alg8-tu-examples
+Name TU matrices from the note and one non-example.
+---
+Bipartite incidence matrices, directed graph incidence matrices, interval matrices.
+Non-example: odd cycle incidence matrix (determinant $\pm2$).
+```
+
+```card id=qc-alg8-branch-bound
+Branch and bound (maximisation): when is a node pruned, and why is that valid?
+---
+If infeasible or its LP value $\le$ the incumbent.
+The node's LP value bounds every integer point in its subtree.
+```
+

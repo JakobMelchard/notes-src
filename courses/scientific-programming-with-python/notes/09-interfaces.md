@@ -114,3 +114,77 @@ Julia is a JIT-compiled (LLVM) dynamic language with C-like speed for typed nume
 5. When is dropping from numpy to C most likely to pay off?
    (a) for `A @ B` with large dense matrices (b) for a loop with a sequential dependency `x[i] = f(x[i-1])` that numpy cannot vectorise (c) for reading a CSV file (d) for a program dominated by network I/O
    **b.** Matrix products already run in BLAS; I/O-bound code gains nothing.
+
+## Cards
+
+```card id=spp-09-when-c
+When does dropping from numpy to compiled code pay off?
+---
+Sequential dependencies or irregular control flow numpy cannot express, prohibitive temporaries, an existing library, or a profiled hot loop. Not for BLAS- or I/O-dominated code.
+```
+
+```card id=spp-09-c-abi
+Why does every FFI target C rather than C++?
+---
+C has a stable, simple ABI: primitive arguments, pointers to contiguous memory, no name mangling. C++ mangles names, so it needs `extern "C"` wrappers or a binding generator.
+```
+
+```card id=spp-09-restype
+Without setting `restype`, what does a ctypes call to a C function returning `double` give?
+---
+Garbage: the default return type is C `int`.
+```
+
+```card id=spp-09-argtypes
+What goes wrong if you omit `argtypes` in ctypes?
+---
+Python floats are passed as ints.
+```
+
+```card id=spp-09-ndpointer
+What does `numpy.ctypeslib.ndpointer(np.float64, ndim=1, flags="C_CONTIGUOUS")` do as an argtype?
+---
+Validates dtype, ndim and contiguity and passes the raw data pointer. A wrong array raises `ArgumentError` instead of corrupting memory.
+```
+
+```card id=spp-09-inplace-copy
+Why is `np.ascontiguousarray` risky before an in-place C function like `vec_axpy`?
+---
+It copies when needed; the C function then modifies the copy, so the in-place result is lost from the caller's array.
+```
+
+```card id=spp-09-ctypes-overhead
+About how much overhead does each ctypes call have, and what follows?
+---
+About 1 µs for argument conversion, so call C on whole arrays, not per element.
+```
+
+```card id=spp-09-cffi-modes
+What does cffi API mode offer over ABI mode?
+---
+It compiles a small C extension against the real header, so types are checked by the C compiler and calls are faster.
+```
+
+```card id=spp-09-subprocess
+Why pass `subprocess.run` a list rather than a shell string?
+---
+`shell=True` invites injection and quoting bugs.
+```
+
+```card id=spp-09-f2py
+What layout does Fortran expect via f2py, and what do `intent(out)` arguments become?
+---
+Column-major: pass `np.asfortranarray(A)` or transposed views. `intent(out)` arguments become return values.
+```
+
+```card id=spp-09-julia
+A C-contiguous `(3, 4)` numpy array passed to Julia via juliacall appears how?
+---
+As a 4x3 matrix (transposed view), shared without copying, because Julia is column-major.
+```
+
+```card id=spp-09-choose
+When choose ctypes/cffi, Cython/numba, or pybind11?
+---
+ctypes/cffi: call an existing C library quickly. Cython/numba: speed up your own Python loops. pybind11: C++ code and classes.
+```

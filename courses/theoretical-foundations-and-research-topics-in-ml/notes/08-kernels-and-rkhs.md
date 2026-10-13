@@ -252,3 +252,86 @@ Hence $\phi(x)=(\sqrt{\lambda_j}\psi_j(x))_j\in\ell_2$ is a feature map and $\|f
 - D. Haussler, "Convolution kernels on discrete structures", UCSC tech. report 1999; T. Gärtner, P. Flach, S. Wrobel, "On graph kernels: hardness results and efficient alternatives", COLT 2003; C. Leslie, E. Eskin, W. Noble, "The spectrum kernel", PSB 2002.
 - C. A. Micchelli, "Interpolation of scattered data: distance matrices and conditionally positive definite functions", *Constr. Approx.* 2 (1986).
 - I. Steinwart, A. Christmann, *Support Vector Machines* (2008), Ch. 4 (RKHS theory in full generality).
+
+## Cards
+
+```card id=tfml-08-psd-kernel
+Define a positive-definite (PSD) kernel.
+---
+$k$ symmetric and every Gram matrix PSD: $\sum_{i,j}c_ic_jk(x_i,x_j)\ge0$ for all $n$, $x_i$, $c\in\mathbb R^n$.
+Strictly PD: $c^\top Kc>0$ for $c\ne0$ and distinct $x_i$.
+```
+
+```card id=tfml-08-feature-map-equivalence
+Why is $k(x,x')=\langle\phi(x),\phi(x')\rangle$ always PSD, and what is the converse?
+---
+$\sum_{ij}c_ic_jk(x_i,x_j)=\|\sum_ic_i\phi(x_i)\|^2\ge0$; symmetry from the inner product.
+Converse: every PSD $k$ has a feature map, $\phi(x)=k(x,\cdot)$ in the RKHS.
+```
+
+```card id=tfml-08-rkhs-def
+Define an RKHS and the reproducing property.
+---
+Hilbert space of functions where every evaluation $f\mapsto f(x)$ is bounded. Riesz gives $k_x$ with $f(x)=\langle f,k_x\rangle$.
+Reproducing property: $\langle f,k(x,\cdot)\rangle=f(x)$; then $|f(x)|\le\|f\|\sqrt{k(x,x)}$.
+```
+
+```card id=tfml-08-rkhs-construction
+RKHS construction: where are PSD-ness and Cauchy–Schwarz used?
+---
+On $\mathrm{span}\{k(x,\cdot)\}$ set $\langle f,g\rangle=\sum\alpha_i\beta_jk(x_i,x'_j)$; PSD gives $\langle f,f\rangle=\alpha^\top K\alpha\ge0$.
+Cauchy–Schwarz: $|f(x)|^2\le\langle f,f\rangle k(x,x)$, so $\langle f,f\rangle=0\Rightarrow f=0$. Then complete.
+```
+
+```card id=tfml-08-moore-aronszajn
+State Moore–Aronszajn.
+---
+Every PSD kernel $k$ has a unique RKHS $\mathcal H_k$ with reproducing kernel $k$; conversely every RKHS has a unique reproducing kernel, and it is PSD.
+```
+
+```card id=tfml-08-closure
+Which operations preserve PSD kernels?
+---
+Sums, nonnegative scaling, products (Schur), $f(x)f(x')$, pointwise limits, $k(\psi(x),\psi(x'))$, nonnegative-coefficient polynomials and $\exp$, normalisation.
+Not general $\psi(k)$: $\sqrt k$, $\log(1+k)$ fail.
+```
+
+```card id=tfml-08-gaussian-psd
+Why is the Gaussian RBF kernel PSD?
+---
+$e^{-\gamma\|x-x'\|^2}=e^{-\gamma\|x\|^2}e^{2\gamma\langle x,x'\rangle}e^{-\gamma\|x'\|^2}$. Middle: $\exp$ of a PSD kernel; outer: $f(x)f(x')$; product PSD.
+Infinite-dimensional feature map; strictly PD.
+```
+
+```card id=tfml-08-sigmoid-trap
+True or false: the sigmoid kernel $\tanh(a\langle x,x'\rangle+b)$ is PSD.
+---
+False in general. At $x=0$, $\tanh(-1)<0$, but $k(x,x)=\|\phi(x)\|^2\ge0$ for any PSD kernel. Also $\exp(-\gamma\|x-x'\|^p)$ is PSD only for $0<p\le2$.
+```
+
+```card id=tfml-08-representer
+State the representer theorem with its exact condition.
+---
+For $\min_{f\in\mathcal H_k}c((x_i,y_i,f(x_i))_i)+\Omega(\|f\|_{\mathcal H_k})$ with $\Omega$ strictly increasing, every minimiser is $\sum_i\alpha_ik(x_i,\cdot)$.
+$c$ need not be convex. Merely non-decreasing $\Omega$: some minimiser has this form.
+```
+
+```card id=tfml-08-representer-proof
+Proof idea of the representer theorem?
+---
+$f=f_\parallel+f_\perp$ w.r.t. $V=\mathrm{span}\{k(x_i,\cdot)\}$. $f_\perp(x_i)=\langle f_\perp,k(x_i,\cdot)\rangle=0$, so the loss ignores it; Pythagoras: $\|f\|\ge\|f_\parallel\|$, so $\Omega$ strictly penalises $f_\perp\ne0$.
+```
+
+```card id=tfml-08-mercer
+State Mercer's theorem and its feature map.
+---
+$\mathcal X$ compact, full-support finite measure, $k$ continuous PSD: $k(x,x')=\sum_j\lambda_j\psi_j(x)\psi_j(x')$, uniformly, $\lambda_j\ge0$ summable.
+$\phi(x)=(\sqrt{\lambda_j}\psi_j(x))_j$; $\|f\|^2_{\mathcal H_k}=\sum_ja_j^2/\lambda_j$.
+```
+
+```card id=tfml-08-rkhs-norm-smoothness
+What does the Gaussian RKHS norm penalise? How does $\gamma$ matter?
+---
+$\|f\|^2\propto\int|\hat f(\omega)|^2e^{\|\omega\|^2/(4\gamma)}d\omega$: high frequencies penalised super-exponentially; functions analytic.
+Small $\gamma$ penalises harder (smooth fits). Laplacian: polynomial weight, Sobolev space.
+```

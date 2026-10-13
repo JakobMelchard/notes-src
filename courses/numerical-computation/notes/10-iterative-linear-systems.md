@@ -261,3 +261,88 @@ matrix).
 `src/cpp/cg.cpp`: matrix-free CG on the 2-D Poisson 5-point stencil
 ($63\times63$, $\kappa=1659$), manufactured solution $x(1-x)y(1-y)$, iteration
 count $O(\sqrt\kappa)$.
+
+## Cards
+
+```card id=numc-10-stationary
+Give the $M$ of Richardson, Jacobi and Gauss–Seidel in $x_{k+1}=x_k+M^{-1}(b-Ax_k)$.
+---
+Richardson $M=I$, Jacobi $M=D=\mathrm{diag}(A)$, Gauss–Seidel $M=L+D$ ($L$ strict lower triangle).
+[S4]: easy to implement, do not always converge, slow when they do.
+```
+
+```card id=numc-10-krylov-why
+Why look for an approximation of $A^{-1}b$ in a Krylov space?
+---
+Cayley–Hamilton: $A^{-1}$ is a polynomial of degree $N-1$ in $A$,
+so $A^{-1}b$ lies in the Krylov space of dimension $N$.
+```
+
+```card id=numc-10-cg-vs-gmres
+What do CG and GMRES minimise, over which set, and what do they require of $A$?
+---
+CG: $\|x^\ast-x\|_A$ over $x_0+\mathcal K_\ell$, needs $A$ SPD.
+GMRES: $\|b-Ax\|_2$ over $x_0+\mathcal K_\ell$, needs only $A$ invertible.
+```
+
+```card id=numc-10-a-norm
+When is $(x,y)_A=x^\top Ay$ an inner product?
+---
+Exactly when $A$ is SPD; then $\|x\|_A=\sqrt{(x,x)_A}$ is a norm.
+```
+
+```card id=numc-10-cg-bound
+State the CG convergence estimate and the resulting iteration count.
+---
+$\|x^\ast-x_\ell\|_A\le2\big(\frac{\sqrt\kappa-1}{\sqrt\kappa+1}\big)^\ell\|e_0\|_A$, $\kappa=\lambda_{\max}/\lambda_{\min}$.
+$O(\sqrt\kappa)$ iterations versus $O(\kappa)$ for Jacobi, Gauss–Seidel, steepest descent.
+```
+
+```card id=numc-10-cg-cost
+Cost per CG step and memory?
+---
+One matvec, two inner products, three axpys.
+Four vectors of length $N$: $x_\ell,r_\ell,d_\ell,Ad_\ell$.
+```
+
+```card id=numc-10-cg-finite
+True or false: CG terminates with the exact solution after at most $N$ steps, so it is used as a direct solver.
+---
+In exact arithmetic it terminates in at most $N$ steps, but round-off destroys that.
+It is used as a genuine iterative method.
+```
+
+```card id=numc-10-monotone
+In CG and GMRES, which quantity decreases monotonically?
+---
+CG: only $\|e_\ell\|_A$, not $\|r_\ell\|_2$.
+GMRES: the residual $\|r_\ell\|_2$, by construction.
+```
+
+```card id=numc-10-steepest
+In steepest descent for SPD $Ax=b$, what are direction and optimal step, and why is it slow?
+---
+$d_k=r_k=b-Ax_k$, $\alpha_k=\frac{(r_k,r_k)_2}{(r_k,r_k)_A}$.
+Consecutive directions are orthogonal: zig-zag for ill-conditioned $A$.
+```
+
+```card id=numc-10-arnoldi
+What relation does Arnoldi produce, and what small problem does GMRES then solve?
+---
+$AV_\ell=V_{\ell+1}\bar H_\ell$, $\bar H_\ell$ upper Hessenberg $(\ell+1)\times\ell$.
+Minimise $\|\,\|r_0\|_2e^1-\bar H_\ell y\|_2$, with $x=x_0+V_\ell y$.
+```
+
+```card id=numc-10-givens
+Why does GMRES use Givens rotations for its least-squares problem?
+---
+$\bar H_\ell$ is Hessenberg and grows by one column per step, so one new rotation extends the QR.
+The residual norm comes out of the QR for free.
+```
+
+```card id=numc-10-lucky
+What is a lucky breakdown, and why is restarted GMRES($m$) used?
+---
+$h_{j+1,j}=0$: exact solution already in $\mathcal K_j$, zero residual.
+Restart because storage and work grow with $\ell$.
+```

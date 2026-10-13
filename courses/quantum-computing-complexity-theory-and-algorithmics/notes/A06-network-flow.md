@@ -118,3 +118,87 @@ Network: $s{\to}u\,(20),\ s{\to}v\,(10),\ u{\to}v\,(30),\ u{\to}t\,(10),\ v{\to}
 ## Code
 
 `src/py/algorithmics/flow.py`: `ford_fulkerson(cap, s, t)` (DFS paths, returns flow dict and value), `edmonds_karp(cap, s, t)` (BFS), `capacity_scaling(cap, s, t)`, `min_cut(cap, flow, s)` (reachable set in $G_f$), `bipartite_matching(L, R, edges)` (with Hall violator on failure), `project_selection(profits, prereqs)`. C++ Edmonds–Karp on an adjacency matrix: `src/cpp/edmonds_karp.cpp`.
+
+## Cards
+
+```card id=qc-alg6-cut-capacity
+Define the capacity of a cut $(A,B)$. Do edges from $B$ to $A$ count?
+---
+$c(A,B)=\sum_{e\text{ out of }A}c(e)$. No, only $A\to B$ edges.
+Flow value across a cut subtracts backward flow: $v(f)=f^{\rm out}(A)-f^{\rm in}(A)$.
+```
+
+```card id=qc-alg6-residual
+What edges does the residual graph $G_f$ contain?
+---
+Forward $(u,v)$ with capacity $c(e)-f(e)$ if $f(e)<c(e)$; backward $(v,u)$ with capacity $f(e)$ if $f(e)>0$. At most $2m$ edges.
+```
+
+```card id=qc-alg6-maxflow-mincut
+State the max-flow/min-cut three-way equivalence.
+---
+(1) $f$ is maximum; (2) no augmenting path in $G_f$; (3) some cut has $v(f)=c(A,B)$.
+Hence $\max v(f)=\min c(A,B)$.
+```
+
+```card id=qc-alg6-find-min-cut
+After Ford-Fulkerson terminates, how is a minimum cut obtained and why is it tight?
+---
+$A^*$ = vertices reachable from $s$ in $G_f$ (one BFS).
+Edges out of $A^*$ are saturated, edges into $A^*$ carry 0, so $v(f)=c(A^*,B^*)$.
+```
+
+```card id=qc-alg6-ff-time
+Running time of Ford-Fulkerson with integer capacities. Is it polynomial?
+---
+$O(mC^*)$, $C^*=\sum_{e\text{ out of }s}c(e)$. No, pseudo-polynomial.
+The diamond with middle edge 1 needs $2C$ iterations.
+```
+
+```card id=qc-alg6-irrational
+True or false: Ford-Fulkerson always terminates with a maximum flow.
+---
+False for irrational capacities: it may not terminate and may converge below the maximum. Integrality is a theorem about integer inputs.
+```
+
+```card id=qc-alg6-scaling-ek
+Bounds for capacity scaling and Edmonds-Karp. Which is strongly polynomial?
+---
+Capacity scaling $O(m^2\log C)$; Edmonds-Karp (BFS shortest paths) $O(nm^2)$.
+Edmonds-Karp is strongly polynomial (no dependence on $C$).
+```
+
+```card id=qc-alg6-ek-critical
+Edmonds-Karp proof: how often can an edge be critical?
+---
+Between critical occurrences $d(u)$ grows by 2 and distances are $<n$, so $O(n)$ times per edge.
+$2m$ edges give $O(nm)$ augmentations of $O(m)$ each.
+```
+
+```card id=qc-alg6-bipartite
+Reduce bipartite matching to max flow. Running time?
+---
+$s\to$ every $\ell\in L$, $L\to R$ edges, every $r\to t$, all capacity 1; integral max flow = max matching.
+FF with $C^*\le n$: $O(mn)$.
+```
+
+```card id=qc-alg6-hall-konig
+State Hall's and König's theorems.
+---
+Hall: perfect matching iff $|N(S)|\ge|S|$ for all $S\subseteq L$.
+König: in bipartite graphs, max matching = min vertex cover.
+```
+
+```card id=qc-alg6-project-selection
+Project selection network: capacities and why prerequisite edges get $\infty$.
+---
+$s\to i$ cap $p_i$ if $p_i>0$; $i\to t$ cap $-p_i$ if $p_i<0$; prerequisites $\infty$.
+Finite cut iff the set is closed; min cut $=P-\sum_{i\in A}p_i$.
+```
+
+```card id=qc-alg6-circulation
+When is a circulation with demands $d(v)$ feasible?
+---
+$\sum_v d(v)=0$ and the max flow with super-source/sink saturates all source edges (value $D=\sum_{d(v)>0}d(v)$).
+Lower bounds: push $\ell(e)$ first, adjust demands and capacities.
+```

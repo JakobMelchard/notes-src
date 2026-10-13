@@ -98,3 +98,87 @@ Estimate what blocked matmul at n = 1024 should achieve. Working set $3 \cdot 8 
 5. **When may `-ffast-math` change results, and when is it harmless?** It permits reassociation ($ (a+b)+c \to a+(b+c) $), reciprocal approximations, and assumes no NaN/inf. Harmless for a dot product with well-scaled data (error still $O(n \epsilon)$); dangerous for compensated summation, for code testing `x != x`, and for reproducibility across compilers.
 
 Code: `src/cpp/matmul_opt.cpp` (`matmul_naive`, `matmul_ikj`, `matmul_transposed`, `matmul_blocked`), `src/cpp/cache_bench.cpp` (`sum_ij` vs `sum_ji`). Sources: [S8] [S16] [S18] [S31] [S34] [S35] [S37].
+
+## Cards
+
+```card id=nssc-02-order
+In what order of importance should serial code be optimised?
+---
+Algorithm, then memory access pattern, then compiler flags, then micro-optimisation.
+```
+
+```card id=nssc-02-ikj
+Why is `ikj` faster than `ijk` for row-major matmul, though both do $2n^3$ flops?
+---
+`ijk` inner loop reads `b[k][j]` with stride n: one line per element, no SIMD.
+`ikj` reads `b[k][j]` and `c[i][j]` contiguously, a vectorisable axpy.
+```
+
+```card id=nssc-02-transposed
+Why is the transposed-$B$ variant slower than `ikj` despite contiguous access?
+---
+Its inner loop is a dot-product reduction, not vectorised without `-ffast-math`.
+`ikj` is an axpy with no loop-carried dependency.
+```
+
+```card id=nssc-02-block-size
+How do you choose the tile size $b$ for blocked matmul?
+---
+Three tiles must fit in cache: $3 \cdot 8 b^2 \le$ cache size.
+128 KB L1 gives $b \approx 70$; 64 is common.
+```
+
+```card id=nssc-02-blocking-ai
+What does blocking change in the roofline picture?
+---
+Raises arithmetic intensity from $O(1)$ to $O(b)$ by reusing each tile $b$ times.
+Moves the kernel from the bandwidth slope to the compute roof.
+```
+
+```card id=nssc-02-blas
+What are the two levels of blocking a real BLAS uses?
+---
+Outer: copy (pack) a block of $A$ sized for L2 into contiguous scratch.
+Inner: register micro-kernel computing a small tile of $C$ in registers.
+```
+
+```card id=nssc-02-aliasing
+What is pointer aliasing, and name two remedies.
+---
+Two pointers may overlap, so the compiler serialises or adds runtime checks.
+Remedies: `__restrict`, distinct container objects, `#pragma omp simd`.
+```
+
+```card id=nssc-02-fastmath
+When is `-ffast-math` dangerous?
+---
+It allows reassociation, reciprocal approximations, assumes no NaN/inf.
+Dangerous for Kahan summation, NaN checks like `x != x`, reproducibility.
+```
+
+```card id=nssc-02-inline
+True or false: C++ `inline` commands the compiler to inline a function.
+---
+False. It concerns the one-definition rule.
+Virtual calls and function pointers in inner loops block inlining; template lambdas do not.
+```
+
+```card id=nssc-02-branch
+What does a branch misprediction cost, and name two remedies?
+---
+About 15-20 cycles on a typical modern core.
+Branchless code, lookup tables, sorting, loop unswitching, `[[likely]]`.
+```
+
+```card id=nssc-02-clock
+Why is `clock()` a pitfall for timing?
+---
+It measures CPU time summed over threads, not wall time.
+```
+
+```card id=nssc-02-nested-vector
+Why avoid `std::vector<std::vector<double>>` for a matrix?
+---
+Each row is a separate heap allocation, rows not contiguous, blocking cannot work.
+Use one flat vector indexed `i*n + j`.
+```
