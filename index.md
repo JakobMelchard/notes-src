@@ -2,7 +2,7 @@
 title: TU Wien study wiki
 ---
 
-A study wiki for TU Wien master courses, built from public sources only: per course, notes, a source register, a transcription of the public TISS page and tested reference code. Anyone can correct or extend it through a pull request; see [CONTRIBUTING](https://github.com/JakobMelchard/tu/blob/main/CONTRIBUTING.md) on GitHub. Prose is CC BY-SA 4.0 and code is MIT, with the exceptions listed in [LICENSE.md](https://github.com/JakobMelchard/tu/blob/main/LICENSE.md).
+A study wiki for TU Wien master courses, built from public sources only: per course, notes, a source register, a transcription of the public TISS page and tested reference code. Anyone can correct or extend it through a pull request; see [CONTRIBUTING](https://github.com/JakobMelchard/notes/blob/main/CONTRIBUTING.md) on GitHub. Prose is CC BY-SA 4.0 and code is MIT, with the exceptions listed in [LICENSE.md](https://github.com/JakobMelchard/notes/blob/main/LICENSE.md).
 
 ## Computational Science and Engineering
 
