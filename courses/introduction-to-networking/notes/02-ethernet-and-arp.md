@@ -220,5 +220,74 @@ Announces a new MAC (failover, VRRP) and detects duplicates (a reply means the a
 ```card id=net-02-csma-ca
 Why does Wi-Fi use CSMA/CA with ACKs instead of CSMA/CD?
 ---
-Collisions cannot be detected while transmitting on the shared radio medium.
+Collision detection is hard on wireless LANs: the local transmission overwhelms the weaker received signal.
+So senders avoid collisions and confirm each frame with an ACK.
+```
+
+```card id=net-02-link-services
+Is Ethernet reliable, and how does its MAC protocol work?
+---
+No. The receiving NIC sends no ACK or NACK, and there is no handshake; dropped frames are recovered only by a reliable higher layer such as TCP.
+The MAC protocol is unslotted CSMA/CD with binary exponential backoff.
+```
+
+```card id=net-02-nic-accept
+Which frames does a NIC pass up to the network layer?
+---
+Frames with its own unicast MAC, the broadcast address, or a matching multicast address (for example NDP traffic).
+Any other frame is discarded.
+```
+
+```card id=net-02-frame-fields
+Name the fields of an Ethernet II frame in order.
+---
+Preamble and start delimiter, destination MAC (6 bytes), source MAC (6 bytes), EtherType, payload, CRC.
+The optional 802.1Q tag sits between the source MAC and the type field.
+```
+
+```card id=net-02-hub-switch
+How does a hub differ from a switch?
+---
+A hub is a physical-layer repeater: it copies bits to all other ports and does not isolate collision domains.
+A switch is a link-layer device: it stores frames, forwards them by destination MAC, and gives each port its own collision domain, so full duplex is possible.
+```
+
+```card id=net-02-mac-families
+Name the three families of MAC protocols and one example of each.
+---
+Channel partitioning (TDMA, FDMA), random access (ALOHA, CSMA, CSMA/CD, CSMA/CA), and taking turns (polling, token passing).
+```
+
+```card id=net-02-aloha
+What is the maximum efficiency of slotted ALOHA, and how does pure ALOHA compare?
+---
+About 1/e, roughly 37 percent of slots carry a successful frame with many busy nodes.
+Pure (unslotted) ALOHA reaches about 18 percent, half of the slotted value.
+```
+
+```card id=net-02-backoff
+After the m-th collision, how long does a CSMA/CD NIC wait before retrying?
+---
+It picks K at random from 0 to 2^m minus 1 and waits K times 512 bit times, then senses the channel again.
+```
+
+```card id=net-02-crc
+What can a CRC detect, and what does a non-zero remainder mean?
+---
+A CRC with r check bits detects all burst errors of up to r bits.
+The receiver divides the received bits by the generator; a non-zero remainder means an error was detected.
+```
+
+```card id=net-02-parity
+What can single-bit parity and two-dimensional parity do?
+---
+Single-bit parity detects a single bit error.
+Two-dimensional parity detects and corrects a single bit error.
+```
+
+```card id=net-02-arp-table
+What does an ARP table hold and how do its entries expire?
+---
+IP address, MAC address and a TTL for each neighbour; the lecture gives about 20 minutes as typical.
+Entries are soft state: they time out unless refreshed.
 ```

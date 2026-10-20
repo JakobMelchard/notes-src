@@ -77,6 +77,15 @@ $\Phi$ is false. The recursion visited 2 (for $x$) $\times$ 2 ($y$) $\times$ 2 (
 5. *Which of $\mathrm{NL} \subseteq \mathrm P$, $\mathrm P \subseteq \mathrm{NP}$, $\mathrm{NP} \subseteq \mathrm{PSPACE}$ are known to be strict? What is known?* None individually; $\mathrm{NL} \ne \mathrm{PSPACE}$ (Savitch plus space hierarchy) shows at least one is strict.
 6. *Why is $\mathrm{PH} \subseteq \mathrm{PSPACE}$, and what would $\mathrm{PH} = \mathrm{PSPACE}$ imply?* Each $\Sigma_k^p$ statement is a bounded-alternation QBF; equality would put TQBF in some $\Sigma_k^p$, and since every $\Sigma_j^p$ problem reduces to TQBF, PH would collapse to level $k$.
 
+## 2026W lectures: chapter 1 (28.10) and chapter 3 (30.10) [S62]
+
+The decks cover this note's classes, but not Savitch, NPSPACE, the hierarchy theorems (only their consequence $\mathrm P \subsetneq \mathrm{EXPTIME}$, attributed to a diagonalisation) or the polynomial hierarchy. In our words:
+
+- **The chain.** $\mathrm L \subseteq \mathrm{NL} \subseteq \mathrm P \subseteq \mathrm{NP} \subseteq \mathrm{PSPACE} \subseteq \mathrm{EXPTIME} \subseteq \mathrm{NEXPTIME} \subseteq \mathrm{EXPSPACE}$. Deterministic is a special case of nondeterministic; $\mathrm{NTIME}(f) \subseteq \mathrm{SPACE}(f)$ (explore the branches one after another, reusing space) gives NP $\subseteq$ PSPACE and NEXPTIME $\subseteq$ EXPSPACE; NL $\subseteq$ P and PSPACE $\subseteq$ EXPTIME come from counting configurations. No single inclusion is known to be strict, but two classes an exponential apart differ: L $\ne$ PSPACE, P $\ne$ EXPTIME, NP $\ne$ NEXPTIME.
+- **QSAT** is the lectures' name for TQBF, stated for a CNF matrix with strictly alternating quantifiers $\exists x_1 \forall x_2 \exists x_3 \cdots$. It is PSPACE-complete (hardness stated, not proved). Membership: nested loops, one per variable, written as two mutually recursive procedures for $\exists$ and $\forall$ levels that pass truth values outward. Space: $O(n)$ bits for the current assignment, a call stack of at most $2n$ frames that each store an index ($O(n \log n)$ bits), and linear space to evaluate the matrix.
+- **Intuition.** PSPACE is the class of nested loops over an exponential search space and of unbounded alternation; QSAT is a game in which $\exists$ and $\forall$ fix variables in turn. A strategy game is in PSPACE when the number of moves is polynomially bounded; then the game tree is searched depth first, never stored.
+- **EXPTIME** examples: winning strategies for Go on $n \times n$ boards (no polynomial bound on the length of a play) and evaluating Datalog queries. Above it: 2-EXPTIME, EXPSPACE, 2-EXPSPACE and so on. NP-complete problems are believed intractable; EXPTIME-complete ones are provably intractable, because P $\ne$ EXPTIME.
+
 ## Code
 
 `src/py/complexity/reachability.py`: `savitch_reach(g, u, v, k, trace)` implements the REACH recursion on an explicit graph (the configuration graph of a machine would be generated on the fly); `test_savitch_recursion_depth_is_log` checks that a path of length 15 needs $k = 4$ levels and that $k = 3$ fails. The recursive TQBF evaluator is the same pattern as `decision_tree_depth` in `query_complexity.py` (B06): minimax over a tree, storing only the current path.
@@ -113,8 +122,8 @@ Space can be reused by re-exploring; time cannot.
 ```card id=qc-cx2-tqbf-membership
 Why is TQBF in PSPACE?
 ---
-Recursive evaluation tries $x_1=0$ then $1$, OR for $\exists$, AND for $\forall$, reusing space.
-$O(n+|\varphi|)$ space, $2^n$ time.
+Recursive evaluation (nested loops, one per variable) tries $x_1=0$ then $1$, OR for $\exists$, AND for $\forall$, reusing space.
+Polynomial space, $2^n$ time. The lectures (as QSAT) count $O(n)$ for the assignment, $O(n\log n)$ for the call stack of indices, linear space to evaluate the matrix.
 ```
 
 ```card id=qc-cx2-tqbf-hardness
@@ -162,4 +171,38 @@ Which games are PSPACE-complete and which EXPTIME-complete?
 ---
 PSPACE: generalised Geography, Hex, Go with polynomial move bound, Reversi.
 EXPTIME: exponentially long plays, e.g. generalised chess, Go with ko.
+```
+
+```card id=qc-cx2-chain-2026
+State the inclusion chain from L to EXPSPACE and which separations are known.
+---
+L $\subseteq$ NL $\subseteq$ P $\subseteq$ NP $\subseteq$ PSPACE $\subseteq$ EXPTIME $\subseteq$ NEXPTIME $\subseteq$ EXPSPACE.
+No single step is known strict; classes an exponential apart differ: L $\ne$ PSPACE, P $\ne$ EXPTIME, NP $\ne$ NEXPTIME.
+```
+
+```card id=qc-cx2-np-pspace
+Why is NP $\subseteq$ PSPACE?
+---
+$\mathrm{NTIME}(f)\subseteq\mathrm{SPACE}(f)$: enumerate the candidate certificates (or branches) one after another, reusing the same space for each check.
+```
+
+```card id=qc-cx2-qsat
+Define QSAT and state its complexity.
+---
+Given a CNF $\psi$, is $\exists x_1\forall x_2\exists x_3\cdots Qx_n\,\psi$ true (a QBF with strict alternation)?
+PSPACE-complete.
+```
+
+```card id=qc-cx2-strategy-games
+When is a two-player strategy game in PSPACE, and why is generalised Go only placed in EXPTIME?
+---
+When plays have polynomially bounded length: search the game tree depth first with polynomially deep nested loops.
+Go on $n\times n$ boards has no polynomial bound on the length of a play.
+```
+
+```card id=qc-cx2-intractable
+Intractable versus provably intractable: which complete problems are which?
+---
+NP-complete: no efficient algorithm known or expected, but not excluded.
+EXPTIME-complete: no polynomial algorithm, provably, since P $\ne$ EXPTIME.
 ```

@@ -2,6 +2,8 @@
 
 Dynamic programming (DP) solves a problem by solving a carefully chosen family of *subproblems* whose answers determine each other by a recurrence, and by storing each answer once so that overlapping subproblems are not recomputed. Where divide and conquer splits into a few independent parts, DP typically has polynomially many subproblems that overlap heavily; the recurrence is the entire algorithm, and correctness is the correctness of the recurrence. This note builds the pattern on weighted interval scheduling, then covers subset sum / knapsack (and what "pseudo-polynomial" means), the two classical shortest-path DPs Bellman–Ford and Floyd–Warshall, and sequence alignment (edit distance, LCS) with Hirschberg's space trick. Reference: KT chapter 6 (6.1 to 6.4 weighted intervals, segmented least squares, knapsack; 6.6 to 6.7 alignment; 6.8 to 6.10 Bellman–Ford and negative cycles); Floyd–Warshall is CLRS 25.2. References: Kleinberg & Tardos ch. 6 [S25]. Exam 1 material.
 
+**2026W scope (chapter 5, 2026W).** Taught: weighted interval scheduling (with solution recovery), knapsack (with the partition special case and restricted cases), sequence alignment and Hirschberg's linear-space idea, Bellman–Ford, negative-cycle detection and currency arbitrage. The lecture writes knapsack with sizes $s_i$ and capacity $S$ (here $w_i$, $W$), and runs Bellman–Ford towards a destination $t$: $\mathrm{OPT}(i, v)$ is the shortest $v$–$t$ path with at most $i$ arcs. Segmented least squares, Floyd–Warshall and LCS are not in the 2026W slides; they stay below as background only and have no cards.
+
 ## Definitions
 
 **Optimal substructure.** An optimal solution to the problem contains optimal solutions to its subproblems (so an optimum can be built from optima of smaller instances). This is what makes a recurrence over optimal *values* valid.
@@ -38,6 +40,8 @@ Subset sum is the case $v_i = w_i$. Table of $(n+1)(W+1)$ entries, $O(1)$ each: 
 
 **Why $O(nW)$ is not polynomial.** The input is $n$ numbers of $b$ bits each plus $W$ with $b$ bits: size $\Theta(nb)$. $W$ can be $2^b$, so $nW = n 2^b$ is exponential in the input size. The algorithm is *pseudo-polynomial*: polynomial in $n$ and the magnitude $W$. If weights are bounded by a polynomial in $n$ ("small numbers") it is polynomial. Knapsack and subset sum are NP-complete (B02), so no algorithm polynomial in $n$ and $\log W$ is expected; the DP is however the basis of the FPTAS in A07 (scale values down so that the table is small).
 
+*Special and restricted cases.* Integer partition of $a_1..a_n$ is knapsack with $w_i = v_i = a_i$ and $W = \frac12 \sum a_i$: a fair split exists iff the optimum value is exactly $W$. So knapsack is NP-hard already when every item has the same value-to-weight ratio. If all items have the same weight (or the same value), sorting and taking the best items greedily is optimal. Greedy by value-to-weight ratio fails in general (example below). The naive state "best value from items $1..i$" is a false start: taking item $i$ depends on how much room the earlier choices left, so the remaining capacity must be a second parameter.
+
 ### Bellman–Ford (KT 6.8)
 
 Single source $s$ (KT does single *destination*; symmetric), no negative cycles. Subproblem: $\mathrm{OPT}(i, v)$ = length of a shortest $s$–$v$ path using **at most $i$ edges**. The last edge is the choice:
@@ -45,6 +49,10 @@ $$\mathrm{OPT}(i, v) = \min\Big(\mathrm{OPT}(i-1, v),\ \min_{(u, v) \in E} \math
 Without negative cycles shortest paths are simple, so $d(s, v) = \mathrm{OPT}(n-1, v)$. Each round $i$ scans all edges: $O(m)$; $n - 1$ rounds: **$O(nm)$**, space $O(n)$ with a single array $d[\cdot]$ updated in place ("relax every edge" $n-1$ times; in-place updates only help, since any value written is the length of some real path and the round-$i$ invariant $d[v] \le \mathrm{OPT}(i,v)$ still holds). Early stop when a round changes nothing.
 
 **Negative cycle detection.** Run a $n$-th round. If any $d[v]$ still decreases, a negative cycle is reachable from $s$: with no negative cycle all values are final after $n-1$ rounds. Conversely, if a negative cycle $C$ is reachable, the values on $C$ never stabilise: summing the would-be-stable inequalities $d[v] \le d[u] + \ell(u,v)$ around $C$ gives $0 \le \ell(C) < 0$. To find the cycle, follow parent pointers back from a vertex updated in round $n$; within $n$ steps a vertex repeats. Detecting a negative cycle anywhere: add a super-source with 0-length edges to all vertices.
+
+*Lecture variant.* Add a fresh target $\tau$ with a 0-cost arc from every vertex, run the destination form towards $\tau$, and compare $\mathrm{OPT}(n, v)$ with $\mathrm{OPT}(n-1, v)$. Without a negative cycle they agree for all $v$ (a path with $\ge n$ arcs repeats a vertex, and cutting out a non-negative cycle does not raise the cost). With a negative cycle some value still drops in round $n$ (otherwise the stable inequalities summed around the cycle give $c(W) \ge 0$); the cycle is read off the shortest $v$–$\tau$ path. $O(mn)$ total. *Arbitrage:* with exchange rates $r_e$, set $c_e = -\log r_e$; a cycle whose rate product exceeds 1 is exactly a negative cycle.
+
+*Why not Dijkstra or a shift.* Dijkstra can settle a vertex too early when a negative arc comes later. Adding the same constant to every arc does not fix this: it favours paths with fewer arcs, so the shortest path can change.
 
 Comparison with Dijkstra: $O(nm)$ vs $O(m \log n)$, but arbitrary signs; also distributed (each vertex updates from its neighbours, the basis of distance-vector routing).
 
@@ -60,7 +68,7 @@ $\mathrm{OPT}(i, j)$ = minimum alignment cost of prefixes $x_1..x_i$ and $y_1..y
 $$\mathrm{OPT}(i, j) = \min\big(\alpha_{x_i y_j} + \mathrm{OPT}(i-1, j-1),\ \delta + \mathrm{OPT}(i-1, j),\ \delta + \mathrm{OPT}(i, j-1)\big),\quad \mathrm{OPT}(i, 0) = i\delta,\ \mathrm{OPT}(0, j) = j\delta.$$
 $O(mn)$ time and space. The table is a grid graph with diagonal edges of cost $\alpha$ and axis edges of cost $\delta$; the alignment cost is the shortest path from $(0,0)$ to $(m,n)$, which is why Dijkstra-style reasoning and the following trick work.
 
-**Hirschberg's $O(m + n)$ space.** The *value* $\mathrm{OPT}(m,n)$ needs only two rows: $O(\min(m,n))$ space. To recover the alignment, note any shortest $(0,0) \to (m,n)$ path passes through some vertex $(m/2, q)$ in the middle column. Compute forward costs $f(m/2, j)$ (from $(0,0)$) and backward costs $g(m/2, j)$ (to $(m,n)$, the same DP run on reversed strings) in $O(mn)$ time and $O(n)$ space; pick $q$ minimising $f + g$; recurse on the two halves $(0,0)\to(m/2, q)$ and $(m/2, q) \to (m, n)$. Time $T(m, n) = O(mn) + T(m/2, q) + T(m/2, n - q) = O(mn)$ (each level halves $m$, total grid area halves each level, geometric sum). Space $O(m + n)$.
+**Hirschberg's $O(m + n)$ space.** (The lecture states the theorem with a proof idea only: split $Y$ in the middle, find by the forward and backward passes the index $i$ at which $X$ is split, recurse. Below the roles of $X$ and $Y$ are swapped, which is symmetric.) The *value* $\mathrm{OPT}(m,n)$ needs only two rows: $O(\min(m,n))$ space. To recover the alignment, note any shortest $(0,0) \to (m,n)$ path passes through some vertex $(m/2, q)$ in the middle column. Compute forward costs $f(m/2, j)$ (from $(0,0)$) and backward costs $g(m/2, j)$ (to $(m,n)$, the same DP run on reversed strings) in $O(mn)$ time and $O(n)$ space; pick $q$ minimising $f + g$; recurse on the two halves $(0,0)\to(m/2, q)$ and $(m/2, q) \to (m, n)$. Time $T(m, n) = O(mn) + T(m/2, q) + T(m/2, n - q) = O(mn)$ (each level halves $m$, total grid area halves each level, geometric sum). Space $O(m + n)$.
 
 **LCS.** $L(i,j) = L(i-1,j-1) + 1$ if $x_i = y_j$, else $\max(L(i-1,j), L(i,j-1))$. **Edit distance** is the alignment recurrence with unit costs.
 
@@ -147,49 +155,103 @@ $p(j)$: largest $i<j$ with $f_i\le s_j$, else 0 (intervals sorted by finish).
 Why is naive recursion for weighted intervals exponential but memoisation $O(n)$ after sorting?
 ---
 Naive: two branches per level, Fibonacci-like ($p(j)=j-2$).
-Memoised: only $n+1$ distinct subproblems, each $O(1)$.
+Memoised: only $n+1$ distinct subproblems, each $O(1)$. Total $O(n\log n)$ with sorting and computing $p$ by binary search.
+```
+
+```card id=qc-alg5-wis-greedy
+Why does earliest-finish-first greedy fail for weighted interval scheduling?
+---
+It ignores weights: a light short job finishing first can block one heavy overlapping job.
+It is only optimal when all weights are equal.
+```
+
+```card id=qc-alg5-wis-recovery
+The DP table $T$ for weighted intervals holds only values. How is an optimal job set recovered, and at what cost?
+---
+Walk back from $j=n$: if $v_j+T[p(j)]>T[j-1]$ take $j$ and jump to $p(j)$, else go to $j-1$.
+At most $n$ steps, so $O(n)$ after the table; $O(n\log n)$ overall.
 ```
 
 ```card id=qc-alg5-knapsack
-0/1 knapsack recurrence for $\mathrm{OPT}(i,w)$ when $w_i\le w$, and the running time.
+0/1 knapsack (sizes $s_i$, capacity $S$): recurrence for $\mathrm{OPT}(i,s)$ when $s_i\le s$, and the running time.
 ---
-$\max(\mathrm{OPT}(i-1,w),\ v_i+\mathrm{OPT}(i-1,w-w_i))$; if $w_i>w$ only the first.
-$O(nW)$ time and space; $O(W)$ space iterating $w$ downward.
+$\max(\mathrm{OPT}(i-1,s),\ v_i+\mathrm{OPT}(i-1,s-s_i))$; if $s_i>s$ only the first; $\mathrm{OPT}(0,s)=0$.
+Fill an $n$ by $S$ table: $\Theta(nS)$.
+```
+
+```card id=qc-alg5-knapsack-state
+Why is $\mathrm{OPT}(i)$ = best value from items $1..i$ not enough for knapsack?
+---
+Whether item $i$ fits depends on how much room the earlier picks used, which $\mathrm{OPT}(i)$ forgets.
+Fix: add the remaining capacity as a second parameter, $\mathrm{OPT}(i,s)$.
+```
+
+```card id=qc-alg5-knapsack-greedy
+Does greedy by value-to-size ratio solve knapsack? Give the idea of a counterexample.
+---
+No. Capacity 6, items (size, value) (2,3), (3,4), (4,5): ratio greedy takes the first two for 7, but the first and third give 8.
+```
+
+```card id=qc-alg5-partition
+Show that integer partition is a special case of knapsack.
+---
+Items with $s_i=v_i=a_i$, capacity $S=\frac12\sum a_i$.
+A fair split exists iff the optimal value equals $S$.
+```
+
+```card id=qc-alg5-knapsack-restricted
+Knapsack restricted cases: all sizes equal, and all value-to-size ratios equal. Easy or hard?
+---
+Equal sizes (or equal values): polynomial, sort and take the best.
+Equal ratios: still NP-hard (it contains partition).
 ```
 
 ```card id=qc-alg5-pseudo-poly
 True or false: the $O(nW)$ DP shows knapsack is in P.
 ---
 False. Input size is $\Theta(n\log W)$ bits; $W$ is exponential in that.
-$O(nW)$ is pseudo-polynomial; knapsack is NP-complete.
+$O(nW)$ is pseudo-polynomial; the decision version of knapsack is NP-complete.
 ```
 
 ```card id=qc-alg5-bellman-ford
 Bellman-Ford: meaning of $\mathrm{OPT}(i,v)$, number of rounds, running time.
 ---
-Shortest $s$-$v$ path with at most $i$ edges.
-$n-1$ rounds (shortest paths are simple without negative cycles), each $O(m)$: $O(nm)$.
+Shortest $v$-$t$ path with at most $i$ arcs (destination $t$); $\mathrm{OPT}(i,v)=\min(\mathrm{OPT}(i-1,v),\min_{(v,w)}\mathrm{OPT}(i-1,w)+c_{vw})$.
+$n-1$ rounds (shortest paths are simple without negative cycles), each $O(m)$: $\Theta(mn)$ time, $\Theta(n^2)$ table.
+```
+
+```card id=qc-alg5-bf-one-array
+How does Bellman-Ford get by with $O(n)$ memory, and what invariant keeps it correct?
+---
+Keep one array $M[v]$, update in place, only relax arcs into vertices whose value changed, stop when a round changes nothing.
+$M[v]$ is always the length of some real $v$-$t$ path and after $i$ rounds at most the best with $\le i$ arcs.
+```
+
+```card id=qc-alg5-no-dijkstra
+Shortest paths with negative arc costs: why not Dijkstra, and why not add a constant to every arc?
+---
+Dijkstra may settle a vertex before a later negative arc makes a cheaper route.
+A uniform shift adds the constant once per arc, so it favours paths with few arcs and can change the shortest path.
 ```
 
 ```card id=qc-alg5-negative-cycle
 How does Bellman-Ford detect and find a negative cycle?
 ---
-Run an $n$-th round; if some $d[v]$ still decreases, a negative cycle is reachable.
-Follow parent pointers back from that $v$; within $n$ steps a vertex repeats.
+Add a new target $\tau$ with 0-cost arcs from every vertex; run $n$ rounds towards $\tau$.
+Negative cycle iff $\mathrm{OPT}(n,v)<\mathrm{OPT}(n-1,v)$ for some $v$; extract it from that $v$-$\tau$ path. $O(mn)$.
 ```
 
-```card id=qc-alg5-floyd-warshall
-Floyd-Warshall recurrence, meaning of $k$, and running time.
+```card id=qc-alg5-negcycle-lemmas
+Negative-cycle test: why do values stay fixed after round $n-1$ without a negative cycle, and why does some value drop in round $n$ with one?
 ---
-$D^{(k)}_{ij}=\min(D^{(k-1)}_{ij},D^{(k-1)}_{ik}+D^{(k-1)}_{kj})$; $k$ = largest allowed intermediate vertex.
-$O(n^3)$ time, $O(n^2)$ space; negative cycle iff some $D_{ii}<0$.
+Without: a path with $\ge n$ arcs has a cycle of cost $\ge0$; removing it does not raise the cost.
+With: if no value dropped, $\mathrm{OPT}(n-1,v)\le\mathrm{OPT}(n-1,w)+c_{vw}$ on every cycle arc; summing gives cycle cost $\ge0$, contradiction.
 ```
 
-```card id=qc-alg5-fw-loop-order
-Floyd-Warshall trap: which loop must be outermost, and why is in-place safe?
+```card id=qc-alg5-arbitrage
+How does currency arbitrage become a negative-cycle question?
 ---
-$k$ must be the outer loop.
-In round $k$, $D_{ik}$ and $D_{kj}$ do not change since $D_{kk}=0$.
+Arc cost $-\log(\text{rate})$. A cycle with rate product above 1 has negative cost sum.
 ```
 
 ```card id=qc-alg5-alignment
@@ -202,19 +264,21 @@ $\mathrm{OPT}(i,0)=i\delta$, $\mathrm{OPT}(0,j)=j\delta$; $O(mn)$ time.
 ```card id=qc-alg5-hirschberg
 How does Hirschberg get linear space while keeping $O(mn)$ time?
 ---
-Two-row forward and backward DPs to the middle row; pick $q$ minimising $f+g$; recurse on both halves.
-Area halves per level (geometric sum): $O(mn)$ time, $O(m+n)$ space.
+Value alone: keep only the previous row, $O(m+n)$ space.
+Alignment: split $Y$ in the middle, find the best split index of $X$ with forward and backward two-row passes, recurse on both halves (D&C plus DP). Area halves per level: $O(mn)$ time.
 ```
 
-```card id=qc-alg5-edit-vs-lcs
-Compute: edit distance of kitten and sitting, and their LCS length. Does edit distance equal $m+n-2\,\mathrm{LCS}$?
+```card id=qc-alg5-edit-distance
+Edit distance as an alignment problem: which costs, and what is it for kitten and sitting?
 ---
-Edit distance 3, LCS 4 (ittn). $6+7-8=5\ne3$.
-Equality holds only if substitutions are forbidden (LCS charges a substitution 2).
+Gap cost $\delta=1$, mismatch cost 1 for different letters, 0 for equal ones.
+kitten to sitting: 3 (substitute k and e, insert g).
 ```
 
-```card id=qc-alg5-longest-path
-Why does DP fail for longest simple path in a general graph?
+```card id=qc-alg5-techniques
+Name the three DP techniques of the chapter with their example problems.
 ---
-No optimal substructure: subpaths of a longest simple path need not be longest simple paths. The problem is NP-hard.
+Binary choice: weighted interval scheduling.
+Adding a new variable: knapsack.
+Combining with divide and conquer: sequence alignment (Hirschberg).
 ```

@@ -278,6 +278,18 @@ Syntax of a private-key encryption scheme, and which algorithms may be randomise
 $(\mathsf{Gen},\mathsf{Enc},\mathsf{Dec})$ with $\mathsf{Dec}_k(\mathsf{Enc}_k(m))=m$ (correctness). Gen and Enc may be randomised; only Dec must be deterministic.
 ```
 
+```card id=crypto-l1-pattern
+What three steps does every primitive in the course follow, in order?
+---
+Syntax (the algorithms and which of them are randomised), then correctness (the scheme does its job), then security (what an adversary cannot learn or do).
+```
+
+```card id=crypto-l1-quadrants
+How do the course topics split by secrecy versus integrity and private versus public key?
+---
+Private-key encryption (secrecy) and MACs (integrity) form the top half; public-key encryption and digital signatures the bottom. Block ciphers serve the private-key half, number theory the public-key half, and hash functions both.
+```
+
 ```card id=crypto-l1-enc-deterministic
 True or false: encryption must be deterministic so ciphertexts decrypt uniquely.
 ---
@@ -396,6 +408,12 @@ Find an invariant: a property $P$ of the message that can be read off every ciph
 Method: how do you prove that a ciphertext does NOT determine which of $m_0$, $m_1$ was sent?
 ---
 Show keys $k, k'$ with $\mathsf{Enc}_k(m_0)=\mathsf{Enc}_{k'}(m_1)$: that ciphertext is consistent with both. Strongest form: for every key $k$ give a matching $k'$ (work with variables for the key, then check with numbers).
+```
+
+```card id=crypto-l1-scytale-spec
+Specify the Scytale over $\Sigma^n$: Gen, Enc and Dec.
+---
+Gen: pick the rod size $k\in\{1,\dots,n\}$ uniformly. Enc: write the message row by row into $k$ rows (padding the last row), read it out column by column. Dec: write the ciphertext column by column into the same grid, read it row by row and drop the padding.
 ```
 
 ```card id=crypto-l1-scytale-transpose

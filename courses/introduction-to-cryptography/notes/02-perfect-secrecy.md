@@ -432,6 +432,54 @@ Thm 2.12 (Shannon), both conditions.
 For $|\mathcal M|=|\mathcal K|=|\mathcal C|$: perfectly secret iff every key has probability $1/|\mathcal K|$ AND for every $m,c$ there is a unique $k$ with $\mathsf{Enc}_k(m)=c$.
 ```
 
+```card id=crypto-l2-modularity
+Why do precise security definitions matter beyond one scheme?
+---
+Each layer can assume the one below as a black box: block cipher, then symmetric encryption, then authenticated encryption, then TLS. A designer relies on the definition of each layer, not on its internals.
+```
+
+```card id=crypto-l2-tradeoff
+Why pick a weaker security notion or a weaker assumption on purpose?
+---
+Stronger notions and stronger assumptions usually cost efficiency. If the weaker notion suffices for the setting, a more efficient scheme can be used.
+```
+
+```card id=crypto-l2-terminal
+Why is a chosen-plaintext attack a realistic model?
+---
+A shared terminal on an encrypted line encrypts whatever a user types. An attacker can choose plaintexts and watch the ciphertexts sent by others on the same line, so later ciphertexts must stay secure.
+```
+
+```card id=crypto-l2-refute
+How do you refute perfect secrecy of a scheme?
+---
+Fix a message distribution giving two messages positive probability, then find a ciphertext $c$ and message $m$ with $\Pr[C=c]>0$ but $\Pr[M=m\mid C=c]\neq\Pr[M=m]$. Example: $\Pr[M=m\mid C=c]=0$ when $c$ cannot be an encryption of $m$. One such pair suffices.
+```
+
+```card id=crypto-l2-zero-key
+Is the one-time pad over $\{0,1\}^\ell$ without the all-zero key perfectly secret?
+---
+No. Take $m=0\ldots0$ with $\Pr[M=m]>0$: the ciphertext $0\ldots0$ needs key $0\ldots0$, which is excluded, so $\Pr[M=m\mid C=c]=0\neq\Pr[M=m]$. Also $2^\ell-1<2^\ell$ keys violates Thm 2.11.
+```
+
+```card id=crypto-l2-group
+Which property of XOR makes the one-time pad work, and how does it generalise?
+---
+$\{0,1\}^\ell$ with XOR is a group: associative, identity $0\ldots0$, every element its own inverse. For any finite group, a uniform key $k$, $c=m+k$ and $m=c-k$ gives a perfectly secret scheme.
+```
+
+```card id=crypto-l2-not-uniform
+Does perfect secrecy mean every message is equally likely given the ciphertext?
+---
+No. It means the posterior equals the prior, $\Pr[M=m\mid C=c]=\Pr[M=m]$, which may be far from uniform. Example: with $\Pr[M=\text{buy}]=0.7$, seeing any ciphertext still leaves buy at 0.7.
+```
+
+```card id=crypto-l2-bayes-equiv
+Equivalent form of perfect secrecy: what must hold for two messages?
+---
+For all $m,m'$ with positive probability and every $c$: $\Pr[C=c\mid M=m]=\Pr[C=c\mid M=m']$, both equal to $\Pr[C=c]$. Proof: Bayes on each term, then the definition; $\Pr[C=c]=0$ is trivial.
+```
+
 ## Code
 
 `src/py/otp.py`: `keygen`, `encrypt`, `xor`, `two_time_pad_leak`, `crib_drag`,

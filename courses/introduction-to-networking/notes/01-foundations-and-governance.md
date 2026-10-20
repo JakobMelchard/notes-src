@@ -245,10 +245,10 @@ It reappears as the TCP window.
 ```
 
 ```card id=net-01-traffic-intensity
-What is traffic intensity and what happens as it approaches 1?
+What is traffic intensity and what happens to queueing delay as it approaches 1 and beyond?
 ---
 $I = La/R$ with arrival rate $a$.
-As $I \to 1$ queueing delay grows without bound; full queues drop packets.
+Near 0 the average queueing delay is small, near 1 it is large. Above 1 more work arrives than can be served and the average delay is unbounded; full queues drop packets.
 ```
 
 ```card id=net-01-switching
@@ -305,4 +305,111 @@ What is BCP 14 and when do MUST, SHOULD, MAY carry normative meaning?
 ---
 BCP 14 = RFC 2119 + RFC 8174.
 They are normative only in capitals.
+```
+
+```card id=net-01-fwd-vs-routing
+What is the difference between forwarding and routing in a network core?
+---
+Forwarding is a local action: a router moves an arriving packet from its input link to the right output link.
+Routing is a global action: it determines the source-to-destination path, using routing algorithms.
+```
+
+```card id=net-01-packet-tradeoff
+Why is packet switching not automatically better than circuit switching?
+---
+It suits bursty traffic (shared links, no call setup), but when arrivals exceed link capacity packets queue and can be lost.
+Congestion therefore needs protocols for reliable transfer and congestion control.
+```
+
+```card id=net-01-loss
+When does a router drop a packet, and who may retransmit it?
+---
+When the arrival rate to a link exceeds its transmission rate for some time and the output queue (buffer) is full, the arriving packet is dropped.
+The previous node, the source end system, or nobody may retransmit it.
+```
+
+```card id=net-01-throughput
+What limits the end-to-end throughput of a path?
+---
+The bottleneck link, the slowest link on the path; for a sender with rate Rs, receiver with rate Rc and a shared link R, the rate is min(Rs, Rc, R/10) in the lecture scenario.
+```
+
+```card id=net-01-traceroute
+How does traceroute obtain a delay for each router on the path?
+---
+For each TTL value i it sends three probes that expire at router i; router i returns an error reply.
+The sender measures the time between sending each probe and its reply.
+```
+
+```card id=net-01-stack
+Name the five layers of the Internet protocol stack with one example protocol each.
+---
+Application (HTTP, SMTP, DNS), transport (UDP, TCP), network (IP, routing protocols), link (Ethernet, 802.11, PPP), physical (bits on the wire).
+```
+
+```card id=net-01-layering
+Why is the network organised in layers, and what does encapsulation do?
+---
+Layers give an explicit structure and let one layer's implementation change without affecting the others.
+Encapsulation wraps each layer's data in its own header (and trailer at link layer) as it goes down the stack; the receiver strips them in reverse.
+```
+
+```card id=net-01-protocol
+What does a network protocol define?
+---
+The format and order of messages exchanged between entities, and the actions taken on sending and on receiving a message.
+Protocols are needed because devices, unlike humans, need precisely specified rules.
+```
+
+```card id=net-01-internet-structure
+Which kinds of networks make up the Internet, and how do they connect?
+---
+Access ISPs connect hosts, regional ISPs connect access networks to larger ISPs, and Tier-1 ISPs form the centre.
+Networks interconnect via private peering or Internet Exchange Points; content provider networks often bypass Tier-1 and regional networks.
+```
+
+```card id=net-01-rfc-types
+What are the main RFC types, and what is an RFC?
+---
+An RFC is a technical or organisational note about the Internet.
+Types: BCP (best current practice), STD (standards track), FYI (informational).
+```
+
+```card id=net-01-registries
+Which body allocates IP addresses at each level of the registry chain?
+---
+ICANN gives blocks to the five RIRs; RIRs assign to LIRs (ISPs, universities, large enterprises); LIRs assign to their customers.
+```
+
+```card id=net-01-rirs
+Name the five RIRs and the one that serves Europe.
+---
+AfriNIC, APNIC, ARIN, LACNIC and RIPE NCC; RIPE NCC serves Europe, West Asia and the former USSR.
+```
+
+```card id=net-01-clock-recovery
+Which line codes allow clock recovery, so that no separate clock wire is needed?
+---
+Manchester and RZ allow clock recovery; NRZ, NRZI and AMI do not.
+Manchester gets it by a voltage transition in every bit interval, at the cost of at most 50 percent line efficiency.
+```
+
+```card id=net-01-block-codes
+Why do block codes such as 4b/5b pair well with NRZ?
+---
+They map N data bits to M code bits and choose code words with no DC component (zero running digital sum), so the line stays DC free and the receiver can recover the clock.
+```
+
+```card id=net-01-baud
+What is baud rate and what is its trade-off?
+---
+The rate at which the voltage level on the wire changes.
+A higher baud rate carries more information per second but is more error prone and reaches shorter distances.
+```
+
+```card id=net-01-modulation
+What do ASK, FSK and PSK vary, and what is each one's main property?
+---
+ASK varies amplitude: simple and low bandwidth, but prone to interference.
+FSK varies frequency at constant amplitude: higher bandwidth possible. PSK varies phase at constant frequency and amplitude: robust, but harder to demodulate.
 ```

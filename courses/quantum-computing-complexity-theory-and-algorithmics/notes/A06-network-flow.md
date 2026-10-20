@@ -2,6 +2,8 @@
 
 A flow network is a directed graph with capacities, a source and a sink; the question is how much can be pushed from source to sink. The answer is governed by a min-max theorem: the maximum flow equals the minimum cut, and the proof is an algorithm (Ford–Fulkerson) that finds both. The value of the topic is less the shipping metaphor than the modelling range: bipartite matching, disjoint paths, scheduling with demands, project selection and sports elimination all reduce to max flow, and each reduction comes with a combinatorial theorem (Hall, König, Menger) that is a corollary of max-flow/min-cut. Reference: KT chapter 7 (7.1 to 7.3 FF and max-flow/min-cut, 7.3 capacity scaling, 7.4 Edmonds–Karp remark, 7.5 matching, 7.6 disjoint paths, 7.7 circulations, 7.11 project selection, 7.12 baseball elimination). References: Kleinberg & Tardos ch. 7 [S25]; both syllabi name the MaxFlow-MinCut theorem and applications [S1, S5]. (The 2024W and 2025W pages printed it as "MaxCut versus MinFlow"; 2026W fixes the typo [S1, S2, S3].) Exam 1 material.
 
+**2026W scope (chapter 6, 2026W).** Taught: flows and cuts, the flow value lemma, weak duality, residual graphs, Ford–Fulkerson, max-flow/min-cut, integrality, the exponential example, capacity scaling, a table of faster algorithms (shortest augmenting path $O(m^2 n)$ without proof), bipartite matching and Hall's theorem, edge-disjoint paths (Menger), circulations with demands and lower bounds, survey design and image segmentation. Not in the 2026W slides: the Edmonds–Karp proof, König's theorem, project selection and baseball elimination; they stay below as background only and have no cards. Lecture conventions: $s$ may have in-arcs, so the value is defined as flow out of $s$ minus flow into $s$; for capacity scaling $C$ is the largest capacity of an arc leaving $s$, $\Delta$ starts at the smallest power of 2 that is $\ge C$, and there are $1 + \lceil \log_2 C \rceil$ phases.
+
 ## Definitions
 
 **Flow network.** Directed $G = (V, E)$, capacity $c(e) > 0$ integer (for now), source $s$ (no in-edges) and sink $t$ (no out-edges). $n = |V|$, $m = |E|$, $C = \max_e c(e)$; assume every vertex lies on some $s$–$t$ path and $m \ge n - 1$.
@@ -72,6 +74,14 @@ Maximum number of edge-disjoint $s$–$t$ paths in a directed graph: unit capaci
 
 *Lower bounds.* Send $\ell(e)$ on every edge first; this creates surplus/deficit $L(v) = \ell^{\rm in}(v) - \ell^{\rm out}(v)$. Solve the demand problem with capacities $c(e) - \ell(e)$ and demands $d(v) - L(v)$; add $\ell$ back. Applications: survey design, airline scheduling (KT 7.8, 7.9).
 
+*Infeasibility certificate.* No circulation exists iff some vertex partition $(A, B)$ has $\sum_{v \in B} d(v) > c(A, B)$: the net demand inside $B$ exceeds what can enter $B$ (read off a min cut of $G'$). With integer capacities, lower bounds and demands, a feasible circulation can be chosen integral. The multicommodity version (each sink must be served by its own source) is different: its integral version is NP-hard, the fractional one is an LP.
+
+*Survey design (KT 7.8).* Products $u_i$, consumers $w_j$; arc $u_i \to w_j$ with bounds $[0, 1]$ if $w_j$ owns $u_i$; $s \to u_i$ with bounds $[p_i, p'_i]$ (questions per product), $w_j \to t$ with $[c_j, c'_j]$ (questions per consumer), and $t \to s$ unbounded. Feasible survey iff an integral circulation exists. Bipartite perfect matching is the case with all bounds 1.
+
+### Image segmentation (KT 7.10)
+
+Pixels $V$, neighbour pairs $E$, likelihoods $a_i, b_i \ge 0$ for foreground and background, separation penalty $p_{ij} \ge 0$. Maximise $\sum_{i \in A} a_i + \sum_{j \in B} b_j - \sum_{\text{separated } ij} p_{ij}$. Since $\sum_V (a_i + b_i)$ is constant, this is the same as minimising $\sum_{i \in B} a_i + \sum_{j \in A} b_j + \sum_{\text{separated } ij} p_{ij}$. Network: source $s$ = foreground, sink $t$ = background, arcs $s \to i$ with capacity $a_i$, $i \to t$ with capacity $b_i$, and each neighbour edge as two opposite arcs of capacity $p_{ij}$. A cut $(A, B)$ then has capacity exactly the quantity to minimise (each separated pair is counted once, in the direction from $A$ to $B$), so a min cut gives the best segmentation with $A$ as foreground.
+
 ### Project selection via min cut (KT 7.11)
 
 Projects $i$ with profit $p_i \in \mathbb{R}$ and prerequisite edges $i \to j$ ("$i$ requires $j$"); choose a feasible (prerequisite-closed) set $A$ maximising $\sum_{i \in A} p_i$. Network: $s \to i$ with capacity $p_i$ for $p_i > 0$; $i \to t$ with capacity $-p_i$ for $p_i < 0$; prerequisite edges with capacity $\infty$. A cut $(A \cup \{s\}, \bar A \cup \{t\})$ has finite capacity iff $A$ is closed, and then $c = \sum_{i \notin A, p_i > 0} p_i + \sum_{i \in A, p_i < 0} (-p_i) = P - \sum_{i \in A} p_i$ with $P = \sum_{p_i > 0} p_i$ constant. Min cut = max profit. Same trick solves image segmentation (KT 7.10).
@@ -134,6 +144,27 @@ What edges does the residual graph $G_f$ contain?
 Forward $(u,v)$ with capacity $c(e)-f(e)$ if $f(e)<c(e)$; backward $(v,u)$ with capacity $f(e)$ if $f(e)>0$. At most $2m$ edges.
 ```
 
+```card id=qc-alg6-weak-duality
+Prove $v(f)\le c(A,B)$ for every flow $f$ and every $s$-$t$ cut $(A,B)$.
+---
+Flow value lemma: $v(f)=f^{\rm out}(A)-f^{\rm in}(A)$ (sum conservation over $A$).
+Drop the subtracted term, then use $f(e)\le c(e)$ on arcs out of $A$. Equality certifies max flow and min cut.
+```
+
+```card id=qc-alg6-greedy-stuck
+Why does plain greedy augmentation (only arcs with $f(e)<c(e)$) not find a max flow?
+---
+It can never undo flow, so an early bad path can block the optimum (worked example: path $s,u,v,t$ first gives 20, the maximum is 30).
+Residual backward arcs fix this.
+```
+
+```card id=qc-alg6-integrality
+State the integrality theorem for max flow and why it holds.
+---
+Integer capacities: some max flow has all $f(e)$ integral.
+Ford-Fulkerson keeps flows and residual capacities integral and terminates, so its output is such a flow.
+```
+
 ```card id=qc-alg6-maxflow-mincut
 State the max-flow/min-cut three-way equivalence.
 ---
@@ -151,14 +182,14 @@ Edges out of $A^*$ are saturated, edges into $A^*$ carry 0, so $v(f)=c(A^*,B^*)$
 ```card id=qc-alg6-ff-time
 Running time of Ford-Fulkerson with integer capacities. Is it polynomial?
 ---
-$O(mC^*)$, $C^*=\sum_{e\text{ out of }s}c(e)$. No, pseudo-polynomial.
+$O(mC^*)$, $C^*=\sum_{e\text{ out of }s}c(e)\le nC$, so $O(mnC)$. No, pseudo-polynomial (input size uses $\log C$).
 The diamond with middle edge 1 needs $2C$ iterations.
 ```
 
 ```card id=qc-alg6-irrational
 True or false: Ford-Fulkerson always terminates with a maximum flow.
 ---
-False for irrational capacities: it may not terminate and may converge below the maximum. Integrality is a theorem about integer inputs.
+False for irrational capacities: it may not terminate, although max-flow/min-cut still holds. Integrality and termination are about integer inputs.
 ```
 
 ```card id=qc-alg6-scaling-ek
@@ -168,11 +199,11 @@ Capacity scaling $O(m^2\log C)$; Edmonds-Karp (BFS shortest paths) $O(nm^2)$.
 Edmonds-Karp is strongly polynomial (no dependence on $C$).
 ```
 
-```card id=qc-alg6-ek-critical
-Edmonds-Karp proof: how often can an edge be critical?
+```card id=qc-alg6-scaling-lemmas
+Capacity scaling: number of phases, gap to the optimum after a phase, augmentations per phase.
 ---
-Between critical occurrences $d(u)$ grows by 2 and distances are $<n$, so $O(n)$ times per edge.
-$2m$ edges give $O(nm)$ augmentations of $O(m)$ each.
+$1+\lceil\log_2C\rceil$ phases ($\Delta$ halves). After a $\Delta$-phase $v(f^*)\le v(f)+m\Delta$ (cut at the set reachable in $G_f(\Delta)$).
+Next phase: each augmentation adds $\ge\Delta/2$, so $\le2m$ of them. Total $O(m\log C)$ augmentations.
 ```
 
 ```card id=qc-alg6-bipartite
@@ -182,18 +213,18 @@ $s\to$ every $\ell\in L$, $L\to R$ edges, every $r\to t$, all capacity 1; integr
 FF with $C^*\le n$: $O(mn)$.
 ```
 
-```card id=qc-alg6-hall-konig
-State Hall's and König's theorems.
+```card id=qc-alg6-hall
+State Hall's marriage theorem and sketch the flow proof of the hard direction.
 ---
-Hall: perfect matching iff $|N(S)|\ge|S|$ for all $S\subseteq L$.
-König: in bipartite graphs, max matching = min vertex cover.
+$|U|=|W|$: perfect matching iff $|N(S)|\ge|S|$ for all $S\subseteq U$.
+No perfect matching: min cut $<n$ with no $U_A\to W_B$ arc, so $|U_B|+|W_A|<n$, hence $|U_A|>|W_A|\ge|N(U_A)|$.
 ```
 
-```card id=qc-alg6-project-selection
-Project selection network: capacities and why prerequisite edges get $\infty$.
+```card id=qc-alg6-menger
+How are edge-disjoint $s$-$t$ paths found with flow, and why is the count exact?
 ---
-$s\to i$ cap $p_i$ if $p_i>0$; $i\to t$ cap $-p_i$ if $p_i<0$; prerequisites $\infty$.
-Finite cut iff the set is closed; min cut $=P-\sum_{i\in A}p_i$.
+Unit capacity on every arc; max flow value = max number of edge-disjoint paths (Menger).
+Paths give a flow; an integral 0-1 flow of value $k$ splits into $k$ edge-disjoint paths by following flow arcs from $s$.
 ```
 
 ```card id=qc-alg6-circulation
@@ -201,4 +232,30 @@ When is a circulation with demands $d(v)$ feasible?
 ---
 $\sum_v d(v)=0$ and the max flow with super-source/sink saturates all source edges (value $D=\sum_{d(v)>0}d(v)$).
 Lower bounds: push $\ell(e)$ first, adjust demands and capacities.
+```
+
+```card id=qc-alg6-circulation-cut
+What certifies that no circulation with demands exists?
+---
+A partition $(A,B)$ with $\sum_{v\in B}d(v)>c(A,B)$: demand in $B$ exceeds what can flow in.
+```
+
+```card id=qc-alg6-multicommodity
+Multicommodity flow versus a single circulation: complexity?
+---
+Each sink must be fed by its own source. Integral version NP-hard; fractional version solvable by LP.
+```
+
+```card id=qc-alg6-survey
+Survey design as a flow problem: which network?
+---
+$s\to$ product $[p_i,p'_i]$, product $\to$ owning consumer $[0,1]$, consumer $\to t$ $[c_j,c'_j]$, $t\to s$ unbounded.
+Feasible survey iff an integral circulation with lower bounds exists.
+```
+
+```card id=qc-alg6-image-segmentation
+Image segmentation as min cut: which arcs and capacities?
+---
+$s\to i$ with $a_i$, $i\to t$ with $b_i$, each neighbour pair as two opposite arcs with $p_{ij}$.
+A cut costs $\sum_{B}a+\sum_{A}b+\sum_{\text{separated}}p$, the penalty to minimise; $A$ = foreground.
 ```

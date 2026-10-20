@@ -204,7 +204,43 @@ Take a free man $u$; he proposes to the best woman $w$ still on his list. If $w$
 ```card id=qc-alg1-gs-runtime
 Running time of Gale-Shapley with $n$ men and $n$ women, and what makes it possible?
 ---
-$O(n^2)$: at most $n^2$ proposals, each $O(1)$ with a queue of free men, rank arrays (where $x$ stands in $v$'s list), partner arrays and for each man a pointer to the next woman to try.
+$O(n^2)$: at most $n^2$ proposals, each $O(1)$ with a queue of free men, rank and inverse rank arrays per person (where $x$ stands in $v$'s list, and who stands at position $i$), partner arrays and for each man a pointer to the next woman to try.
+```
+
+```card id=qc-alg1-gs-termination
+Why does Gale-Shapley stop after at most $n^2$ iterations of its loop?
+---
+Use as measure the number of man-woman pairs already considered: every proposal uses up one pair, since a man never proposes to the same woman twice (if she later takes someone better, the pair is deleted), and there are only $n^2$ pairs. Queue length and matching size do not change strictly in every iteration, so they give no bound.
+```
+
+```card id=qc-alg1-gs-stable
+Proof idea that Gale-Shapley outputs a stable matching.
+---
+Assume $\{u,w\}$ blocks the output. Whether $u$ ended unmatched (his list ran empty) or prefers $w$ to his partner, he reached $w$ or $w$ was deleted from his list; both only happen because $w$ got a proposal from someone she likes more than $u$, and her partner only improves from then on. So $w$ does not prefer $u$: contradiction.
+```
+
+```card id=qc-alg1-o-notation-abuse
+Why is $T(n)=O(f(n))$ an abuse of notation, and what is the cleaner form?
+---
+The equals sign is not symmetric or transitive here: $5n^3=O(n^3)$ and $3n^2=O(n^3)$, yet $5n^3\ne 3n^2$. Better: $T(n)\in O(f(n))$, a set of functions.
+```
+
+```card id=qc-alg1-additivity
+Additivity rules for $O$, $\Omega$ and $\Theta$.
+---
+If $f=O(h)$ and $g=O(h)$ then $f+g=O(h)$; the same for $\Omega$. If $f=\Theta(h)$ and $g=O(h)$ then $f+g=\Theta(h)$. Also transitivity holds for each of $O$, $\Omega$, $\Theta$.
+```
+
+```card id=qc-alg1-largest-gap
+Largest empty interval among $n$ arrival time stamps: algorithm and running time.
+---
+Sort the time stamps, then scan once and take the largest gap between neighbours: $O(n\log n)$, dominated by sorting.
+```
+
+```card id=qc-alg1-max-indset-brute
+Brute-force running time for maximum independent set.
+---
+Try all $2^n$ vertex subsets, each checked in $O(n^2)$: $O(2^n n^2)$, exponential.
 ```
 
 ```card id=qc-alg1-roommates

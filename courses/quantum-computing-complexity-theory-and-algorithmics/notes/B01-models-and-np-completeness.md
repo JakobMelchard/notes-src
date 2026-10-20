@@ -4,7 +4,7 @@ Complexity theory classifies problems by the resources (time, space, randomness,
 
 ## Definitions
 
-**Turing machine (TM).** A 7-tuple $M = (Q, \Sigma, \Gamma, \delta, q_0, q_{acc}, q_{rej})$: finite state set $Q$, input alphabet $\Sigma$, tape alphabet $\Gamma \supset \Sigma \cup \{\sqcup\}$, transition function $\delta : Q \times \Gamma \to Q \times \Gamma \times \{L, R\}$, start state $q_0$, halting states $q_{acc} \ne q_{rej}$. A **configuration** is $(q, w, i)$: state, tape contents, head position; written as the string $w_1 \dots w_{i-1}\, q\, w_i \dots w_m$. $\delta$ defines the one-step relation $C \vdash C'$. $M$ accepts $x$ if $q_0 x \vdash^* C$ with $C$ in state $q_{acc}$. The language $L(M) = \{x : M \text{ accepts } x\}$. A decision problem is a language $L \subseteq \Sigma^*$.
+**Turing machine (TM).** A 7-tuple $M = (Q, \Sigma, \Gamma, \delta, q_0, q_{acc}, q_{rej})$: finite state set $Q$, input alphabet $\Sigma$, tape alphabet $\Gamma \supset \Sigma \cup \{\sqcup\}$, transition function $\delta : Q \times \Gamma \to Q \times \Gamma \times \{L, R\}$, start state $q_0$, halting states $q_{acc} \ne q_{rej}$. A **configuration** is $(q, w, i)$: state, tape contents, head position; written as the string $w_1 \dots w_{i-1}\, q\, w_i \dots w_m$. $\delta$ defines the one-step relation $C \vdash C'$. $M$ accepts $x$ if $q_0 x \vdash^* C$ with $C$ in state $q_{acc}$. The language $L(M) = \{x : M \text{ accepts } x\}$. A decision problem is a language $L \subseteq \Sigma^*$. The 2026W lectures use Papadimitriou's equivalent quadruple form instead (section 2026W lectures below).
 
 **Time and space.** $\mathrm{time}_M(x)$ = number of steps until halting; $T_M(n) = \max_{|x| = n} \mathrm{time}_M(x)$. $\mathrm{space}_M(x)$ = number of distinct cells visited; $S_M(n)$ analogously. Always as functions of the input length $n = |x|$, never of the numeric value of the input (a number $N$ has length $\log N$).
 
@@ -20,7 +20,7 @@ $$\mathrm P = \bigcup_k \mathrm{DTIME}(n^k), \qquad \mathrm{NP} = \bigcup_k \mat
 
 **NP via verifiers (second definition).** $L \in \mathrm{NP}$ iff there is a polynomial $p$ and a polynomial-time TM $V$ (the verifier) with
 $$x \in L \iff \exists\, c \in \{0,1\}^{p(|x|)} : V(x, c) = 1.$$
-$c$ is a **certificate** (witness). Example: SAT, certificate = satisfying assignment; HAMILTONIAN CYCLE, certificate = the cycle. coNP: $x \in L \iff \forall c: V(x,c) = 1$ (e.g. UNSAT, TAUTOLOGY).
+$c$ is a **certificate** (witness). Example: SAT, certificate = satisfying assignment; HAMILTONIAN CYCLE, certificate = the cycle. coNP: $x \in L \iff \forall c: V(x,c) = 1$ (e.g. UNSAT, TAUTOLOGY). The 2026W lectures phrase the same definition as a certificate relation $R$ that is polynomially balanced ($(x, c) \in R$ implies $|c| \le |x|^k$) and decidable in polynomial time (section 2026W lectures below).
 
 **Karp reduction.** $A \le_p B$ if there is a polynomial-time computable $f$ with $x \in A \iff f(x) \in B$ for all $x$. (Many-one: one query to $B$, answer taken as is. Cook/Turing reductions allow many adaptive queries; in this course reductions are Karp unless stated.)
 
@@ -83,6 +83,23 @@ Cover $\{a, b\}$: $81 + 69 = 150 = (2112)_4$: digit $e_0$ is already 2 (both end
 5. *If someone found a polynomial algorithm for 3-COLOURING, what follows for FACTORING?* 3-COLOURING is NP-complete, so P = NP; FACTORING (decision version) is in NP, hence in P. Conversely a polynomial FACTORING algorithm (e.g. Shor on a quantum computer) says nothing about P vs NP, since FACTORING is not known to be NP-hard.
 6. *Sketch why the Cook-Levin formula has polynomial size.* Tableau of $p(n) \times p(n)$ cells, each with $O(1)$ variables; window constraints are $O(1)$ clauses per cell; total $O(p(n)^2)$.
 
+## 2026W lectures: introduction (12.10), chapter 1 (28.10), chapter 2 (30.10) [S62]
+
+Pichler's complexity block opens with an introduction to computability and complexity, then chapter 1 (Turing machines and complexity classes) and chapter 2 (propositional logic and NP). In our words, with what differs from the sections above:
+
+- **Model of computation in the introduction.** Not a RAM but a small imperative language (typed variables, assignment, if, while, return). It is as strong as any real language because it can host an interpreter, so "no program in it" means "no algorithm at all". Problem types: decision, function, optimisation, enumeration, counting, search. A problem needs infinitely many instances, otherwise a lookup table solves it.
+- **Halting is undecidable** by diagonalisation: from a supposed decider build a program that loops exactly when its input program halts on its own code, and run it on itself. Further undecidable problems follow by computable reductions from Halting (example: does a program map input $I_1$ to output $I_2$; reduce by a program that first runs $\Pi$ on its input and then returns the input unchanged).
+- **Reductions.** Turing reductions call a subroutine for $B$ arbitrarily often (polynomial time: Cook); many-one reductions map each instance to one instance of $B$ and take the answer as is (polynomial time: Karp). Complexity work uses polynomial time or logarithmic space reductions, so that the reduction does not hide the difficulty. C-hard and C-complete are defined with many-one reductions. If one NP-complete problem is in P, then P = NP.
+- **Turing machine as in the lectures.** $M = (K, \Sigma, \delta, s)$ with $\delta : K \times \Sigma \to (K \cup \{h, \text{yes}, \text{no}\}) \times \Sigma \times \{\leftarrow, \rightarrow, -\}$; the tape is infinite to the right only, starts with the left marker $\triangleright$ (never overwritten, the head bounces off it) followed by the input; a configuration is a triple (state, string left of and including the head, string right of the head). Numbers are encoded in binary.
+- **Variants.** A $k$-string machine running in time $f(n)$ is simulated by one string in $O(f(n)^2)$; a two-way infinite tape is simulated in $O(f(n))$ by folding the cells $z \ge 0$ to odd and $z < 0$ to even positions. Palindromes take $\Theta(n^2)$ on one string and $\Theta(n)$ on two. For sublinear space the machine gets a read-only input string and a write-only output string, and only the strings in between count.
+- **NTMs.** Transition relation instead of function. Acceptance is asymmetric: accept if some branch says yes, reject only if no branch does. $\mathrm{NTIME}(f) \subseteq \bigcup_{c>1}\mathrm{TIME}(c^{f(n)})$ by exploring the computation tree (branching bounded by a constant). The two definitions of NP agree: guess a certificate and check it, or take an accepting computation of polynomial length as the certificate. Nondeterminism reads as guess and check.
+- **Complements.** co-C consists of the complements of problems in C; a many-one reduction from $A$ to $B$ is also one from co-$A$ to co-$B$. Deterministic classes equal their co-classes; NP = coNP is open and believed false.
+- **Propositional logic in chapter 2.** Syntax, truth assignments, the derived connectives $\to, \leftrightarrow, \oplus$, Boolean functions and truth tables, the laws of a Boolean algebra; $\{\wedge, \vee, \neg\}$ is functionally complete. $\varphi$ is valid iff $\neg\varphi$ is unsatisfiable.
+- **Cook-Levin as proved in the lectures.** Not tableau windows but atoms $\mathit{symbol}_\sigma[\tau, \pi]$, $\mathit{cursor}[\tau, \pi]$ and $\mathit{state}_s[\tau]$ for times and cells up to $N = q(|x|)$, with five groups of conjuncts: initialisation, transition rules (state, symbol and cursor at time $\tau$ imply one of the allowed successors at $\tau + 1$), uniqueness (exactly one state, cursor position and symbol per cell), inertia (cells away from the cursor keep their symbol), and acceptance (state yes at time $N$).
+- **VALIDITY** is coNP-complete (complement of SAT up to negating the formula). SAT on DNF and VALIDITY on CNF are in P; VALIDITY stays coNP-complete on 3-DNF.
+- **Normal forms.** Rewriting to CNF or DNF by eliminating $\to, \leftrightarrow$, pushing negations inward and distributing can blow up exponentially (CNF of $(x_1 \wedge y_1) \vee \dots \vee (x_n \wedge y_n)$). A sat-equivalent CNF is polynomial: replace $(A \wedge B) \vee C$ by $(z \vee A) \wedge (z \vee B) \wedge (\neg z \vee C)$ with fresh $z$. To 3-CNF: replace a clause $l_1 \vee l_2 \vee l_3 \vee R$ by $(z \vee l_1 \vee l_2) \wedge (\neg z \vee l_3 \vee R)$ and repeat. 2-SAT is in P (via reachability, B03).
+- **NP-complete problems in the lectures.** 3-SAT, INDEPENDENT SET (reduction from 3-SAT as in Results, with both directions proved), CLIQUE ($I$ independent in $G$ iff $I$ is a clique in the complement graph), VERTEX COVER ($I$ independent iff $V \setminus I$ is a cover), $k$-COLORABILITY for fixed $k \ge 3$ (2-COLORABILITY is in P by propagating colours through a connected graph), HAMILTON PATH, HAMILTON CYCLE, TSP as a decision problem. Not in the 2026W decks: SUBSET SUM and Ladner's theorem.
+
 ## Code
 
 `src/py/complexity/sat.py`: `brute_force_sat`, `dpll` (cross-check), `sat_to_3sat` (clause splitting), `three_sat_to_vertex_cover` (returns vertices, edges, $k_{IS}$, $k_{VC}$), `assignment_to_independent_set`, `independent_set_exists`, `vertex_cover_exists`, `vertex_cover_to_subset_sum` (base-4 construction), `subset_sum_exists` (exact pruned search). `test_sat.py` checks on 30 seeded tiny CNFs that satisfiability is preserved along SAT $\to$ 3SAT $\to$ IS/VC $\to$ SUBSET SUM and that a satisfying assignment maps to an actual cover and subset.
@@ -96,24 +113,18 @@ $O(T(n)^2)$ time; space preserved up to a constant.
 So polynomial time does not depend on the number of tapes.
 ```
 
-```card id=qc-cx1-ram-cost
-Why does complexity theory use logarithmic cost for RAMs rather than unit cost?
----
-Under unit cost, repeated squaring builds $2^{2^n}$ in $n$ steps, breaking polynomial equivalence with TMs.
-Under logarithmic cost RAM and TM simulate each other polynomially.
-```
-
 ```card id=qc-cx1-np-verifier
 Define NP via verifiers.
 ---
 $x\in L\iff\exists c\in\{0,1\}^{p(|x|)}:V(x,c)=1$, with polynomial $p$ and polynomial-time $V$.
+In the lectures: a certificate relation $R$ that is polynomially balanced ($|c|\le|x|^k$) and decidable in polynomial time, with $x$ a yes-instance iff some $(x,c)\in R$.
 ```
 
 ```card id=qc-cx1-ntm-verifier
 Why does an NTM definition of NP give a verifier?
 ---
-WLOG binary choices; the certificate is the choice sequence $c\in\{0,1\}^{q(n)}$.
-The verifier simulates the branch following $c$.
+The certificate is a polynomially long accepting computation of the NTM on $x$ (equivalently the sequence of nondeterministic choices).
+The verifier checks it step by step in polynomial time.
 ```
 
 ```card id=qc-cx1-karp
@@ -128,13 +139,6 @@ To prove a new problem $B$ NP-hard, which direction must the reduction go?
 ---
 Known-hard $A\le_pB$: map $A$-instances to $B$-instances.
 Reducing $B$ to SAT only shows $B\in$ NP.
-```
-
-```card id=qc-cx1-cook-levin
-Cook-Levin: what checks that row $i+1$ follows from row $i$, and what is the formula size?
----
-Constant-size $2\times3$ windows that must match legal patterns from $\delta$.
-Tableau $p(n)\times p(n)$: formula size $O(p(n)^2)$.
 ```
 
 ```card id=qc-cx1-sat-3sat
@@ -169,4 +173,125 @@ Why does Shor's algorithm not imply NP $\subseteq$ BQP?
 ---
 FACTORING (decision) is in NP $\cap$ coNP and not known to be NP-hard.
 An NP-complete problem in coNP would give NP = coNP.
+```
+
+```card id=qc-cx1-halting-diag
+Proof idea: the Halting problem is undecidable.
+---
+Assume a decider $H(\Pi,I)$. Build $D(\Pi)$: loop forever if $H(\Pi,\Pi)$ says halts, else stop.
+Run $D$ on its own code: it halts iff it does not halt. Contradiction.
+```
+
+```card id=qc-cx1-undecidable-reduction
+How do you prove a new problem $P$ undecidable, and what may the reduction cost?
+---
+Reduce Halting to $P$: a decider for $P$ plus the reduction would decide Halting.
+The reduction only has to be computable, no time or space bound.
+```
+
+```card id=qc-cx1-np-complete-in-p
+Why does one NP-complete problem in P give P = NP?
+---
+Every $A\in$ NP reduces to it in polynomial time; compute the reduction, then run the polynomial algorithm.
+So NP $\subseteq$ P, and P $\subseteq$ NP always.
+```
+
+```card id=qc-cx1-tm-quadruple
+How do the 2026W lectures define a deterministic Turing machine?
+---
+$M=(K,\Sigma,\delta,s)$, $\delta:K\times\Sigma\to(K\cup\{h,\text{yes},\text{no}\})\times\Sigma\times\{\leftarrow,\rightarrow,-\}$.
+One-sided tape starting with $\triangleright$ (never overwritten, cursor never left of it), then the input.
+```
+
+```card id=qc-cx1-two-sided
+Simulating a two-way infinite tape on a one-sided one: cost and trick?
+---
+Same time $O(f(n))$. Store cell $z\ge0$ at position $2z+1$ and cell $z<0$ at $-2z$; each step costs a constant number of moves.
+```
+
+```card id=qc-cx1-palindrome
+Palindromes: running time on a 1-string versus a 2-string TM?
+---
+1-string: $\Theta(n^2)$, erase first and last symbol and walk back each round.
+2-string: $\Theta(n)$, copy the input, then compare forward against backward.
+```
+
+```card id=qc-cx1-ntm-asymmetry
+When does an NTM accept and when does it reject?
+---
+Accept if some sequence of choices reaches yes; reject only if no sequence does.
+Acceptance and rejection are asymmetric.
+```
+
+```card id=qc-cx1-ntime-exp
+Deterministic simulation of an NTM running in time $f(n)$?
+---
+$\mathrm{NTIME}(f)\subseteq\bigcup_{c>1}\mathrm{TIME}(c^{f(n)})$: branching is bounded by a constant $d$, so at most $d^{f(n)}$ paths, explored one by one.
+```
+
+```card id=qc-cx1-cook-levin-atoms
+Cook-Levin as proved in the 2026W lectures: which atoms and which groups of conjuncts?
+---
+Atoms $\mathit{symbol}_\sigma[\tau,\pi]$, $\mathit{cursor}[\tau,\pi]$, $\mathit{state}_s[\tau]$ for $\tau,\pi\le N=q(|x|)$.
+Groups: initialisation, transition rules, uniqueness, inertia (cells off the cursor unchanged), acceptance (state yes at time $N$).
+```
+
+```card id=qc-cx1-validity
+Complexity of VALIDITY, and why?
+---
+coNP-complete. $\varphi$ is valid iff $\neg\varphi$ is unsatisfiable, so VALIDITY and co-SAT reduce to each other.
+```
+
+```card id=qc-cx1-normal-form-easy
+For which normal forms are SAT and VALIDITY easy?
+---
+SAT on DNF and VALIDITY on CNF are in P.
+SAT on 3-CNF stays NP-complete, VALIDITY on 3-DNF stays coNP-complete.
+```
+
+```card id=qc-cx1-sat-cnf
+Why not convert a formula to an equivalent CNF before reducing SAT, and what is used instead?
+---
+The equivalent CNF can be exponentially larger, e.g. for $(x_1\wedge y_1)\vee\dots\vee(x_n\wedge y_n)$.
+Instead, a sat-equivalent rewrite: $(A\wedge B)\vee C$ becomes $(z\vee A)\wedge(z\vee B)\wedge(\neg z\vee C)$ with fresh $z$.
+```
+
+```card id=qc-cx1-clause-split
+How is a long clause $l_1\vee l_2\vee l_3\vee R$ shortened towards 3-CNF?
+---
+Replace it by $(z\vee l_1\vee l_2)\wedge(\neg z\vee l_3\vee R)$ with fresh $z$, and repeat.
+Set $z$ false if $l_1$ or $l_2$ is true, else true.
+```
+
+```card id=qc-cx1-is-clique-vc
+How are INDEPENDENT SET, CLIQUE and VERTEX COVER reduced to each other?
+---
+$I$ is independent in $G$ iff $I$ is a clique in the complement graph.
+$I$ is independent iff $V\setminus I$ is a vertex cover, so $K$ becomes $|V|-K$.
+```
+
+```card id=qc-cx1-coloring
+Complexity of $k$-COLORABILITY?
+---
+NP-complete for every fixed $k\ge3$.
+2-COLORABILITY is in P: colour one vertex, give neighbours the opposite colour, fail on a conflict.
+```
+
+```card id=qc-cx1-co-reduction
+If $A$ reduces to $B$ by a many-one reduction, what about the complements?
+---
+The same function reduces co-$A$ to co-$B$: $x\in A\iff R(x)\in B$ is the same as $x\notin A\iff R(x)\notin B$.
+```
+
+```card id=qc-cx1-co-classes
+Which classes are known to equal their co-class?
+---
+Deterministic ones, e.g. P = co-P (swap yes and no).
+For nondeterministic classes this may fail: NP versus coNP is open, inequality believed.
+```
+
+```card id=qc-cx1-functional-complete
+What does functional completeness of $\{\wedge,\vee,\neg\}$ say?
+---
+Every Boolean function $\{0,1\}^n\to\{0,1\}$ is expressed by a formula using only these connectives (e.g. read a DNF off the truth table).
 ```

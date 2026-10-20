@@ -438,7 +438,7 @@ Confusion: the plaintext/key-ciphertext relation is obscured, from the non-linea
 ```card id=crypto-l3-avalanche
 Avalanche criterion.
 ---
-Flipping one input bit should change about half (at least half, per the lecture) of the output bits.
+Flipping one input bit should change at least half of the output bits.
 ```
 
 ```card id=crypto-l3-spn-key
@@ -480,7 +480,7 @@ Tabulate $E_{k_1}(x)$ for all $k_1$, compare with $E^{-1}_{k_2}(y)$: $2^{56}$ me
 ```card id=crypto-l3-3des
 Two-key Triple DES: formula, security, why DES$^{-1}$ in the middle?
 ---
-$\mathsf{DES}_{k_1}(\mathsf{DES}^{-1}_{k_2}(\mathsf{DES}_{k_1}(x)))$, 112 key bits, 112-bit security (NIST: 80). With $k_1=k_2$ it collapses to single DES (backward compatibility).
+$\mathsf{DES}_{k_1}(\mathsf{DES}^{-1}_{k_2}(\mathsf{DES}_{k_1}(x)))$, 112 key bits, 112-bit security (NIST: 80). With $k_1=k_2$ it collapses to single DES (backward compatibility). Discontinued for new implementations; kept for decryption of legacy data.
 ```
 
 ```card id=crypto-l3-aes-round
@@ -499,6 +499,30 @@ Inverse in $\mathrm{GF}(2^8)=\mathbb F_2[X]/(X^8+X^4+X^3+X+1)$, then an affine m
 Is a block cipher an encryption scheme?
 ---
 No. It is a deterministic permutation of one block; encryption needs a mode of operation on top, and a bad mode breaks everything.
+```
+
+```card id=crypto-l3-nsa-sboxes
+What was questioned about the DES design, and what came out later?
+---
+The standard was reshaped during standardisation: the key shrank from 128 to 56 bits, and the S-boxes were chosen without published criteria. Later differential cryptanalysis showed the S-boxes resist that attack, which suggests the designers knew it in the 1970s.
+```
+
+```card id=crypto-l3-des-vs-aes
+Name three differences between DES and AES.
+---
+DES: 64-bit block, 56-bit key, Feistel network, eight different S-boxes, secret design choices, optimised for hardware. AES: 128-bit block, 128/192/256-bit keys, substitution-permutation network with one S-box, open competition, optimised for byte-oriented software.
+```
+
+```card id=crypto-l3-aes-margin
+What is a security margin, and where does AES stand?
+---
+The number of rounds beyond the best known attack. AES-128 has 10 rounds; the best attacks reach about 5 to 6 rounds. The best full-round attack (biclique, $2^{126.2}$ calls) is barely below the $2^{128}$ generic search. The related-key attack ($2^{99.5}$) is in a hypothetical model.
+```
+
+```card id=crypto-l3-feistel-hw
+Why is the Feistel structure convenient for hardware?
+---
+Decryption uses the same components in reverse order with the XOR rewired, so one circuit serves both directions. The round function $f$ need not be invertible.
 ```
 
 ## Code

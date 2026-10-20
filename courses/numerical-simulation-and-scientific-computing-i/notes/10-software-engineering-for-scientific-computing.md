@@ -335,3 +335,138 @@ What may you do with published code that carries no licence?
 ---
 Almost nothing beyond reading it: copyright applies automatically at creation, so without a licence you have no right to copy, modify or redistribute.
 ```
+
+```card id=nssc-se-makefile
+What does a Makefile describe?
+---
+Targets with prerequisites and commands, forming a dependency graph from the inputs (sources) to the output (an executable).
+Make reads hand-written Makefiles; Ninja files are usually machine generated.
+```
+
+```card id=nssc-se-build-tools
+How do build automation tools and build configuration generators relate?
+---
+Build automation tools (make, Ninja) run the dependency graph from sources to executable.
+Configuration generators (CMake, Meson, autotools) write that input and also detect compilers, find dependencies and handle platforms.
+```
+
+```card id=nssc-se-cmake-tests-packages
+How are tests and packages defined and built with CMake?
+---
+`enable_testing()` and `add_test(...)` define tests, and `ctest` runs them (`-R` filters by name, `-VV` is verbose).
+`install(...)` rules feed CPack, which generates installers and source packages such as RPM, DEB or archives.
+```
+
+```card id=nssc-se-cmake-target
+What is a CMake target?
+---
+An executable, library or utility that the build tool knows about.
+`add_library(name source.cpp)` makes the library usable across the project, and dependencies between targets are declared.
+```
+
+```card id=nssc-se-cmake-generator
+How do you choose the build tool that CMake generates input for?
+---
+With `-G`, for example `cmake -G Ninja` or `cmake -G "Unix Makefiles"`, or with the environment variable `CMAKE_GENERATOR`.
+`cmake --build` then invokes the chosen tool.
+```
+
+```card id=nssc-se-cmake-practice
+Name three CMake good practices from the course.
+---
+Out-of-source builds; `cmake_minimum_required(VERSION 3.15...4.0)` with the lowest supported and the highest tested version; stable project and target names written as literals, not variables.
+```
+
+```card id=nssc-se-git-object
+What is a git object, and how is it identified?
+---
+Everything git stores (files, commits, tags) is an object in `.git`, named by the SHA-1 hash of its content, so an object cannot be changed in place.
+```
+
+```card id=nssc-se-git-commit-steps
+What are the two steps of a git commit?
+---
+Add files to the index (staging area) to mark them for the next commit, then commit all staged files with a message.
+Commit often, by topic, and do not mix unrelated changes.
+```
+
+```card id=nssc-se-gitignore
+What does a `.gitignore` file do?
+---
+Ignored paths are not shown as untracked and are not added by `git add`. Patterns allow wildcards, and `!` negates a pattern.
+Track the `.gitignore` itself, and use it for generated files, binaries and large data.
+```
+
+```card id=nssc-se-git-tools
+Which git commands compare commits, show who changed a line, and undo a commit?
+---
+`git diff` shows the differences between commits or files, `git blame` shows who changed each line of a file and when, and `git revert` undoes the changes of a past commit.
+```
+
+```card id=nssc-se-git-submodule
+What is a git submodule?
+---
+A separate repository inside another repository. The parent project tracks only the commit SHA of the submodule, which pins the library's version.
+```
+
+```card id=nssc-se-git-stash
+What is `git stash` for?
+---
+It stores uncommitted modifications so you can switch branches or pull; they come back with `git stash apply`.
+The stash is a stack, so several layers of uncommitted work can be kept.
+```
+
+```card id=nssc-se-docker-image
+What is the difference between a Docker image and a container, and what is a build context?
+---
+An image is a read-only template built from a Dockerfile; a container is a runnable instance of an image.
+The build context is the set of files available to the build.
+```
+
+```card id=nssc-se-doc-gen
+Name three documentation generators and the languages they serve.
+---
+Doxygen, mainly for C and C++; MkDocs, written in and for Python; Sphinx, written in Python and widely used across languages.
+```
+
+```card id=nssc-se-ci-rules
+What do `workflow` and job `rules` decide in GitLab CI/CD?
+---
+`workflow` decides which pipelines are created at all. Job `rules` decide when an individual job is added to a pipeline.
+Job names that start with a dot are templates and are never added to a pipeline.
+```
+
+```card id=nssc-se-agent-limits
+What strengths and limits of coding agents does the lecture give?
+---
+The lecturer's stated opinion, not a scientific fact. Strengths: simple, tedious tasks, finding inconsistencies between docs and code, exploring large codebases, planning implementations.
+Limits: large architectural changes, long-running tasks, open-ended tasks done independently, and unclear instructions.
+```
+
+```card id=nssc-se-oss-vs-free
+Is open source the same as free software?
+---
+No. Free refers to freedom, not price; the FSF defines it through four freedoms. Free software can be commercial.
+Open source is a development model and a licence category, defined separately by the OSI with its own criteria.
+```
+
+```card id=nssc-se-copyright-rights
+Which rights does copyright grant, and what is protected?
+---
+Economic rights: reproduction, public display and making adaptations. Moral rights: to be recognised as the author and to protect the work's integrity.
+Copyright arises automatically on creation. An idea is not protected, only its expression.
+```
+
+```card id=nssc-se-public-domain
+What do public domain and Creative Commons mean?
+---
+Public domain: copyright has been removed, so the work can be shared, modified and even made proprietary.
+Creative Commons: licences inspired by open source, intended mainly for non-software works such as text, music and art.
+```
+
+```card id=nssc-se-fsf-osi
+What do the FSF and the OSI each do?
+---
+The FSF (founded 1985 by Richard Stallman) sponsors GNU, publishes the GPL and campaigns for free software.
+The OSI (founded 1998) stewards the Open Source Definition and certifies open source licences.
+```

@@ -4,7 +4,7 @@ Below P the interesting resource is sublinear space: a machine that may read its
 
 ## Definitions
 
-- **Log-space TM.** Two tapes: a read-only input tape (head moves freely, cannot write) and a read-write work tape; only work-tape cells count. $\mathrm L = \mathrm{SPACE}(\log n)$, $\mathrm{NL} = \mathrm{NSPACE}(\log n)$, $\mathrm{coNL} = \{\bar L : L \in \mathrm{NL}\}$. With $c \log n$ bits the machine holds $O(1)$ counters or vertex names in the range $[0, n^c)$.
+- **Log-space TM.** Two tapes: a read-only input tape (head moves freely, cannot write) and a read-write work tape; only work-tape cells count. $\mathrm L = \mathrm{SPACE}(\log n)$, $\mathrm{NL} = \mathrm{NSPACE}(\log n)$, $\mathrm{coNL} = \{\bar L : L \in \mathrm{NL}\}$. With $c \log n$ bits the machine holds $O(1)$ counters or vertex names in the range $[0, n^c)$. The 2026W lectures use a $k$-string machine ($k > 2$) whose first string is the read-only input and whose last string is a write-only output (the head never moves left on it); space is the total length of strings $2$ to $k-1$.
 - **Configuration** of a log-space machine on $x$: (state, input head position, work tape content, work head position). Count: $|Q| \cdot (n+2) \cdot |\Gamma|^{c \log n} \cdot c \log n = O(n^{c'})$: **polynomially many** configurations. The configuration graph $G_{M,x}$ is polynomial in size and each edge can be checked in log space (compare two configurations, simulate one step).
 - **Log-space reduction.** $A \le_L B$ if some log-space computable $f$ (write-only output tape, not counted) satisfies $x \in A \iff f(x) \in B$. Every log-space reduction is a polynomial-time reduction (polynomially many configurations, no repetition on a halting computation). NL-completeness is defined with $\le_L$; polynomial-time reductions would trivialise it, since $\mathrm{NL} \subseteq \mathrm P$ makes every nontrivial problem in NL complete under $\le_p$.
 - **PATH (REACHABILITY).** Given a directed graph $G$ and vertices $s, t$: is there a directed path $s \to t$?
@@ -67,6 +67,15 @@ Consequence: the nondeterministic space hierarchy is strict (B02), and the "poly
 5. *Why can log-space reductions be composed although $f(x)$ cannot be stored?* Recompute $f(x)$ bit by bit on demand; polynomial time overhead, still $O(\log n)$ space.
 6. *Which of the following are known: $\mathrm L = \mathrm{NL}$, $\mathrm{NL} = \mathrm{coNL}$, $\mathrm{NL} = \mathrm P$, $\mathrm{NL} \ne \mathrm{PSPACE}$?* Only $\mathrm{NL} = \mathrm{coNL}$ (Immerman-Szelepcsényi) and $\mathrm{NL} \ne \mathrm{PSPACE}$ (Savitch plus space hierarchy).
 
+## 2026W lectures: chapter 1 (28.10) and chapter 3 (30.10) [S62]
+
+The decks treat L and NL briefly. Not in them: Immerman-Szelepcsényi, Reingold, the 2SAT implication graph (2-SAT is only called tractable via reachability), HORN-SAT. Composition of log-space reductions is named as beyond the scope of the lecture. In our words:
+
+- **L.** A log-space program keeps a constant number of pointers, counters and Boolean flags. Its running time is not bounded by definition, but with logarithmic work space (and a logarithmic counter for the input head) there are only polynomially many configurations, so it can be taken polynomial.
+- **Example in L: FIND-NODE** (does a labelled tree contain label $n$). Traverse the tree with two node pointers (current, next) and one direction bit: going down, move to the first child or turn upward at a leaf; going up, move to the next sibling and turn downward, else to the parent; stop on return to the root.
+- **NL and REACHABILITY.** REACHABILITY is NL-complete under log-space reductions. Membership: keep the current vertex in binary, guess the next vertex, check the edge, stop with yes at the target, and count steps so no path of length $n$ or more is built. Hardness idea: an NL machine's configurations and transitions form the configuration graph, and acceptance is a path from the start to an accepting configuration. Since REACHABILITY is in P, NL $\subseteq$ P follows.
+- **Why log-space reductions.** For P and classes below it, polynomial-time reductions are too strong to compare problems.
+
 ## Code
 
 `src/py/complexity/reachability.py`: `nl_reachable` (guess-the-next-vertex machine, state = current vertex + counter, all branches explored), `savitch_reach` / `reachable_savitch` (B02), `implication_graph`, `kosaraju_scc`, `two_sat` (SCC criterion, returns an assignment), `two_sat_brute`, `inductive_count` (returns $c_{n-1}$, optionally the whole sequence $c_0, \dots, c_{n-1}$), `certify_unreachable`. Tests compare with `networkx.has_path`, `networkx.strongly_connected_components` and brute-force 2SAT.
@@ -76,7 +85,7 @@ Consequence: the nondeterministic space hierarchy is strict (B02), and the "poly
 ```card id=qc-cx3-logspace-tm
 Define a log-space TM. Which tape counts toward space?
 ---
-Read-only input tape plus read-write work tape; only work-tape cells count.
+Read-only input tape, read-write work tapes, and (in the lectures) a write-only output tape; only the work tapes count.
 $\mathrm L=\mathrm{SPACE}(\log n)$, $\mathrm{NL}=\mathrm{NSPACE}(\log n)$.
 ```
 
@@ -91,13 +100,6 @@ Write down the configuration graph and run BFS from start to accept.
 Why must NL-completeness use log-space rather than polynomial-time reductions?
 ---
 NL $\subseteq$ P, so under $\le_p$ every nontrivial problem in NL would be complete.
-```
-
-```card id=qc-cx3-compose
-How are log-space reductions composed when $f(x)$ cannot be stored?
----
-Run $g$ on a virtual input: recompute $f(x)$ from scratch for each requested bit, counting output bits.
-Polynomial time, still $O(\log n)$ space.
 ```
 
 ```card id=qc-cx3-path-nl
@@ -145,4 +147,24 @@ Directed reachability in L would give L = NL, which is open.
 Which are known: L = NL, NL = coNL, NL = P, NL $\ne$ PSPACE?
 ---
 Only NL = coNL (Immerman-Szelepcsényi) and NL $\ne$ PSPACE (Savitch plus space hierarchy).
+```
+
+```card id=qc-cx3-l-memory
+What may a log-space program store, and why is its running time polynomial?
+---
+A constant number of pointers, counters and Boolean flags.
+Logarithmic work space gives only polynomially many configurations, so a halting run is polynomially long.
+```
+
+```card id=qc-cx3-find-node
+Why is FIND-NODE (does a labelled tree contain label $n$) in L?
+---
+Traverse the tree with two node pointers (current, next) and one bit for the direction (down or up), checking each label.
+```
+
+```card id=qc-cx3-path-hardness
+Idea of the NL-hardness of REACHABILITY, and what follows for NL versus P?
+---
+The configurations and transitions of an NL machine on $x$ form a graph; acceptance is a path from the start to an accepting configuration.
+REACHABILITY is in P, so NL $\subseteq$ P.
 ```

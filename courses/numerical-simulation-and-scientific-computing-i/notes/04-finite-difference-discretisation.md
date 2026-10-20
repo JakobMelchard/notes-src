@@ -173,3 +173,9 @@ Why is $u = \sin\pi x \sin\pi y$ a bad test for a 2D Poisson solver?
 It is an eigenvector of $A_2$, so CG converges in one iteration.
 Use a manufactured solution that is not an eigenfunction.
 ```
+
+```card id=nssc-04-helmholtz
+How does the Helmholtz equation $\nabla^2\phi \pm k^2\phi = b$ change the discrete FD matrix compared with Poisson?
+---
+The sparsity pattern stays the same; the diagonal shifts by $\pm k^2$, so $-2/h^2$ becomes $-2/h^2 \pm k^2$.
+```

@@ -152,7 +152,7 @@ Now add edge 4–5. Both in $L_2$: odd cycle. LCA of 4 and 5 in the BFS tree is 
 
 5. **State and prove the invariant that makes Dijkstra correct; where do you use that lengths are non-negative?** See Results. When $v$ is extracted with key $\mathrm{dist}[v]$, any path $P$ to $v$ must leave $S$ at some first edge $(x, y)$, and $\ell(P) \ge d(s,x) + \ell(x,y) + \ell(\text{rest}) \ge \mathrm{dist}[y] + 0 \ge \mathrm{dist}[v]$. The "$+\,0$" is where $\ell \ge 0$ is used.
 
-## 2026W lecture: chapter 2, graphs (07.10) [S62]
+## 2026W lecture: chapter 2, graphs (05.10 to 09.10) [S62]
 
 Chen's chapter-2 deck is Kleinberg and Tardos chapter 3 [S25] and matches the
 sections above: representations, paths, cycles and trees, BFS and DFS,
@@ -237,6 +237,42 @@ If every vertex had an in-arc, walking backwards along in-arcs from any vertex w
 How is topological sorting done in $O(n+m)$?
 ---
 Count the remaining in-arcs of each vertex and keep the set of vertices with count 0. Repeatedly remove one, output it, and decrement its out-neighbours' counts, adding those that reach 0.
+```
+
+```card id=qc-alg2-path-cycle-length
+How are the length of a path and of a cycle measured in the lecture?
+---
+Path $(v_1,\dots,v_k)$: number of vertices minus one, so $k-1$ edges. Cycle $(v_1,\dots,v_k)$ with $v_1=v_k$, $k>2$ and the first $k-1$ vertices distinct: its length is the number of its vertices, which equals its number of edges.
+```
+
+```card id=qc-alg2-bfs-distance
+What exactly does layer $L_i$ of BFS from $s$ contain, and how do you read off an $s$-$t$ path?
+---
+All vertices at distance exactly $i$ from $s$. There is an $s$-$t$ path iff $t$ lies in some layer; storing for each new vertex the vertex it was found from (parent array) and following it back gives a shortest $s$-$t$ path.
+```
+
+```card id=qc-alg2-cc-algorithm
+Generic algorithm for the connected component of $s$, and why it is correct.
+---
+Start with $R=\{s\}$ and add $v$ while some edge $\{u,v\}$ has $u\in R$, $v\notin R$; return $G[R]$. Every added vertex has a path from $s$ (induction). Nothing is missing: a path from $s$ to a vertex outside $R$ would have a first edge leaving $R$, which the loop would still add. BFS or DFS implement it in $O(n+m)$.
+```
+
+```card id=qc-alg2-dfs
+DFS: idea, running time, and what it does not give you.
+---
+From $s$, follow one unvisited neighbour as deep as possible and backtrack when stuck (recursive call per unvisited neighbour). $O(n+m)$ with adjacency lists. Unlike BFS it need not find shortest paths.
+```
+
+```card id=qc-alg2-weak-strong
+Strongly vs weakly connected digraph.
+---
+Strongly connected: every two vertices are mutually reachable by directed paths. Weakly connected: the underlying undirected graph is connected.
+```
+
+```card id=qc-alg2-induced-subgraph
+Subgraph induced by a vertex set $V'$, and by an edge set $E'$.
+---
+$G[V']$ has vertices $V'$ and every edge of $G$ with both ends in $V'$. $G[E']$ has edges $E'$ and exactly the vertices that are endpoints of edges in $E'$.
 ```
 
 ## Code

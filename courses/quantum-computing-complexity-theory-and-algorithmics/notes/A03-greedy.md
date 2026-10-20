@@ -111,7 +111,7 @@ Sorted: cf2 de6 ab7 ac9 ef9 bc10 cd11 af14 bd15. Take cf (sets {c,f}), de ({d,e}
 
 5. **Why is Kruskal's running time $O(m \log n)$ rather than $O(m \log m)$? Are these different?** $m \le n^2$ so $\log m \le 2 \log n$; they are the same order. The sort dominates; the union-find work $O(m \alpha(n))$ is lower order.
 
-## 2026W lecture: chapter 3, greedy algorithms (09.10) [S62]
+## 2026W lecture: chapter 3, greedy algorithms (09.10 and 14.10) [S62]
 
 Chen's chapter-3 deck is Kleinberg and Tardos chapter 4 [S25]: interval
 scheduling, interval partitioning, shortest paths, minimum spanning trees and
@@ -152,6 +152,9 @@ sections above:
   so an optimum with no inversions exists, and that is the greedy schedule.
 - **How greedy proofs go:** greedy stays ahead, a structural bound the greedy
   meets (depth), the exchange argument, and (named only) matroids.
+- **Not in the 2026W deck:** Huffman coding and the union-find internals
+  (union-find is only used as a black box in Kruskal, $O(m\,\alpha(m,n))$);
+  the sections above keep them as background.
 
 ### Cards
 
@@ -206,7 +209,7 @@ The most expensive edge $f$ on any cycle $C$ is in no MST. Exchange: removing $f
 ```card id=qc-alg3-prim-kruskal
 Prim vs Kruskal: rule and running time.
 ---
-Prim: grow one tree from a root, always adding the cheapest edge leaving it (cut property); $O(n^2)$ with an array, $O(m\log n)$ with a heap. Kruskal: edges by increasing cost, skip those closing a cycle (cycle property), components in union-find; $O(m\log m)$ for the sort.
+Prim: grow one tree from a root, always adding the cheapest edge leaving it (cut property); $O(n^2)$ with an array, $O(m\log n)$ with a heap. Kruskal: edges by increasing cost, skip those closing a cycle (cycle property), components in union-find; $O(m\log n)$ for the sort (as $m\le n^2$, $\log m=O(\log n)$) plus $O(m\,\alpha(m,n))$ for the union-find operations.
 ```
 
 ```card id=qc-alg3-cayley
@@ -228,9 +231,57 @@ In a schedule without idle time, an inversion ($d_i<d_j$ but $j$ before $i$) imp
 ```
 
 ```card id=qc-alg3-proof-strategies
-Three standard ways to prove a greedy algorithm optimal.
+Standard ways to prove a greedy algorithm optimal.
 ---
-Greedy stays ahead (after every step at least as good as any other solution); structural bound (every solution needs at least $X$, greedy achieves $X$); exchange argument (turn any optimum into the greedy solution step by step without loss).
+Greedy stays ahead (after every step at least as good as any other solution); structural bound (every solution needs at least $X$, greedy achieves $X$); exchange argument (turn any optimum into the greedy solution step by step without loss). Matroids are named as the general structure under which a greedy algorithm is optimal.
+```
+
+```card id=qc-alg3-heap-update
+Binary heap: how does decreasing a priority work (as in Dijkstra and Prim), and how is the element found?
+---
+Set the smaller priority and sift the element up like an insert, $O(\log n)$. To find it in the array, keep its position $pos[v]$ and update it on every swap.
+```
+
+```card id=qc-alg3-heap-smaller-child
+Why does extract-min swap the moved element with the smaller child?
+---
+The smaller child becomes the parent of the other child, so the heap order holds again at that node.
+```
+
+```card id=qc-alg3-dijkstra-chain
+Dijkstra correctness: the inequality chain for an arbitrary $s$-$v$ path $P$ whose first arc leaving $S$ is $(x,y)$, and what justifies each step.
+---
+$\ell(P)\ge\ell(P')+\ell(x,y)\ge \mathrm{dist}(x)+\ell(x,y)\ge\pi(y)\ge\pi(v)$, with $P'$ the part of $P$ up to $x$. Steps: non-negative lengths; induction hypothesis ($x\in S$); definition of $\pi(y)$; Dijkstra picked $v$ rather than $y$.
+```
+
+```card id=qc-alg3-dijkstra-array-heap
+Dijkstra's running time with an array versus a binary heap as priority queue.
+---
+Array: insert and update $O(1)$, extract-min $O(n)$, total $O(n^2)$. Binary heap: every operation $O(\log n)$, $n$ extract-mins and at most $m$ updates, total $O((n+m)\log n)$. The array wins on dense graphs.
+```
+
+```card id=qc-alg3-cutset
+Cut and cutset in the MST chapter.
+---
+A cut is a non-empty vertex set $A\subsetneq V$; its cutset $D(A,V\setminus A)$ is the set of edges with exactly one endpoint in $A$. A cycle that uses one edge of a cutset must cross back and so uses a second one; the cut and cycle property proofs swap these two edges.
+```
+
+```card id=qc-alg3-reverse-delete
+Reverse-delete algorithm for MST.
+---
+Start with all edges; go through them by non-increasing cost and delete an edge unless that disconnects the graph. Each deleted edge is the most expensive on some remaining cycle, so the cycle property justifies it.
+```
+
+```card id=qc-alg3-kruskal-correct
+Why is Kruskal correct?
+---
+Edge $e=\{u,v\}$ in increasing cost order. If it closes a cycle, it is the most expensive edge on that cycle: discard by the cycle property. Otherwise take $S$ = component of $u$; $e$ is the cheapest edge leaving $S$ (cheaper ones were already handled), so it is in the MST by the cut property.
+```
+
+```card id=qc-alg3-tiebreak
+How do Prim and Kruskal cope with equal edge costs?
+---
+Perturb costs by tiny amounts (for integer costs, add $i/n^2$ to edge $e_i$); both algorithms only compare costs, so the MST for the perturbed costs is an MST for the original ones. In practice: compare by cost, break ties by edge index.
 ```
 
 ## Code

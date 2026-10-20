@@ -1,6 +1,6 @@
 # A04 Divide and conquer: merge sort, inversions, closest pair, Karatsuba, Strassen
 
-Divide and conquer splits an input into parts of a constant fraction of the size, solves the parts recursively, and combines the answers. The recursion has depth $O(\log n)$, so if combining costs little the total is a small multiple of the combine cost (A01, master theorem). The paradigm gives $O(n \log n)$ sorting, an $O(n \log n)$ count of inversions that looks like it needs $\Theta(n^2)$, an $O(n \log n)$ closest pair in the plane, and, more surprisingly, sub-cubic matrix multiplication and sub-quadratic integer multiplication by finding a clever way to save one recursive call out of four (Karatsuba) or eight (Strassen). Reference: KT chapter 5 (5.1 merge sort and recurrences, 5.3 inversions, 5.4 closest pair, 5.5 integer multiplication, 5.6 FFT); Strassen is not in KT, see CLRS 4.2. References: Kleinberg & Tardos ch. 5 [S25]; 192.219 additionally names merge sort [S5]. Exam 1 material.
+Divide and conquer splits an input into parts of a constant fraction of the size, solves the parts recursively, and combines the answers. The recursion has depth $O(\log n)$, so if combining costs little the total is a small multiple of the combine cost (A01, master theorem). The paradigm gives $O(n \log n)$ sorting, an $O(n \log n)$ count of inversions that looks like it needs $\Theta(n^2)$, an $O(n \log n)$ closest pair in the plane, and, more surprisingly, sub-cubic matrix multiplication and sub-quadratic integer multiplication by finding a clever way to save one recursive call out of four (Karatsuba) or eight (Strassen). Reference: KT chapter 5 (5.1 merge sort and recurrences, 5.3 inversions, 5.4 closest pair, 5.5 integer multiplication, 5.6 FFT); Strassen is not in KT, see CLRS 4.2. References: Kleinberg & Tardos ch. 5 [S25]; 192.219 additionally names merge sort [S5]. Exam 1 material. The 2026W chapter 4 covers merge sort, the restricted master theorem, counting inversions and closest pair only; Karatsuba, Strassen and the FFT below are background, not lecture material.
 
 ## Definitions
 
@@ -41,11 +41,11 @@ Sort the points once by $x$ (list $P_x$) and once by $y$ (list $P_y$). Recursive
 
 1. Split by the vertical line $x = x^*$ through the median $x$-coordinate into $Q$ (left half) and $R$ (right half); build $Q_x, Q_y, R_x, R_y$ in $O(n)$ by filtering.
 2. Recurse: $\delta = \min(\delta_Q, \delta_R)$, the smallest distance found within a half.
-3. Combine: only pairs $(q, r)$ with $q \in Q, r \in R$ and $d(q, r) < \delta$ can beat $\delta$. Let $S$ be the points with $|x - x^*| < \delta$ (the *strip*), listed by $y$ (filter $P_y$, $O(n)$). Scan $S_y$; for each point compare it with the next **7** points in $y$-order (KT uses 15 for a simpler bound; 11 and 7 are the tighter constants).
+3. Combine: only pairs $(q, r)$ with $q \in Q, r \in R$ and $d(q, r) < \delta$ can beat $\delta$. Let $S$ be the points with $|x - x^*| < \delta$ (the *strip*), listed by $y$ (filter $P_y$, $O(n)$). Scan $S_y$; for each point compare it with the next **11** points in $y$-order (the 2026W lecture's constant; a finer count gets it down to 7, and KT uses 15).
 
-**Strip lemma.** If $s, s' \in S$ and $d(s, s') < \delta$, then $s$ and $s'$ are within 7 positions of each other in $S_y$ (in particular within 11, or 15).
+**Strip lemma.** If $s_i, s_j$ are the strip points with the $i$-th and $j$-th smallest $y$-coordinate and $|i - j| \ge 12$, then $d(s_i, s_j) \ge \delta$. So a closer pair sits within 11 positions in $S_y$.
 
-*Proof.* Partition the strip into squares of side $\delta/2$, arranged in two columns of width $\delta/2$ on each side of $x^*$ (four columns total, each $\delta/2$ wide, spanning the strip of width $2\delta$) and rows of height $\delta/2$. Each square lies entirely in $Q$ or entirely in $R$, so any two points in the same square are at distance $\le \delta/2 \cdot \sqrt{2} < \delta$, contradicting $\delta$ being the minimum within a half; hence **each square holds at most one point**. If $s'$ is at least two rows below $s$ (equivalently $y(s) - y(s') \ge \delta$), then $d(s, s') \ge \delta$. So any $s'$ with $d(s,s') < \delta$ lies in $s$'s row or the next row: a $2 \times 4$ block of 8 squares, at most 8 points including $s$, hence at most 7 candidates. (The classical 11 uses the same block but is careless about which row the pair sits in; 15 comes from a $4 \times 4$ block. All are constants; the point is $O(1)$ comparisons per strip point.) $\square$
+*Proof.* Cover the strip with boxes of side $\delta/2$: four columns (two on each side of $x^*$, strip width $2\delta$) and rows of height $\delta/2$. Each box lies entirely in $Q$ or entirely in $R$, so two points in one box would be at distance $\le \delta/\sqrt{2} < \delta$, contradicting $\delta$ being the minimum within a half; hence **each box holds at most one point**. The row of $s_i$ and the two rows above it have 12 boxes, so at most 12 points including $s_i$; a point 12 or more positions later lies at least three rows higher, with two full rows in between, so its $y$-distance alone is $\ge 2 \cdot \delta/2 = \delta$. $\square$ The exact constant does not matter; what matters is $O(1)$ comparisons per strip point.
 
 **Correctness.** Any pair closer than $\delta$ is in the strip and is detected by the scan; pairs within a half are found recursively. **Time:** $T(n) = 2T(n/2) + O(n) = O(n \log n)$; the initial sort is another $O(n \log n)$. Re-sorting the strip at each level would give $O(n \log^2 n)$; carrying the $y$-sorted lists down avoids it.
 
@@ -86,14 +86,14 @@ Total $1 + 3 + 13 = 17$. Check by brute force: pairs $(5,4),(5,2),(5,3),(4,2),(4
 
 **Karatsuba** on $x = 1234$, $y = 5678$ (base 10, two-digit halves): $x_1 = 12, x_0 = 34, y_1 = 56, y_0 = 78$. $x_1y_1 = 672$, $x_0 y_0 = 2652$, $p = 46 \cdot 134 = 6164$, middle $= 6164 - 672 - 2652 = 2840$. Result $672 \cdot 10^4 + 2840 \cdot 10^2 + 2652 = 6720000 + 284000 + 2652 = 7006652$. Check: $1234 \cdot 5678 = 7006652$.
 
-**Closest pair strip.** Suppose the recursive calls returned $\delta_Q = \delta_R = 2$ around the median line $x^* = 5$, so $\delta = 2$ and the strip is $3 < x < 7$. Strip points sorted by $y$: $p_1 = (4.2, 0)$, $p_2 = (5.9, 0.6)$, $p_3 = (3.4, 1.9)$, $p_4 = (6.4, 2.7)$, $p_5 = (4.6, 4.0)$. (Consistent with $\delta = 2$: within $Q = \{p_1, p_3, p_5\}$ the closest are $p_1, p_3$ at $\sqrt{0.64 + 3.61} \approx 2.06$; within $R = \{p_2, p_4\}$ the distance is $\sqrt{0.25 + 4.41} \approx 2.16$.) Scan: $p_1$ vs $p_2$: $\sqrt{2.89 + 0.36} \approx 1.80 < 2$, new best, and it straddles $x^*$ ($4.2 < 5 < 5.9$) as any improvement must; $p_1$ vs $p_3$: $2.06$; $p_1$ vs $p_4$: $y$-difference $2.7 \ge \delta$, stop scanning successors of $p_1$. $p_2$ vs $p_3$: $\sqrt{6.25 + 1.69} \approx 2.82$; $p_2$ vs $p_4$: $2.16$; $p_2$ vs $p_5$: $y$-difference $3.4$, stop. $p_3$ vs $p_4$: $\approx 3.10$; $p_3$ vs $p_5$: $y$-difference $2.1$, stop. $p_4$ vs $p_5$: $\sqrt{3.24 + 1.69} \approx 2.22$. Result: closest pair $(p_1, p_2)$ at $\approx 1.80$. No point was compared with more than 3 successors, within the bound of 7.
+**Closest pair strip.** Suppose the recursive calls returned $\delta_Q = \delta_R = 2$ around the median line $x^* = 5$, so $\delta = 2$ and the strip is $3 < x < 7$. Strip points sorted by $y$: $p_1 = (4.2, 0)$, $p_2 = (5.9, 0.6)$, $p_3 = (3.4, 1.9)$, $p_4 = (6.4, 2.7)$, $p_5 = (4.6, 4.0)$. (Consistent with $\delta = 2$: within $Q = \{p_1, p_3, p_5\}$ the closest are $p_1, p_3$ at $\sqrt{0.64 + 3.61} \approx 2.06$; within $R = \{p_2, p_4\}$ the distance is $\sqrt{0.25 + 4.41} \approx 2.16$.) Scan: $p_1$ vs $p_2$: $\sqrt{2.89 + 0.36} \approx 1.80 < 2$, new best, and it straddles $x^*$ ($4.2 < 5 < 5.9$) as any improvement must; $p_1$ vs $p_3$: $2.06$; $p_1$ vs $p_4$: $y$-difference $2.7 \ge \delta$, stop scanning successors of $p_1$. $p_2$ vs $p_3$: $\sqrt{6.25 + 1.69} \approx 2.82$; $p_2$ vs $p_4$: $2.16$; $p_2$ vs $p_5$: $y$-difference $3.4$, stop. $p_3$ vs $p_4$: $\approx 3.10$; $p_3$ vs $p_5$: $y$-difference $2.1$, stop. $p_4$ vs $p_5$: $\sqrt{3.24 + 1.69} \approx 2.22$. Result: closest pair $(p_1, p_2)$ at $\approx 1.80$. No point was compared with more than 3 successors, well within the bound of 11.
 
 ## Pitfalls
 
 - The recursion must shrink the size by a *constant factor*; $T(n) = 2T(n-1) + 1$ is exponential (A01).
 - Counting inversions requires the recursive calls to *return sorted output*; counting split inversions on unsorted halves is $\Theta(n^2)$ again.
 - In merge-and-count, add $|L| - i$ when taking from $R$, not $|R| - j$ when taking from $L$; with equal elements decide the convention (strict $>$) and use `<=` in the merge.
-- Closest pair: the strip is $|x - x^*| < \delta$ around the *median*, width $2\delta$; the per-point constant (7, 11, 15) comes from a packing argument that needs $\delta$ to be the minimum *within each half*, which is why squares of side $\delta/2$ hold at most one point.
+- Closest pair: the strip is $|x - x^*| < \delta$ around the *median*, width $2\delta$; the per-point constant (11 in the lecture, 7 or 15 elsewhere) comes from a packing argument that needs $\delta$ to be the minimum *within each half*, which is why squares of side $\delta/2$ hold at most one point.
 - Sorting the strip by $y$ at every level costs $O(n \log n)$ per level, $O(n \log^2 n)$ total; pre-sorted $P_y$ filtered top-down fixes it.
 - Karatsuba's $p$ has $n/2 + 1$ bits; this does not change the recurrence's asymptotics but does matter in an implementation (carry).
 - Strassen's exponent is $\log_2 7$, from $a = 7$, $b = 2$; the $O(n^2)$ additions are lower order, they do not make it $n^2 \log n$.
@@ -105,7 +105,7 @@ Total $1 + 3 + 13 = 17$. Check by brute force: pairs $(5,4),(5,2),(5,3),(4,2),(4
 
 2. **Describe an $O(n \log n)$ algorithm for counting inversions and justify the count of split inversions.** Merge-and-count. When $R[j]$ is emitted, the $|L| - i$ remaining left elements are all larger than $R[j]$ and precede it in the input: exactly those are the split inversions involving $R[j]$; every split inversion is counted exactly once, at the moment its right element is emitted.
 
-3. **In the closest-pair algorithm, why does it suffice to compare each strip point with a constant number of others?** Squares of side $\delta/2$ within one half contain at most one point each (two points in one square would be at distance $\le \delta/\sqrt{2} < \delta$). A point closer than $\delta$ to $s$ is within $\delta$ in $y$, so in the $2$-row, $4$-column block of 8 squares: at most 7 other points; sorted by $y$ they are among the next 7 (any point outside this block has $y$-difference $\ge \delta$).
+3. **In the closest-pair algorithm, why does it suffice to compare each strip point with a constant number of others?** Boxes of side $\delta/2$ within one half contain at most one point each (two points in one box would be at distance $\le \delta/\sqrt{2} < \delta$). The strip is four boxes wide, so the row of $s$ and the two rows above hold at most 12 points including $s$. A point 12 or more positions later in $y$-order lies at least three rows higher, with two full rows of height $\delta/2$ in between, so at distance $\ge \delta$; hence comparing with the next 11 points suffices.
 
 4. **Karatsuba uses three multiplications instead of four. What if someone found a way to use two? What if the split was into three parts with five products?** Two: $T(n) = 2T(n/2) + O(n) = O(n \log n)$. Three parts, five products: $T(n) = 5T(n/3) + O(n) = O(n^{\log_3 5}) = O(n^{1.465})$, better than Karatsuba's $1.585$; that is Toom-3 (actually Toom-3 uses 5 products, so this is real).
 
@@ -115,13 +115,79 @@ Total $1 + 3 + 13 = 17$. Check by brute force: pairs $(5,4),(5,2),(5,3),(4,2),(4
 
 `src/py/algorithmics/divide_conquer.py`: `merge_sort(a)`, `count_inversions(a)` (returns count and sorted list), `closest_pair(points)` (with the strip scan; tests compare to brute force), `strassen(A, B)` (numpy blocks, padded to a power of two), `master_theorem(a, b, d)`.
 
+## 2026W lecture: chapter 4, divide and conquer (14.10) [S62]
+
+Chen's chapter-4 deck follows Kleinberg and Tardos chapter 5 [S25] but stops
+after closest pair. In our words:
+
+- **Paradigm.** Split into parts, solve them recursively, combine. The common
+  case halves the input and combines in linear time; named uses are binary
+  search, exponentiation and sorting.
+- **Merge sort** with the recurrence
+  $T(n)\le T(\lceil n/2\rceil)+T(\lfloor n/2\rfloor)+O(n)$, solved to
+  $O(n\log n)$ twice: by the recursion tree ($\log_2 n$ levels of $cn$ each)
+  and by induction on $k$ for $n=2^k$.
+- **Restricted master theorem.** For $T(n)=x\,T(\lceil n/y\rceil)+O(n^d)$ with
+  constants $x>0$, $y>1$, $d\ge 0$: $O(n^d)$ if $d>\log_y x$,
+  $O(n^d\log n)$ if $d=\log_y x$, $O(n^{\log_y x})$ if $d<\log_y x$. Extension:
+  if the combine cost is $O(n^{\log_y x}\log^k n)$ with $k>-1$, then
+  $T(n)=O(n^{\log_y x}\log^{k+1} n)$.
+- **Counting inversions** of a permutation, motivated by comparing two
+  rankings. The number of inversions is a distance between rankings (non-negative,
+  symmetric, triangle inequality); finding one ranking with least total distance
+  to a set of rankings (Kemeny) is NP-hard. Sort-and-count in $O(n\log n)$.
+- **Closest pair in the plane.** 1D: sort and compare neighbours. Quadrants
+  fail (no even split). Split by a vertical line, recurse, then check the
+  $2\delta$ strip in $y$-order against the next 11 points. Sorting the strip
+  anew in each call gives $T(n)\le 2T(n/2)+O(n\log n)=O(n\log^2 n)$; passing
+  down lists sorted by $x$ and by $y$ gives $O(n\log n)$.
+
 ## Cards
 
-```card id=qc-alg4-merge-sort
-Merge sort: recurrence, solution, and the comparison-sort lower bound.
+```card id=qc-alg4-mergesort-rec
+Merge sort: recurrence for the number of comparisons, its solution, and two ways to prove it.
 ---
-$T(n)=2T(n/2)+cn$, so $T(n)=O(n\log n)$.
-Any comparison sort needs $\lceil\log_2 n!\rceil=\Omega(n\log n)$ comparisons (decision tree with $n!$ leaves).
+$T(n)\le T(\lceil n/2\rceil)+T(\lfloor n/2\rfloor)+O(n)$, so $T(n)=O(n\log n)$.
+Recursion tree: $\log_2 n$ levels, each costing $cn$. Induction on $k$ with $n=2^k$: $T(2^{k+1})=2T(2^k)+O(2^{k+1})=O(2^{k+1}(k+1))$.
+```
+
+```card id=qc-alg4-master-restricted
+Restricted master theorem for $T(n)=x\,T(\lceil n/y\rceil)+O(n^d)$, with $x>0$, $y>1$, $d\ge0$.
+---
+$d>\log_y x$: $O(n^d)$. $d=\log_y x$: $O(n^d\log n)$. $d<\log_y x$: $O(n^{\log_y x})$.
+```
+
+```card id=qc-alg4-master-log
+Master theorem extension: $T(n)=x\,T(\lceil n/y\rceil)+O(n^{\log_y x}\log^k n)$ with $k>-1$.
+---
+$T(n)=O(n^{\log_y x}\log^{k+1} n)$: one more log factor. Example: $2T(n/2)+O(n\log n)=O(n\log^2 n)$.
+```
+
+```card id=qc-alg4-inversions-example
+Count the inversions of $1,5,4,8,10,2 \mid 6,9,12,11,3,7$ by divide and conquer.
+---
+Left half 5 (5-4, 5-2, 4-2, 8-2, 10-2), right half 8, across the halves 9.
+Across: merge $1,2,4,5,8,10$ with $3,6,7,9,11,12$, adding $4+2+2+1+0+0$. Total 22.
+```
+
+```card id=qc-alg4-ranking-distance
+Why count inversions, and what related problem is hard?
+---
+The number of inversions between two rankings is a distance (non-negative, symmetric, triangle inequality), used to compare tastes or rankings.
+Finding one ranking with least total distance to a set of rankings (Kemeny ranking) is NP-hard.
+```
+
+```card id=qc-alg4-closest-1d-quadrants
+Closest pair: how is the 1D case solved, and why not split the plane into quadrants?
+---
+1D: sort and compare consecutive points, $O(n\log n)$.
+Quadrants cannot guarantee about $n/4$ points per piece; a vertical line through the median $x$ gives an even split.
+```
+
+```card id=qc-alg4-strip-11
+Closest pair: why is it enough to compare each strip point with the next 11 in $y$-order?
+---
+Boxes of side $\delta/2$ hold at most one point each (two would be closer than $\delta$ within one half). The strip is 4 boxes wide, so 12 or more positions later means two full rows lie in between, and the $y$-distance alone is $\ge\delta$.
 ```
 
 ```card id=qc-alg4-split-inversions
@@ -138,19 +204,6 @@ Counting split inversions on unsorted halves is $\Theta(n^2)$ again.
 Sorting does not change the split count, which depends only on which elements are in $L$ vs $R$.
 ```
 
-```card id=qc-alg4-inversions-compute
-Compute the number of inversions of $[1,5,4,8,10,2,6,9,3,7]$ (left 1, right 3, split 13).
----
-$1+3+13=17$.
-```
-
-```card id=qc-alg4-strip-lemma
-Closest pair: why does each strip point need comparing with only 7 successors in $y$-order?
----
-Squares of side $\delta/2$ hold at most one point (two would be at distance $\le\delta/\sqrt2<\delta$).
-A closer point lies in a $2\times4$ block of 8 squares, so at most 7 candidates.
-```
-
 ```card id=qc-alg4-closest-time
 True or false: re-sorting the strip by $y$ at every level keeps closest pair at $O(n\log n)$.
 ---
@@ -158,35 +211,3 @@ False: that gives $O(n\log^2 n)$.
 Carrying the pre-sorted list $P_y$ down by filtering keeps $T(n)=2T(n/2)+O(n)=O(n\log n)$.
 ```
 
-```card id=qc-alg4-karatsuba
-Karatsuba: which three products, and the resulting running time?
----
-$x_1y_1$, $x_0y_0$, $p=(x_1+x_0)(y_1+y_0)$; middle term $p-x_1y_1-x_0y_0$.
-$T(n)=3T(n/2)+O(n)=O(n^{\log_2 3})=O(n^{1.585})$.
-```
-
-```card id=qc-alg4-karatsuba-variants
-What if integer multiplication split into 3 parts using 5 products?
----
-$T(n)=5T(n/3)+O(n)=O(n^{\log_3 5})=O(n^{1.465})$, better than Karatsuba. This is Toom-3.
-```
-
-```card id=qc-alg4-strassen
-Strassen's recurrence and solution. Why is it not $\Theta(n^2\log n)$?
----
-$T(n)=7T(n/2)+O(n^2)=\Theta(n^{\log_2 7})=O(n^{2.81})$.
-$\log_2 7\approx2.807>2$, master case 1 (leaves dominate); the additions are lower order.
-```
-
-```card id=qc-alg4-omega
-What is the matrix multiplication exponent $\omega$, and what bounds does the note give?
----
-Infimum of $c$ with $n\times n$ multiplication in $O(n^c)$. $2\le\omega<2.372$.
-$k\times k$ with $r$ scalar products gives $\omega\le\log_k r$ (Strassen: $\log_2 7$).
-```
-
-```card id=qc-alg4-fft
-How does the FFT multiply two degree-$n$ polynomials in $O(n\log n)$?
----
-Evaluate at the $2n$ complex roots of unity (even/odd split, $2T(n/2)+O(n)$), multiply pointwise, interpolate by the inverse transform.
-```

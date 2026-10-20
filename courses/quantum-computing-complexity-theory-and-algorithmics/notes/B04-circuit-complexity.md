@@ -70,6 +70,14 @@ The same construction with a random tape gives $\mathrm{BPP} \subseteq \mathrm{P
 5. *Why is PARITY not in $\mathrm{AC}^0$, and where exactly does the proof use that the function is PARITY?* Random restrictions plus the switching lemma collapse constant-depth small circuits to shallow decision trees; PARITY restricted is still PARITY on the free variables and has decision-tree depth equal to their number.
 6. *What does the P-completeness of CIRCUIT VALUE tell you about parallel algorithms?* CVP $\in \mathrm{NC}$ iff $\mathrm{NC} = \mathrm P$; P-complete problems are believed not to parallelise to polylog depth.
 
+## 2026W lectures: introduction (12.10) [S62]
+
+Of this note, the classical complexity decks contain only circuit evaluation; circuit classes, P/poly, NC, AC, P-completeness and lower bounds do not appear in them (the TISS list places circuit classes next to the quantum complexity topics). In our words:
+
+- A $k$-ary Boolean circuit has $k$ input gates, one output gate, and AND, OR and NOT gates (AND true iff all inputs true, OR true iff some input true).
+- **CIRCUIT EVAL** (given a circuit and values for its inputs, is the output true?) is in P: propagate values from the inputs upward, evaluating a gate once all its children are known; each gate is evaluated once, so there are linearly many rounds (linear time with suitable data structures).
+- **MODEL CHECKING** for propositional logic (does a given assignment satisfy a given formula?) reduces in polynomial time to circuit evaluation, since a formula is a circuit whose gates are its subformulas; hence it is in P.
+
 ## Code
 
 No dedicated module. Topological evaluation of a DAG (CVP) is `topological_sort` in `src/py/algorithmics/graphs.py` (A02); the reversible-circuit and Feynman-path ideas are simulated in `src/py/complexity/query_complexity.py` (B06, `random_query_algorithm` builds a circuit as a product of unitaries) and in the quantum package (`src/py/quantum/`).
@@ -156,4 +164,17 @@ Best known explicit circuit lower bound for NP, and the natural proofs barrier?
 ---
 About $3n$ (e.g. $(3+\frac1{86})n$, Li-Yang $3.1n$).
 Razborov-Rudich: constructive and large techniques would break pseudorandom generators.
+```
+
+```card id=qc-cx4-circuit-eval
+Why is CIRCUIT EVAL (circuit plus input values, is the output true?) in P?
+---
+Evaluate bottom-up: a gate is computed once all its children are known, each gate once.
+Linearly many rounds of polynomial work; linear time with suitable data structures.
+```
+
+```card id=qc-cx4-model-checking
+Why is checking whether an assignment satisfies a propositional formula in P?
+---
+The formula is a circuit with one gate per subformula; this reduces it in polynomial time to CIRCUIT EVAL, which is in P.
 ```

@@ -189,3 +189,112 @@ Why does Jacobi preconditioning not help the Poisson matrix?
 Its diagonal is constant ($4/h^2$), so $M^{-1}A$ is a scalar multiple of $A$.
 Same eigenvalue spread; $M$ must be SPD with cheap $M^{-1}r$.
 ```
+
+```card id=nssc-05-storage-formats
+Name the three sparse storage formats covered in the lecture.
+---
+COO (coordinate list of row, column and value), CSR (compressed sparse row), CSC (compressed sparse column).
+```
+
+```card id=nssc-05-fill-in
+Why is the inverse of a sparse matrix a poor route to solving $Ax = b$?
+---
+The inverse of a sparse matrix, even a tridiagonal one, is generally dense.
+Storing it costs $N^2$ entries, and products with it are expensive.
+```
+
+```card id=nssc-05-no-iterative
+Name two cases where a non-iterative solver is enough.
+---
+1D tridiagonal systems with the Thomas algorithm, which is efficient and not iterative.
+Time-dependent N-D problems split into 1D problems, each solved with Thomas, and banded matrices with a banded direct solver.
+```
+
+```card id=nssc-05-tolerance-halfway
+Why can an iterative method use a looser tolerance inside a larger algorithm, while a direct method cannot?
+---
+An iterative method can stop at any accuracy. If an earlier step adds error of order $10^{-3}$, the later iterative step only needs a tolerance around $10^{-4}$ to be on the safe side.
+Direct methods cannot operate half-way.
+```
+
+```card id=nssc-05-warm-start
+What initial guess should an iterative solve use inside a time-marching loop?
+---
+The solution of the previous time step (warm start).
+```
+
+```card id=nssc-05-stop-tests
+Name the three stopping tests of the iteration procedure.
+---
+$N_{\max}$ caps the iteration count; reaching it is an error.
+Residual test $\|r\| < \text{tol}_r$ with $r = Ax - b$; step test $\|x - x_{\text{old}}\| < \text{tol}_x$, which warns that the iterates barely change.
+Whether to normalise by $\|b\|$ is problem dependent.
+```
+
+```card id=nssc-05-splitting-form
+Write the stationary iteration for $A = M - N$ and the requirement on $M$.
+---
+$x^{k+1} = x^k + M^{-1} r^k$ with $r^k = b - Ax^k$, equivalently $M x^{k+1} = b + N x^k$.
+$M$ should be as close to $A$ as possible and cheap to invert.
+```
+
+```card id=nssc-05-jacobi-lecture
+What does the lecture say about the convergence of Jacobi, and why is it taught?
+---
+Probably the worst convergence rate of the basic methods, but convergence is still guaranteed.
+It is the building block (smoother) inside multigrid.
+```
+
+```card id=nssc-05-stall
+Why does a stationary iteration stall, and what does multigrid do about it?
+---
+After a few iterations only the smooth part of the error is left, and it converges very slowly.
+Multigrid moves the problem to a coarser grid, where the smooth error looks rapidly varying and is removed cheaply, then interpolates back.
+```
+
+```card id=nssc-05-error-residual
+How are error and residual related, and how is a solver's performance measured?
+---
+$A e^{(m)} = r^{(m)}$ with $e^{(m)} = x - x^{(m)}$, so the error goes to zero as the residual does.
+Performance is measured by the number of iterations needed to drive the residual to zero.
+```
+
+```card id=nssc-05-restrict-prolong
+What are restriction and prolongation in the multigrid scheme?
+---
+Restriction moves the residual to the coarse grid, in the lecture example by taking every other point.
+Prolongation moves the coarse correction back to the fine grid by linear interpolation.
+```
+
+```card id=nssc-05-vw-cycle
+Describe the V cycle and the W cycle.
+---
+A V cycle goes from the finest grid directly to the coarsest and back, and repeats until convergence.
+A W cycle does not go directly; it visits the coarse grids more often.
+```
+
+```card id=nssc-05-mg-example
+In the lecture example (Gauss-Seidel per level, six levels from N=64 to N=2), how many V cycles bring the residual below $10^{-3}$, and how many Gauss-Seidel iterations are needed without multigrid?
+---
+8 V cycles; plain Gauss-Seidel needs 2580 iterations.
+```
+
+```card id=nssc-05-matrix-free
+What must a matrix-free Jacobi solver store, and what may it not allocate?
+---
+Only the solution vectors. Matrix entries come from the stencil computed from grid indices, with boundary points handled as in the COO assembly.
+No new, malloc or standard containers inside the solver, and no static arrays that scale with the problem size.
+```
+
+```card id=nssc-05-exact-solution
+What is the exact solution of the 2D Laplace test problem of the Jacobi exercise, with data $\sin \pi x$ on the top side and zero on the other sides?
+---
+$f(x, y) = \dfrac{\sinh(\pi y)\,\sin(\pi x)}{\sinh \pi}$ on the unit square.
+```
+
+```card id=nssc-05-flags
+Can compiler optimisation flags change the result of a Jacobi run?
+---
+Yes, in general: reordering floating-point operations, for example by vectorisation, changes rounding, so bitwise reproducibility can be lost.
+Weigh the time gain against that loss.
+```
