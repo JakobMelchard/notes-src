@@ -41,7 +41,7 @@ is not published anywhere read: **ask** (below).
 
 | course (repo folder) | semester | covers |
 |---|---|---|
-| NSSC I (`numerical-simulation-and-scientific-computing-i`) | winter | memory hierarchy, roofline, serial optimisation, OpenMP |
+| NSSC I (`nssc1`) | winter | memory hierarchy, roofline, serial optimisation, OpenMP |
 | Efficient Programs (`efficient-programs`) | winter | measurement, `perf`, vectorisation, cache effects |
 | Scientific Programming with Python | winter | numpy, `multiprocessing`, performance |
 | ASC-School I (`asc-school-i-hpc`) | winter | Linux, ASC clusters, Slurm, MPI in depth |

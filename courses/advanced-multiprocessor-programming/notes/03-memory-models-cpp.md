@@ -9,7 +9,7 @@ Preshing [S21], Sutter's *atomic<> Weapons* [S22]. Code:
 `src/cpp/memory_model.cpp`. Hardware background (store buffers, caches):
 Efficient Programs 03,
 04;
-races and false sharing: [NSSC I 07](../../numerical-simulation-and-scientific-computing-i/notes/07-shared-memory-parallel-computing.md).
+races and false sharing: [NSSC I 07](../../nssc1/notes/07-shared-memory-parallel-computing.md).
 
 ## Why a model is needed
 

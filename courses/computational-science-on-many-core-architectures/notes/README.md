@@ -21,7 +21,7 @@ Rupp (E360) [S1].
 *(unsourced: ...)* in place. The lecturer publishes **no** course material
 that we could find [S8]; his 2015 VSC tutorial [S4] covers the syllabus and is
 used throughout. The OpenMP basics are not repeated here: see NSSC I notes 01,
-02, 07 in [`../../../ws2026/numerical-simulation-and-scientific-computing-i/notes/`](../../numerical-simulation-and-scientific-computing-i/notes/README.md)
+02, 07 in [`../../../ws2026/numerical-simulation-and-scientific-computing-i/notes/`](../../nssc1/notes/README.md)
 [S40].
 
 | # | note | one line |

@@ -24,7 +24,7 @@ Every claim carries `[S<n>]` into [`../refs/SOURCES.md`](../refs/SOURCES.md);
 inferences and unverified items are marked in place. Changes:
 `CHANGELOG.md`. Already covered elsewhere and only linked
 here: OpenMP, threads, races, Amdahl in
-[NSSC I 07](../../numerical-simulation-and-scientific-computing-i/notes/07-shared-memory-parallel-computing.md);
+[NSSC I 07](../../nssc1/notes/07-shared-memory-parallel-computing.md);
 latency, store buffers, caches in
 Efficient Programs 03
 and 04.

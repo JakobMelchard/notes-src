@@ -3,7 +3,7 @@
 How source files become one program, and the rules that make "it compiles" differ
 from "it links" and from "it is correct". The toolchain side (make, CMake, compiler
 flags, lldb, sanitizers, git) is in
-[NSSC I note 10](../../numerical-simulation-and-scientific-computing-i/notes/10-software-engineering-for-scientific-computing.md)
+[NSSC I note 10](../../nssc1/notes/10-software-engineering-for-scientific-computing.md)
 [S15]; this note does the language side. Lecture items 001, 003, 004, 025 [S3].
 
 Code: `src/cpp/basics_main.cpp`, `basics_other.cpp`, `basics.hpp`, `modules/`.

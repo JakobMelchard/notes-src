@@ -88,7 +88,7 @@ What AMP actually uses from it, and where to self-study instead (inference from 
 
 | needed for AMP | self-study here |
 |---|---|
-| threads, shared memory, races, locks, OpenMP tasks, Amdahl | [NSSC I note 07](../../numerical-simulation-and-scientific-computing-i/notes/07-shared-memory-parallel-computing.md) and its `threads_cpp.cpp` |
+| threads, shared memory, races, locks, OpenMP tasks, Amdahl | [NSSC I note 07](../../nssc1/notes/07-shared-memory-parallel-computing.md) and its `threads_cpp.cpp` |
 | caches, coherence, false sharing, latency | Efficient Programs 03, 04 |
 | work and span, greedy scheduling | note 11 here (derived from [S8]) |
 | C++ atomics and memory orders | note 03 here |

@@ -6,7 +6,7 @@ word, and the whole problem becomes **cache-coherence traffic**. Code:
 `src/cpp/spinlocks.cpp`. Hardware background:
 Efficient Programs 04, caches
 and the false-sharing measurement in
-[NSSC I 07](../../numerical-simulation-and-scientific-computing-i/notes/07-shared-memory-parallel-computing.md).
+[NSSC I 07](../../nssc1/notes/07-shared-memory-parallel-computing.md).
 
 ## Definitions
 

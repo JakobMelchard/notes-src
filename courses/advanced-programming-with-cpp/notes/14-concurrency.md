@@ -4,7 +4,7 @@ C++11 gave the language a memory model: a precise definition of which multithrea
 programs have defined behaviour. The core rule is short: **a data race is undefined
 behaviour**. Item 022 [S3]; hand-out ex3.3 (make a `shared_ptr` count thread-safe with
 atomics and with locks, benchmark both) [S4]; CP.2, CP.20, CP.25, CP.42 [S10]. OpenMP
-and scaling laws are in [NSSC I note 07](../../numerical-simulation-and-scientific-computing-i/notes/07-shared-memory-parallel-computing.md) [S15] (not repeated here).
+and scaling laws are in [NSSC I note 07](../../nssc1/notes/07-shared-memory-parallel-computing.md) [S15] (not repeated here).
 
 Code: `src/cpp/concurrency.cpp` (14 deterministic checks, clean under ThreadSanitizer:
 `make tsan`; `./bin/concurrency --bench` for timings).

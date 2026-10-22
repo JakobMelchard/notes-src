@@ -21,7 +21,7 @@ A study wiki for TU Wien master courses, built from public sources only: per cou
 - [191.125 Scientific Programming with Python](courses/scientific-programming-with-python/index.md)
 - [194.077 Applied Deep Learning](courses/applied-deep-learning/index.md)
 - [194.189 Efficient Programs (PR)](courses/efficient-programs-project/index.md)
-- [360.242 Numerical Simulation and Scientific Computing I](courses/numerical-simulation-and-scientific-computing-i/index.md)
+- [360.242 Numerical Simulation and Scientific Computing I](courses/nssc1/index.md)
 - [360.251 Advanced Programming with C++](courses/advanced-programming-with-cpp/index.md)
 - [360.252 Computational Science on Many-Core Architectures](courses/computational-science-on-many-core-architectures/index.md)
 

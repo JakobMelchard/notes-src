@@ -6,7 +6,7 @@ TISS: "work-stealing" and the learning outcome "understand concepts and
 implementations of work-stealing schedulers" [S2]. Code:
 `src/cpp/work_stealing.cpp`. The OpenMP-task and hand-written task-manager
 view of the same idea is in
-[NSSC I 07](../../numerical-simulation-and-scientific-computing-i/notes/07-shared-memory-parallel-computing.md).
+[NSSC I 07](../../nssc1/notes/07-shared-memory-parallel-computing.md).
 
 ## The computation as a DAG
 
