@@ -437,3 +437,410 @@ What are the typical IPv6 allocation sizes for an LIR and for a site?
 ---
 An LIR typically receives a /29 to /32; a site typically receives a /48 to /56.
 ```
+
+## recordings, 2026W
+
+```card id=net-rec-01-pdu-names
+What are the data units at layers 4, 3 and 2 called?
+---
+Layer 4 carries a segment, layer 3 a datagram, and layer 2 a frame, which encapsulates the datagram.
+The application-level unit is a message.
+```
+
+```card id=net-rec-01-edge-core
+What do the network edge and the network core consist of?
+---
+The edge holds the hosts (clients and servers, many in data centres) and the access networks over physical media.
+The core is an interconnected mesh of routers, a network of networks.
+```
+
+```card id=net-rec-01-access-rates
+What rates does the lecture give for HFC cable and DSL access?
+---
+HFC is asymmetric: up to 40 Mbit/s to 1.2 Gbit/s down and 30 to 100 Mbit/s up, shared by the homes on one cable segment to the headend.
+DSL gives a dedicated line to the DSLAM: 24 to 52 Mbit/s down and 3.5 to 16 Mbit/s up.
+```
+
+```card id=net-rec-01-copper-fiber
+What does the lecture say about twisted pair and fibre?
+---
+Category 5 twisted pair gives 100 Mbit/s or 1 Gbit/s, Category 6 gives 10 Gbit/s.
+Fibre carries light pulses point to point at thousands of Gbit/s with a low error rate, is immune to electromagnetic noise, and has repeaters spaced far apart.
+```
+
+```card id=net-rec-01-wireless-link
+Why does the lecture class a radio link as broadcast and half duplex?
+---
+The signal goes into the air with no physical wire, so every receiver in range hears the sender.
+The link carries one direction at a time, from sender to receiver.
+```
+
+```card id=net-rec-01-wireless-reach
+What reach does the lecture give for wireless LAN, cellular and geostationary satellite?
+---
+Wireless LAN covers tens of metres, wide-area cellular (4G and 5G) about 10 km, and a geostationary satellite link has about 270 ms end-to-end delay.
+```
+
+```card id=net-rec-01-tier1
+How many tier-1 providers does the lecture count, and how do they connect?
+---
+Around 11 to 13, depending on the definition.
+They peer with each other under contracts, and global connectivity depends on those peerings.
+```
+
+```card id=net-rec-01-table-size
+How does a home router's forwarding table compare with a backbone router's?
+---
+A home router usually holds only a default route to its upstream provider.
+A backbone router holds roughly a million prefixes covering the reachable Internet.
+```
+
+```card id=net-rec-01-attacks
+Which three attack types on networks does the lecture cover?
+---
+Packet sniffing on shared media with a promiscuous interface, IP spoofing with a forged source address, and denial of service through floods of bogus traffic, often from botnets.
+Spoofed requests can also be reflected and amplified towards a victim.
+```
+
+```card id=net-rec-01-defences
+Which lines of defence against network attacks does the lecture list?
+---
+Authentication (SIM hardware in cellular networks, no equivalent in the classic Internet), encryption for confidentiality (HTTPS runs TLS), digital signatures for integrity, access restrictions such as password-protected VPNs, and firewalls, which are off by default and can filter flood traffic.
+```
+
+```card id=net-rec-02-history-early
+Which early milestones does the lecture's history slide date?
+---
+ALOHAnet, a satellite network in Hawaii (1970), Ethernet at Xerox PARC (1976), Cerf and Kahn's internetworking principles (1974), and about 200 ARPANET nodes by 1979.
+```
+
+```card id=net-rec-02-history-80s
+Which protocols and milestones does the history slide place in the 1980s?
+---
+SMTP (1982), TCP/IP deployment and DNS (both 1983), FTP (1985), and TCP congestion control (1988).
+```
+
+```card id=net-rec-02-icann-roles
+What does ICANN manage, and why do regional registries exist?
+---
+ICANN manages global IP address and AS number allocation and the DNS root zone, and sets global rules.
+A single central body does not scale, so the RIRs receive resources from ICANN and redistribute them in their regions.
+```
+
+```card id=net-rec-02-rir-policy
+How are RIR policies decided at RIPE NCC, and who may take part?
+---
+Policy is made in public working groups, on mailing lists and at RIPE meetings.
+Anyone may take part, not only RIPE NCC members.
+```
+
+```card id=net-rec-02-layer-agnostic
+What does layer agnosticism mean?
+---
+Each layer works with whatever lies below and above it: Ethernet can run over Wi-Fi, copper or fibre, IPv4 or IPv6 can run over Ethernet, and UDP or TCP can run over IPv4 or IPv6.
+```
+
+```card id=net-rec-02-best-effort
+Does the Internet guarantee that a sent packet arrives, and in the order sent?
+---
+No. Under the best-effort model a packet can be dropped, and packets can arrive out of the order in which they were sent.
+```
+
+```card id=net-rec-02-fdm-tdm
+What are FDM and TDM in circuit switching?
+---
+FDM divides the frequency band (for example, colours of light on a fibre) into bands, one per call.
+TDM divides time into periodic slots, one per call.
+```
+
+```card id=net-rec-02-traceroute-rtt
+Why does traceroute measure a round-trip time and not a one-way delay?
+---
+The sender can only time the reply, because clocks on machines it does not control are not synchronised to the millisecond.
+The return path may also differ from the outgoing path.
+```
+
+```card id=net-rec-02-traceroute-loss
+Does loss at one intermediate traceroute hop mean that packets are lost there?
+---
+Not necessarily. A router under load may deprioritise answering probes over forwarding.
+Loss matters when it persists to later hops or to the final destination.
+```
+
+```card id=net-rec-02-throughput-def
+What is the difference between instantaneous and average throughput?
+---
+Instantaneous throughput is the rate at one point in time, and average throughput is the rate over a longer period.
+```
+
+```card id=net-rec-02-overprovision
+Why can an access network sell many DSL lines that together exceed its uplink?
+---
+Subscribers rarely all use their line at full speed at the same time, so a shared uplink (for example 10 Gbit/s) is enough most of the time.
+The lecture notes that cable is harder, because of interference.
+```
+
+```card id=net-rec-02-fiber-modes
+How do single-mode and multimode fibre differ, according to the lecture?
+---
+Single-mode fibre suits long reach (the lecture cites a 10 km long-range optic at 1310 nm) but breaks if bent sharply.
+Multimode fibre is more robust and suits shorter reach.
+```
+
+```card id=net-rec-02-l2-services
+Which services does the link layer provide?
+---
+Framing and link access (MAC addresses in the frame header), channel access on shared media, reliable delivery between neighbours (seldom used on low-error links), flow control, and error detection, with error correction in some cases.
+```
+
+```card id=net-rec-02-nic
+Where is the link layer implemented?
+---
+In the network adapter (NIC) or on a chip in the host.
+It combines link and physical layer functions and attaches to the host bus.
+```
+
+```card id=net-rec-02-duplex
+What is the difference between half duplex and full duplex?
+---
+Half duplex: both ends can transmit, but not at the same time.
+Full duplex: both directions can carry data at full rate at once, and most modern wired links are full duplex.
+```
+
+```card id=net-rec-02-error-correction
+Can error detection guarantee that a corrupted frame is caught, and how does correction differ?
+---
+No. A detection code can miss errors, and more check bits catch more of them.
+Error correction goes further: the receiver computes what the bits should have been, so no retransmission is needed.
+```
+
+```card id=net-rec-02-checksum
+How does the Internet checksum work, and what does a match prove?
+---
+The data is read as 16-bit words, summed in ones' complement, and the result is sent with the segment.
+The receiver recomputes it: a mismatch proves an error, but a match does not prove there is none. UDP uses it.
+```
+
+```card id=net-rec-02-hash
+Can a file hash such as SHA-1 repair a corrupted download?
+---
+No. It is an integrity check: it shows that something changed but cannot say which bits, so it is not redundancy.
+```
+
+```card id=net-rec-02-ideal-mac
+What would an ideal multiple access protocol provide?
+---
+A lone sender gets the full channel rate, and M senders each get an average of R divided by M.
+It is fully decentralised and needs no clock synchronisation or fixed slots.
+```
+
+```card id=net-rec-02-link-types
+Which links does the lecture call point to point, and which broadcast?
+---
+Point to point: dial-up (PPP), and a link between a host and a switch.
+Broadcast or shared: old-style Ethernet, upstream HFC, 802.11 Wi-Fi, and satellite or wireless links.
+```
+
+```card id=net-rec-02-tdma-fdma
+What is the weakness of TDMA and FDMA at low load?
+---
+Each node owns a fixed slot or band even when idle, so unused slots or bands go empty.
+A lone active node gets only one share, 1/N of the channel.
+```
+
+```card id=net-rec-02-csma
+What does CSMA do before sending, and why do collisions still happen?
+---
+It listens: it sends when the channel is idle and defers when it is busy.
+Collisions still happen because of propagation delay: a node may not yet hear a transmission that has started, so the whole frame is wasted.
+```
+
+```card id=net-rec-02-cd-jam
+What does a CSMA/CD sender do after it detects a collision?
+---
+It aborts the frame and sends a jam signal so the other nodes know.
+It then waits a random backoff that grows with each further collision.
+```
+
+```card id=net-rec-02-csma-cd-eff
+What is the efficiency of CSMA/CD, and when does it approach 1?
+---
+$1/(1 + 5\,t_{prop}/t_{trans})$, where $t_{prop}$ is the maximum propagation delay and $t_{trans}$ the time to send a maximum-size frame.
+It approaches 1 when propagation delay is small compared with frame time.
+```
+
+```card id=net-rec-02-taking-turns
+What are the drawbacks of polling and token passing?
+---
+In polling, a primary node invites secondary nodes in turn: there is polling overhead, latency, and the primary is a single point of failure.
+In token passing, passing the token costs overhead and latency, and a lost token stalls the ring.
+```
+
+```card id=net-rec-02-ethernet-speeds
+Which speeds does Ethernet cover today?
+---
+From early 10 Mbit/s up to about 800 Gbit/s.
+The 802.3 family shares one MAC protocol and frame format across these speeds and media.
+```
+
+```card id=net-rec-02-ethernet-topology
+How has Ethernet's physical topology changed?
+---
+A bus, with all nodes in one collision domain, was popular until the mid 1990s.
+Today a star around a switch is standard, and each link is its own collision domain.
+```
+
+```card id=net-rec-02-cable-reach
+What is the reach of one copper Ethernet segment, and how does a hub change it?
+---
+About 100 m per segment. A hub adds a segment, so two segments reach about 200 m.
+```
+
+```card id=net-rec-02-payload
+What payload range does an Ethernet frame carry, and what are jumbo frames?
+---
+Payloads run from 46 to 1500 bytes. Jumbo frames go up to about 9000 to 9200 bytes.
+```
+
+```card id=net-rec-02-ethertype
+Which EtherType values does the lecture give for IPv4 and IPv6?
+---
+0x0800 for IPv4 and 0x86DD for IPv6.
+Other values exist for protocols such as IPX and AppleTalk.
+```
+
+```card id=net-rec-02-fib-aging
+How do switch table entries expire, and what happens when the table is full?
+---
+Each entry has a TTL that traffic refreshes, and expired entries are removed.
+A full table cannot learn new addresses, so frames to unknown destinations are flooded.
+```
+
+```card id=net-rec-02-vlan-purpose
+What does a VLAN do?
+---
+It splits one physical switch into several virtual switches, a logical division of broadcast domains.
+It is set in software, so fewer physical switches and cables are needed.
+```
+
+```card id=net-rec-02-vlan-hopping
+How can an attacker try VLAN hopping, and how is it mitigated?
+---
+A rogue switch can spoof VLAN negotiation, or a forged double VLAN tag can be sent.
+Mitigations: disable the negotiation protocols, manage switches centrally, check that the outer tag matches the port, disable the default VLAN, and accept only native tags on trunks.
+```
+
+```card id=net-rec-02-standards-bodies
+Which standards body covers Ethernet, and which covers IP?
+---
+The IEEE covers the 802 standards, such as 802.3 Ethernet and 802.11 Wi-Fi.
+The IETF covers Internet protocols such as IP, documented in RFCs.
+```
+
+```card id=net-rec-03-ipv4-format
+How is an IPv4 address written, and how many are there?
+---
+32 bits, written as four 8-bit octets in decimal, separated by dots.
+That gives about four billion addresses.
+```
+
+```card id=net-rec-03-ipv6-format
+How is an IPv6 address written?
+---
+128 bits as eight 16-bit groups in hexadecimal, separated by colons.
+Leading zeros in a group may be left out, and one run of zero groups may be replaced by a double colon.
+```
+
+```card id=net-rec-03-prefix
+What does the x in a.b.c.d/x give?
+---
+The prefix length: the number of leading network bits. It carries the same information as the netmask.
+```
+
+```card id=net-rec-03-sub-block
+How might an ISP split 192.0.2.0/24 among customers?
+---
+Into /27 blocks: 192.0.2.0/27, 192.0.2.32/27 and 192.0.2.64/27, each with its first 27 bits fixed.
+```
+
+```card id=net-rec-03-classes
+Which prefix lengths did classes A, B and C have, and what was class D for?
+---
+Class A /8, class B /16, class C /24. Class D was for multicast.
+This is history only: classful addressing is deprecated.
+```
+
+```card id=net-rec-03-multicast
+What is a multicast address for?
+---
+Addressing a group of hosts at once, for example one stream from a source reaching many receivers, as in TV streaming or conferencing.
+```
+
+```card id=net-rec-03-router-vs-switch
+What does a router examine that a switch does not?
+---
+A router examines IP headers and chooses routes.
+A switch works on link-layer frames and forwards them by destination MAC address.
+```
+
+```card id=net-rec-03-icmp
+What is ICMP used for?
+---
+Control and error messages carried inside IP datagrams, for signalling between routers and hosts.
+```
+
+```card id=net-rec-03-ttl
+What does the TTL field do, and what does the header checksum cover?
+---
+Each router decrements TTL and discards the datagram at zero, which stops packets looping forever.
+The header checksum checks the integrity of the header.
+```
+
+```card id=net-rec-03-fragments
+What are the identification, flags and fragment offset fields for?
+---
+Reassembling a datagram that was split into fragments, for example because it was too large for a link.
+```
+
+```card id=net-rec-03-ipv4-length
+What total length does an IPv4 datagram typically have, and what is the maximum?
+---
+About 1500 bytes is typical. The total length field allows up to 64 KB, header included.
+```
+
+```card id=net-rec-03-arp-layer
+Which layer does ARP belong to?
+---
+It is a link-layer protocol with its own EtherType, and it works on the interface without an IP address.
+Lecture 1 treated it as lying between layers 2 and 3, and lecture 3 called it a layer 2 protocol.
+```
+
+```card id=net-rec-ex1-private-block
+Which address range must the lab interface use, and with what prefix?
+---
+An IPv4 address in the 10.0.0.0/8 private block, on a /24 prefix.
+```
+
+```card id=net-rec-ex1-interface
+What two steps bring a Linux interface into use for IPv4?
+---
+Bring the link up, and assign an IPv4 address to it. The ip command does both.
+```
+
+```card id=net-rec-ex1-ipv6-host
+What does the host need to reach the lab VM?
+---
+IPv6 connectivity, because the VM is reached over SSH on an IPv6 address.
+```
+
+```card id=net-rec-ex1-arp
+What does a successful ARP request return, and to whom?
+---
+The MAC address of the host that owns the IP address asked for, sent as a unicast reply to the requester.
+```
+
+```card id=net-rec-ex1-mac-format
+How is a 48-bit MAC address written?
+---
+Six hex byte pairs separated by colons, for example 00:1a:2b:3c:4d:5e.
+```

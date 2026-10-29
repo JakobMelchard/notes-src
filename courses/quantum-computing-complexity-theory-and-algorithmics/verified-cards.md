@@ -964,3 +964,205 @@ Why is checking whether an assignment satisfies a propositional formula in P?
 ---
 The formula is a circuit with one gate per subformula; this reduces it in polynomial time to CIRCUIT EVAL, which is in P.
 ```
+
+## chapter 6 annotations, 2026W
+
+```card id=qc-alg6-summary-simplex
+In the lecturer's max-flow summary table, what is the 1951 simplex row and its worst-case bound?
+---
+A handwritten note on the slide points from simplex to "LP method", so it is the linear programming approach to max flow. The table gives $O(m^3C)$ (Dantzig).
+```
+
+```card id=qc-alg6-shortest-aug-path
+Worst-case bound for augmenting along shortest paths (Dinitz, Edmonds-Karp, 1970)?
+---
+$O(m^2 n)$.
+```
+
+```card id=qc-alg6-cap-scaling-time
+Worst-case bound for capacity scaling (Edmonds-Karp, 1972)?
+---
+$O(m^2\log C)$.
+```
+
+```card id=qc-alg6-orlin-2013
+Which 2013 result gives $O(nm)$ worst case for max flow, and what does the compact-network variant give?
+---
+Orlin: the compact network alone gives $O(nm+m\log n)$; combined with King-Rao-Tarjan it gives $O(nm)$.
+```
+
+```card id=qc-alg6-latest-bound
+Best worst-case bound for max flow in the lecture's summary table, and its method?
+---
+$m^{1+o(1)}\log C$, from 2022: an interior point method using min-ratio cycles.
+```
+
+```card id=qc-alg6-hopcroft-karp
+Worst-case running time for bipartite maximum matching via shortest augmenting paths?
+---
+$O(m\sqrt n)$ (Hopcroft-Karp, 1973). Generic augmenting paths give $O(mn)$ here.
+```
+
+```card id=qc-alg6-matching-scaling
+Running time of bipartite matching via capacity scaling, and why does it simplify?
+---
+$O(m^2\log C)$ with $C=1$ for unit capacities, so $O(m^2)$.
+```
+
+```card id=qc-alg6-blossom
+Running time of Edmonds' blossom algorithm for general (non-bipartite) maximum matching, and the best known bound?
+---
+Blossom algorithm (Edmonds, 1965): $O(n^4)$. Best known: $O(m\sqrt n)$ (Micali-Vazirani, 1980). Non-bipartite structure is harder than the bipartite case, but understood via Tutte-Berge and Edmonds-Gallai.
+```
+
+## chapter 7, 2026W
+
+```card id=qc-alg7-rho-approx
+What does a $\rho$-approximation algorithm guarantee, and what is the proof obstacle?
+---
+It runs in polynomial time on every instance and returns a solution within ratio $\rho$ of the optimum. The obstacle: the bound must hold without knowing the optimum value, so the analysis compares the output with a computable bound on OPT.
+```
+
+```card id=qc-alg7-mvc-def
+State the optimisation version of Minimum Vertex Cover.
+---
+Given an undirected graph, find a vertex set of minimum size such that every edge has at least one endpoint in it.
+```
+
+```card id=qc-alg7-maximal-matching
+When is a matching maximal, and how does that differ from maximum?
+---
+Maximal: no matching properly contains it, so no edge can be added. Maximum: largest possible number of edges. Every maximum matching is maximal, but a maximal matching need not be maximum.
+```
+
+```card id=qc-alg7-mm-algo
+What does MM-Algo output for vertex cover, and why is the output a cover?
+---
+Find a maximal matching and output the endpoints of all its edges. An edge not in the matching must share an endpoint with a matching edge (otherwise the matching could be extended), so it is covered.
+```
+
+```card id=qc-alg7-mm-bound
+Why is any maximal matching at most the minimum vertex cover, and what approximation follows?
+---
+Matching edges share no endpoint, so any vertex cover needs a distinct vertex for each one: $|M|\le OPT$. MM-Algo outputs $2|M|$ vertices, a factor-2 approximation.
+```
+
+```card id=qc-alg7-mvc-tight
+What do the slides say about the factor 2 for minimum vertex cover?
+---
+They remark that the 2-approximation is tight.
+```
+
+```card id=qc-alg7-hdf-weakness
+Describe the highest-degree-first heuristic for vertex cover and its weakness.
+---
+Repeatedly put a vertex of highest current degree into the cover and delete the edges it covers, until no edge remains. It always returns a cover, but it can be worse than the optimum by a factor of order $\ln|V|$.
+```
+
+```card id=qc-alg7-hdf-bound
+Upper bound on the ratio of highest-degree-first for vertex cover?
+---
+$\ln|E|+1$ times the minimum vertex cover.
+```
+
+```card id=qc-alg7-np-opt-def
+What does an NP-optimisation problem $\Pi$ specify?
+---
+Valid instances, recognisable in polynomial time. For each instance, feasible solutions of polynomial length, with a polynomial-time feasibility check. A polynomial-time objective with non-negative rational values. $\Pi$ is a minimisation or a maximisation problem.
+```
+
+```card id=qc-alg7-factor-delta
+Define a factor-$\delta$ approximation for a minimisation and for a maximisation problem.
+---
+Minimisation ($\delta\ge1$): $f(I,S)\le\delta\cdot OPT(I)$. Maximisation ($\delta\le1$): $f(I,S)\ge\delta\cdot OPT(I)$. $S$ must be feasible, and the algorithm must run in time polynomial in $|I|$.
+```
+
+```card id=qc-alg7-decision-link
+How does the decision version of an NP-optimisation problem relate to its hardness?
+---
+The decision version asks whether the optimum meets a bound $k$. NP-hardness of the decision version implies NP-hardness of the optimisation problem.
+```
+
+```card id=qc-alg7-ptas-fptas
+Compare a PTAS and an FPTAS.
+---
+Both take an instance and an error parameter $\epsilon$ and return a solution within $(1\pm\epsilon)$ of the optimum. PTAS: polynomial in $|I|$ for each fixed $\epsilon$, with the exponent allowed to depend on $\epsilon$. FPTAS: polynomial in $|I|$ and $1/\epsilon$ together.
+```
+
+```card id=qc-alg7-techniques
+Which techniques for designing approximation algorithms does the lecture list?
+---
+Greedy algorithms with a tailored analysis, dynamic programming, and LP-based methods with deterministic or randomised rounding. The list is not exhaustive.
+```
+
+```card id=qc-alg7-knap-greedy
+Why does greedy by value-to-size ratio fail for maximum-value knapsack?
+---
+It can fill the bag with good ratios and leave no room for a large valuable item. In the lecture's five-item example with bound 11, greedy gets 35 and the optimum is 40.
+```
+
+```card id=qc-alg7-knap-best-two
+What is the best-of-two fix for maximum-value knapsack, and what does it guarantee?
+---
+Sort by value-to-size ratio. Take the longest prefix $a_1,\dots,a_{k-1}$ that fits, and the next item $a_k$ alone; return the more valuable of these two sets. Guarantee: factor $1/2$, since the two values together are at least OPT.
+```
+
+```card id=qc-alg7-knap-ptas
+How does ModGreedyKnapsack reach a $(1-\epsilon)$ guarantee for maximum-value knapsack?
+---
+Enumerate all subsets of at most $k=\lceil1/\epsilon\rceil-1$ items that fit, greedily fill each with the remaining items in ratio order, and return the best combined set. If the optimum has more than $k$ items, its $k$ most valuable items are among the branches, and the greedy part loses at most $OPT/(k+1)$. Time $O(n^{1/\epsilon}\cdot\mathrm{poly}(\log V,\log S))$, a PTAS.
+```
+
+```card id=qc-alg7-knap-dp
+What does the pseudo-polynomial knapsack table compute, and what is its running time?
+---
+$X(i,v)$ is the smallest total size of a subset of the first $i$ items with value exactly $v$, or $\infty$. Each entry takes the smaller of skipping item $i$ and adding it. The answer is the largest $v$ with $X(n,v)\le S$. Time $O(nV)$, where $V$ is the total value.
+```
+
+```card id=qc-alg7-knap-rescale
+How does Rescale-DP turn the value DP into an FPTAS?
+---
+Scale each value to $\lfloor v(a_i)\,n/(\epsilon\,v_{\max})\rfloor$, keep sizes, and run the DP on the scaled values. The slides bound the result by $OPT-\epsilon v_{\max}\ge(1-\epsilon)OPT$. Time $O(n^3/\epsilon)$.
+```
+
+```card id=qc-alg7-fptas-pseudo
+What does an FPTAS for an integer-valued problem imply about pseudo-polynomial algorithms?
+---
+If OPT is bounded by a polynomial in the unary input length, choose $\epsilon$ as one over that polynomial. The error is then below one unit, so the integer answer is optimal. Hence a strongly NP-hard problem with this bound has no FPTAS unless P = NP.
+```
+
+```card id=qc-alg7-maxsat-trivial
+What is MaxSAT, and what is the simple 0.5-approximation?
+---
+Given a CNF formula, find an assignment satisfying the most clauses. Take any assignment; if it satisfies fewer than half the clauses, flip all variables. An assignment and its complement together satisfy every clause, so the better one satisfies at least half.
+```
+
+```card id=qc-alg7-maxsat-known
+Best known ratios and hardness thresholds for MaxSAT, Max3SAT and Max2SAT in the lecture?
+---
+MaxSAT: best known 0.7846 (Asano-Williamson), no ratio above 0.875 unless P = NP. Max3SAT: best known 7/8 (Karloff-Zwick), matching hardness. Max2SAT: best known 0.940 (Lewin, Livnat, Zwick), hardness 21/22 unless P = NP.
+```
+
+```card id=qc-alg7-maxsat-ilp
+Write the ILP for MaxSAT used in the lecture and its LP relaxation.
+---
+Binary $y_i$ per variable, binary $z_j$ per clause. Maximise $\sum_j z_j$ subject to $z_j\le\sum_{x_i\in C_j}y_i+\sum_{\neg x_i\in C_j}(1-y_i)$. Relax all variables to $[0,1]$ and solve the LP.
+```
+
+```card id=qc-alg7-maxsat-rounding
+How does randomised rounding turn the MaxSAT LP solution into an assignment, and what does it guarantee?
+---
+Set each $x_i=1$ independently with probability $\hat y_i$. The expected number of satisfied clauses is at least $(1-1/e)\,OPT$, about 0.6 OPT.
+```
+
+```card id=qc-alg7-maxsat-clause
+Lower bound on the probability that a $k$-literal clause is satisfied by the rounding?
+---
+$\bigl(1-(1-1/k)^k\bigr)\hat z_j$. The proof uses AM-GM on the falsification probability and a linear lower bound from concavity.
+```
+
+```card id=qc-alg7-maxsat-best-two
+What is the best-of-two MaxSAT algorithm and its guarantee?
+---
+With probability $1/2$ output a uniformly random assignment, otherwise the rounded LP assignment. Random assignments favour long clauses and rounding favours short ones, so the case analysis gives expected $\tfrac34 OPT$. The randomness can be removed by conditional expectations.
+```

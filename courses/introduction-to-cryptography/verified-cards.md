@@ -427,3 +427,205 @@ Why is the Feistel structure convenient for hardware?
 ---
 Decryption uses the same components in reverse order with the XOR rewired, so one circuit serves both directions. The round function $f$ need not be invertible.
 ```
+
+## lecture 4, 2026W
+
+```card id=crypto-l4-stream-enc
+How does a stream cipher encrypt and decrypt, compared with the one-time pad?
+---
+A keystream $s_1,s_2,\dots$ is generated from a short seed and XORed bit by bit: $c_i=m_i\oplus s_i$, and decryption is $m_i=c_i\oplus s_i$. It is the one-time pad with a pseudorandom pad in place of a truly random key.
+```
+
+```card id=crypto-l4-lfsr
+Why is a linear-feedback shift register a poor keystream generator on its own?
+---
+It is very efficient in hardware, but its output is linear in its state, and linearity gives attackers equations to solve.
+```
+
+```card id=crypto-l4-keystream-sources
+Name the keystream sources lecture 4 lists besides LFSRs.
+---
+Combinations of LFSRs (A5/1 for GSM), RC4 (used in WEP), and block cipher modes of operation, which are covered later in the course.
+```
+
+```card id=crypto-l4-perfect-cost
+What two limits does perfect secrecy impose, and why are they impractical?
+---
+The key must be as long as the message and used only once (Shannon). Such keys are not practical, so the course moves to computational notions.
+```
+
+```card id=crypto-l4-two-relaxations
+Why must the two relaxations of perfect security be made together?
+---
+Restrict the adversary to probabilistic polynomial time and allow a negligible success probability. Restricting only the resources does not get past Shannon's limits, and allowing only a small error does not either.
+```
+
+```card id=crypto-l4-eav-experiment
+Describe the eavesdropper indistinguishability experiment for a private-key scheme.
+---
+The adversary submits two messages $m_0,m_1$ of equal length. The challenger generates a key $k\leftarrow\mathsf{Gen}$, picks a uniform bit $b$, and returns $c\leftarrow\mathsf{Enc}_k(m_b)$. The adversary outputs $b'$ and wins iff $b'=b$.
+```
+
+```card id=crypto-l4-perfect-indist
+What success probability does perfect indistinguishability allow the adversary in the eavesdropper experiment?
+---
+Exactly $\tfrac12$ for every adversary, the same as guessing the bit at random.
+```
+
+```card id=crypto-l4-equivalence
+Are perfect secrecy and perfect indistinguishability equivalent?
+---
+Yes (lecture 4, Lemma 2.7). The direction from perfect indistinguishability to perfect secrecy is the less intuitive one and needs a reduction.
+```
+
+```card id=crypto-l4-concrete
+What does a $(t,\varepsilon)$-indistinguishable scheme guarantee?
+---
+Every adversary running in time at most $t$ wins the eavesdropper experiment with probability at most $\tfrac12+\varepsilon$.
+```
+
+```card id=crypto-l4-concrete-limits
+What is the main strength and the main weakness of the concrete $(t,\varepsilon)$ approach?
+---
+Strength: the numbers speak directly to real applications. Weakness: it does not say how security scales when the key grows, and it does not fix the machine model that counts time.
+```
+
+```card id=crypto-l4-asymptotic
+In the asymptotic approach, what is the security parameter and what depends on it?
+---
+A parameter $n$ known to everyone, roughly the key length. The running times of the honest parties and the adversary, and the success probability, are all functions of $n$. The adversary is told $n$.
+```
+
+```card id=crypto-l4-ppt
+Why use probabilistic polynomial time as the model for honest parties and adversaries?
+---
+By the strong Church-Turing thesis, any physically realisable computation can be simulated on a Turing machine with at most polynomial slowdown. Polynomial time is therefore independent of the device, and randomised algorithms are included.
+```
+
+```card id=crypto-l4-negligible
+Define a negligible function.
+---
+$f:\mathbb N\to\mathbb R^+$ is negligible if for every positive polynomial $p$ there is an $N$ such that $f(n)<1/p(n)$ for all $n>N$. Examples: $2^{-n}$ and $2^{-\sqrt n}$.
+```
+
+```card id=crypto-l4-closure
+Which closure properties of polynomials and negligible functions do security proofs use?
+---
+Products and compositions of polynomials are polynomial. A polynomial times a negligible function is negligible. So a polynomial number of subroutine calls keeps both the running time and the total failure probability small.
+```
+
+```card id=crypto-l4-worked-example
+Lecture 4 worked example: honest cost $10^6n^2$ cycles, adversary $10^8n^4$ cycles with success $2^{-n/2}$. What changes between $n=80$ at 2 GHz and $n=160$ at 8 GHz?
+---
+The honest run takes 3.2 seconds in both cases. The adversary needs about three weeks at $n=80$ for success $2^{-40}$, and about 13 weeks at $n=160$ for success $2^{-80}$.
+```
+
+```card id=crypto-l4-revised-syntax
+What does the revised syntax of a private-key scheme require from Gen, Enc and Dec?
+---
+Gen takes the security parameter in unary, $1^n$, and returns a key of length at least $n$. Enc is probabilistic polynomial time and takes messages of any length. Dec is deterministic, without loss of generality.
+```
+
+```card id=crypto-l4-comp-indist
+State computational indistinguishability for an eavesdropper.
+---
+For every probabilistic polynomial-time adversary there is a negligible $\varepsilon(n)$ with $\Pr[\mathrm{PrivK}=1]\le\tfrac12+\varepsilon(n)$, where the challenge messages have equal length.
+```
+
+```card id=crypto-l4-equal-length
+Why must the challenge messages have equal length in the computational definition?
+---
+Otherwise the length alone identifies the chosen message. For example, a one-block and a two-block message are told apart from the ciphertext size, so no scheme could meet the definition.
+```
+
+```card id=crypto-l4-plaintext-length
+Can an encryption scheme hide the plaintext length?
+---
+Not in general. Even the one-time pad reveals the length. Sensitive uses, such as yes/no answers, database searches and very small message spaces, need an extra mechanism at the protocol or scheme level.
+```
+
+```card id=crypto-l4-semantic
+What does semantic security promise, and how does it relate to indistinguishability?
+---
+The ciphertext leaks nothing to any probabilistic polynomial-time adversary except with negligible probability. It is equivalent to computational indistinguishability (lecture 4, Theorem 3.13).
+```
+
+```card id=crypto-l4-eav-only
+What does the lecture 4 indistinguishability definition not yet cover?
+---
+Chosen-plaintext and chosen-ciphertext attacks. It is an eavesdropper-only notion, the base for the stronger notions that follow.
+```
+
+```card id=crypto-l4-partial-leak
+Is recovering one letter of the plaintext enough to call a scheme broken?
+---
+Yes. Security means the adversary learns no information about the plaintext, and any dependency that leaks, even from an XOR, counts as a break.
+```
+
+## lecture 5, 2026W
+
+```card id=crypto-l5-randomness
+Is a single bitstring random?
+---
+Randomness is a property of a distribution, not of one string. Under the uniform distribution on $\{0,1\}^{16}$ every string has probability $2^{-16}$, including the all-zero string.
+```
+
+```card id=crypto-l5-all-tests
+Why must cryptographic pseudorandomness pass all efficient tests?
+---
+The adversary's test is unknown in advance, so a distribution is pseudorandom only if every efficient test accepts it with nearly the same probability as the uniform distribution.
+```
+
+```card id=crypto-l5-pseudorandom-def
+Define a pseudorandom sequence of distributions, asymptotically and concretely.
+---
+Asymptotically: for every probabilistic polynomial-time test $A$ there is a negligible $\varepsilon$ such that the acceptance probabilities on $D_n$ and on the uniform distribution differ by at most $\varepsilon(n)$. Concretely: tests running in time at most $t$ differ by at most $\varepsilon$.
+```
+
+```card id=crypto-l5-prg-def
+Define a pseudorandom generator.
+---
+A deterministic polynomial-time algorithm $G$ with output length $\ell(|x|)$ for all seeds $x$, where $\ell(n)>n$ (it expands), and where the outputs $G(U_n)$ form a pseudorandom sequence.
+```
+
+```card id=crypto-l5-prg-indist
+Restate PRG security as indistinguishability.
+---
+A uniform seed $x\in\{0,1\}^n$ expanded by $G$ and a uniform string $y\in\{0,1\}^{\ell(n)}$ are computationally indistinguishable: no probabilistic polynomial-time algorithm tells them apart with more than negligible advantage.
+```
+
+```card id=crypto-l5-prg-existence
+Do pseudorandom generators exist, and what is known?
+---
+Unknown. Their existence would imply $\mathsf P\ne\mathsf{NP}$. They can be built from weaker assumptions, such as one-way functions, with factoring given as the example.
+```
+
+```card id=crypto-l5-reduction-shape
+What is the shape of a security proof by reduction?
+---
+Assume the problem is hard. Suppose an efficient adversary breaks the construction. Build a reduction $A'$ that uses this adversary to solve the problem efficiently, which is a contradiction. $A'$ is probabilistic polynomial time whenever $A$ is.
+```
+
+```card id=crypto-l5-pseudo-otp
+Define the pseudo one-time pad.
+---
+$\mathsf{Gen}(1^n)$ samples a uniform $k\in\{0,1\}^n$. For a message $m\in\{0,1\}^{\ell(n)}$, $\mathsf{Enc}_k(m)=G(k)\oplus m$, and $\mathsf{Dec}_k(c)=G(k)\oplus c$.
+```
+
+```card id=crypto-l5-pseudo-otp-thm
+What does the pseudo one-time pad achieve, and under which assumption?
+---
+If $G$ is a pseudorandom generator, it is computationally indistinguishable against an eavesdropper. It is not perfectly secret: its key has $n$ bits while there are $2^{\ell(n)}$ messages with $\ell(n)>n$, so lecture 2 Theorem 2.11 rules out perfect secrecy.
+```
+
+```card id=crypto-l5-pseudo-otp-proof
+How does the reduction prove the pseudo one-time pad secure?
+---
+$A'$ receives $y$, which is either $G(k)$ or uniform, and runs the eavesdropper experiment with $y$ as the pad, outputting 1 iff $A$ guesses $b$. With $G(k)$ this is the real experiment. With uniform $y$ the pad is a true one-time pad, so $A$ guesses with probability exactly $\tfrac12$. The advantage of $A$ is therefore at most the advantage of $A'$ against $G$, which is negligible.
+```
+
+```card id=crypto-l5-open-questions
+What open questions does lecture 5 raise after the pseudo one-time pad theorem?
+---
+What if $G$ is not pseudorandom (the assumption fails), what if the definition is not strong enough, and what if the key is used more than once.
+```
