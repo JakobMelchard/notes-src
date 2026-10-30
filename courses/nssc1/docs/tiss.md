@@ -93,7 +93,7 @@ run every winter term since 2019W.
 
 "Mode of examination" reads **"Written and oral"**, while both rows of the Exams
 table say **written**. This is true in 2024W, 2025W and 2026W alike. It is not
-resolved by anything public; see [../notes/00-exam-focus.md](../notes/00-exam-focus.md).
+resolved by anything public.
 The TUWEL course describes only a written exam (below).
 
 ## TISS against TUWEL, 2026-10-09

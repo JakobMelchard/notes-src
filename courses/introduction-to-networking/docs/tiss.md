@@ -66,8 +66,7 @@ delivers lectures 2k-1 and 2k, and the exercises fall after 09.11, 16.11,
 07.12.2026, 11.01 and 18.01.2027.~~ **Refuted 2026-10-09** by the course site
 [S36]: "lecture N" counts the topic lines of the course page (two to four per
 Monday), and the site marks the five exercises at 19.10, 09.11, 23.11, 14.12.2026
-and 11.01.2027, which are topic lines 7, 9, 16, 19 and 22. See
-[`../notes/00-exam-focus.md`](../notes/00-exam-focus.md).
+and 11.01.2027, which are topic lines 7, 9, 16, 19 and 22.
 
 Re-read on **2026-10-09** (page and API record): no date, room, exam or
 registration field changed.

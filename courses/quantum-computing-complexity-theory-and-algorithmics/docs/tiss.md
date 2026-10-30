@@ -58,7 +58,7 @@ der **Dekohärenz** erläutern und **elementare Fehlerkorrekturstrategien**
 diskutieren und evaluieren". The English `objective` is one sentence and names
 neither, and neither appears in the English subject list. Decoherence is covered
 in the opening lecture of the sibling course [S20]; error correction is in no
-sibling course. See [`../notes/00-exam-focus.md`](../notes/00-exam-focus.md).
+sibling course.
 
 ## Year-on-year comparison
 
@@ -169,8 +169,7 @@ Two observations that matter.
 ## Examination modalities
 
 "Exercises + written exam". TISS publishes no weighting; the TUWEL organization
-slides do (30 exercise points + 70 exam points, see below and
-[`../notes/00-exam-focus.md`](../notes/00-exam-focus.md)) [S62].
+slides do (30 exercise points + 70 exam points, see below) [S62].
 
 ## Exams
 
